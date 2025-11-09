@@ -13,10 +13,12 @@ import {
 } from '../../services/planesService';
 import ModalAgregarItem from '../../components/planes/ModalAgregarItem';
 import ModalEditarItem from '../../components/planes/ModalEditarItem';
+import { useAuthContext } from '../../context/AuthContext';
 
 export default function PlanDetalle() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { userType } = useAuthContext();
   
   const [plan, setPlan] = useState<PlanDeTratamiento | null>(null);
   const [loading, setLoading] = useState(true);
@@ -301,7 +303,7 @@ export default function PlanDetalle() {
           
           {/* Botones de Acción */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {plan.puede_ser_editado && (
+            {plan.puede_ser_editado && userType === 'ODONTOLOGO' && (
               <button
                 onClick={() => setModalAgregarAbierto(true)}
                 disabled={procesando}
@@ -326,7 +328,7 @@ export default function PlanDetalle() {
               </button>
             )}
             
-            {plan.estado === 'PROPUESTO' && (
+            {plan.estado === 'PROPUESTO' && userType === 'ODONTOLOGO' && (
               <button
                 onClick={handlePresentarPlan}
                 disabled={procesando || plan.cantidad_items === 0}
@@ -476,7 +478,7 @@ export default function PlanDetalle() {
             <div style={{ fontSize: '64px', marginBottom: '16px' }}>📭</div>
             <p style={{ fontSize: '18px', marginBottom: '8px' }}>Aún no hay servicios en este plan</p>
             <p style={{ fontSize: '14px', marginBottom: '16px' }}>Agrega servicios para comenzar a construir el plan de tratamiento</p>
-            {plan.puede_ser_editado && (
+            {plan.puede_ser_editado && userType === 'ODONTOLOGO' && (
               <button
                 onClick={() => setModalAgregarAbierto(true)}
                 style={{
@@ -575,7 +577,7 @@ export default function PlanDetalle() {
                       </div>
                       
                       {/* Botones de Acción */}
-                      {plan.puede_ser_editado && item.estado === 'PENDIENTE' && (
+                      {plan.puede_ser_editado && userType === 'ODONTOLOGO' && item.estado === 'PENDIENTE' && (
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                           <button
                             onClick={() => handleEditarItem(item)}
@@ -670,7 +672,9 @@ export default function PlanDetalle() {
           {plan.estado === 'PRESENTADO' && (
             <>
               <li>El plan ha sido presentado al paciente</li>
-              <li>Marca como ACEPTADO cuando el paciente confirme, o RECHAZADO si no acepta</li>
+              {userType === 'PACIENTE' && (
+                <li>Marca como ACEPTADO cuando el paciente confirme, o RECHAZADO si no acepta</li>
+              )}
             </>
           )}
           {plan.estado === 'ACEPTADO' && (
