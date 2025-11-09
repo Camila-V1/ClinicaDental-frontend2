@@ -1,12 +1,175 @@
 /**
- * 🩺 MODAL REGISTRAR EPISODIO DE ATENCIÓN - CON VINCULACIÓN A PLANES (GUÍA 18)
+ * 🩺 MODAL REGISTRAR EPISODIO DE ATENCIÓN - CON VINCULACIÓN A PLANES (GUÍA 18 + 20a)
  */
 
 import { useState, useEffect } from 'react';
 import { crearEpisodio, type CrearEpisodioDTO } from '../../services/historialService';
 import { obtenerPlanesActivos, obtenerItemsDisponibles, type PlanDeTratamiento, type ItemPlanTratamiento } from '../../services/planesService';
 import { obtenerServicios, type Servicio } from '../../services/serviciosService';
-import { atenderCita } from '../../services/agendaService';
+import { atenderCita, type ItemPlanInfo } from '../../services/agendaService';
+
+/**
+ * Componente: Información del Plan (Solo Lectura)
+ * Se muestra cuando la cita está vinculada a un plan de tratamiento
+ */
+function PlanInfoReadOnly({ itemPlanInfo }: { itemPlanInfo: ItemPlanInfo }) {
+  return (
+    <div style={{
+      backgroundColor: '#d1fae5',
+      border: '2px solid #10b981',
+      borderRadius: '8px',
+      padding: '16px',
+      marginBottom: '24px'
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '8px',
+        marginBottom: '12px'
+      }}>
+        <span style={{ fontSize: '20px' }}>✅</span>
+        <strong style={{ color: '#065f46' }}>
+          Cita Vinculada a Plan de Tratamiento
+        </strong>
+      </div>
+
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: '1fr 1fr', 
+        gap: '12px'
+      }}>
+        {/* Plan */}
+        <div>
+          <label style={{ 
+            fontSize: '12px', 
+            color: '#065f46',
+            fontWeight: '600',
+            display: 'block',
+            marginBottom: '4px'
+          }}>
+            📋 Plan de Tratamiento
+          </label>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '10px 12px',
+            borderRadius: '6px',
+            border: '1px solid #10b981',
+            fontSize: '14px',
+            color: '#111827'
+          }}>
+            {itemPlanInfo.plan_nombre}
+          </div>
+        </div>
+
+        {/* Servicio */}
+        <div>
+          <label style={{ 
+            fontSize: '12px', 
+            color: '#065f46',
+            fontWeight: '600',
+            display: 'block',
+            marginBottom: '4px'
+          }}>
+            🦷 Servicio del Plan
+          </label>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '10px 12px',
+            borderRadius: '6px',
+            border: '1px solid #10b981',
+            fontSize: '14px',
+            color: '#111827'
+          }}>
+            {itemPlanInfo.servicio_nombre}
+          </div>
+        </div>
+
+        {/* Precio */}
+        <div>
+          <label style={{ 
+            fontSize: '12px', 
+            color: '#065f46',
+            fontWeight: '600',
+            display: 'block',
+            marginBottom: '4px'
+          }}>
+            💰 Precio
+          </label>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '10px 12px',
+            borderRadius: '6px',
+            border: '1px solid #10b981',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#111827'
+          }}>
+            {itemPlanInfo.precio_total}
+          </div>
+        </div>
+
+        {/* Estado */}
+        <div>
+          <label style={{ 
+            fontSize: '12px', 
+            color: '#065f46',
+            fontWeight: '600',
+            display: 'block',
+            marginBottom: '4px'
+          }}>
+            📊 Estado
+          </label>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '10px 12px',
+            borderRadius: '6px',
+            border: '1px solid #10b981',
+            fontSize: '14px',
+            color: '#111827'
+          }}>
+            {itemPlanInfo.estado}
+          </div>
+        </div>
+      </div>
+
+      {/* Notas del plan */}
+      {itemPlanInfo.notas && (
+        <div style={{ marginTop: '12px' }}>
+          <label style={{ 
+            fontSize: '12px', 
+            color: '#065f46',
+            fontWeight: '600',
+            display: 'block',
+            marginBottom: '4px'
+          }}>
+            📝 Notas del Plan
+          </label>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '10px 12px',
+            borderRadius: '6px',
+            border: '1px solid #10b981',
+            fontSize: '13px',
+            color: '#6b7280',
+            fontStyle: 'italic'
+          }}>
+            {itemPlanInfo.notas}
+          </div>
+        </div>
+      )}
+
+      <div style={{ 
+        marginTop: '12px', 
+        paddingTop: '12px', 
+        borderTop: '1px solid #86efac',
+        fontSize: '12px',
+        color: '#065f46'
+      }}>
+        ℹ️ Este episodio se vinculará automáticamente al ítem del plan. No es necesario seleccionar servicio.
+      </div>
+    </div>
+  );
+}
 
 interface Props {
   isOpen: boolean;
@@ -21,6 +184,7 @@ interface Props {
   servicioId: number | null;
   itemPlanId: number | null;
   citaId?: number; // ID de la cita para marcarla como atendida después de registrar el episodio
+  itemPlanInfo?: ItemPlanInfo | null; // Información completa del plan
 }
 
 export default function ModalRegistrarEpisodio({
@@ -33,7 +197,8 @@ export default function ModalRegistrarEpisodio({
   esCitaPlan,
   servicioId,
   itemPlanId,
-  citaId
+  citaId,
+  itemPlanInfo
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -58,7 +223,7 @@ export default function ModalRegistrarEpisodio({
   useEffect(() => {
     if (isOpen) {
       console.log('🩺 Modal abierto, inicializando formulario');
-      console.log('📋 Datos de la cita:', { esCitaPlan, servicioId, itemPlanId });
+      console.log('📋 Datos de la cita:', { esCitaPlan, servicioId, itemPlanId, itemPlanInfo });
       
       setFormData({
         motivo_consulta: motivoCita,
@@ -71,15 +236,30 @@ export default function ModalRegistrarEpisodio({
       setItemSeleccionado(null);
       
       // Decidir el modo basado en la cita
-      if (esCitaPlan) {
-        console.log('✅ Cita es parte de un plan');
+      if (esCitaPlan && itemPlanInfo) {
+        // CASO 1: Cita vinculada a plan CON itemPlanInfo completo (GUÍA 20a)
+        console.log('✅ Cita es parte de un plan (itemPlanInfo disponible)');
+        console.log('📋 Plan:', itemPlanInfo.plan_nombre);
+        console.log('🦷 Servicio:', itemPlanInfo.servicio_nombre);
+        console.log('💰 Precio:', itemPlanInfo.precio_total);
+        console.log('📊 Estado:', itemPlanInfo.estado);
         setModoSeleccion('plan');
         setServicioSeleccionado(null);
-        // Cargar planes (el usuario deberá seleccionar el ítem específico)
-        cargarPlanesActivos();
+        // Ya no necesitamos cargar planes porque tenemos la info del plan
+        setPlanesActivos([]);
+        setCargandoPlanes(false);
         // Cargar servicios por si acaso
         cargarServicios();
+      } else if (esCitaPlan && !itemPlanInfo) {
+        // CASO 2: Cita vinculada a plan SIN itemPlanInfo (vincular manualmente)
+        console.log('⚠️ Cita es parte de un plan pero sin itemPlanInfo (vincular manualmente)');
+        setModoSeleccion('plan');
+        setServicioSeleccionado(null);
+        // Cargar planes activos para selección manual
+        cargarPlanesActivos();
+        cargarServicios();
       } else {
+        // CASO 3: Cita de servicio libre
         console.log('✅ Cita es de servicio libre');
         setModoSeleccion('libre');
         // No necesitamos cargar planes si no es cita de plan
@@ -95,8 +275,9 @@ export default function ModalRegistrarEpisodio({
         });
       }
     }
-  }, [isOpen, motivoCita, pacienteId, esCitaPlan, servicioId, itemPlanId]);
+  }, [isOpen, motivoCita, pacienteId, esCitaPlan, servicioId, itemPlanId, itemPlanInfo]);
 
+  // Ya no se usa cuando hay itemPlanInfo, pero se mantiene para citas sin vincular a plan
   const cargarPlanesActivos = async () => {
     try {
       setCargandoPlanes(true);
@@ -134,14 +315,17 @@ export default function ModalRegistrarEpisodio({
       return;
     }
 
-    if (modoSeleccion === 'plan' && !itemSeleccionado) {
-      alert('Debes seleccionar un servicio del plan');
-      return;
-    }
+    // Validación: si NO hay itemPlanInfo (debe seleccionar manualmente)
+    if (!itemPlanInfo) {
+      if (modoSeleccion === 'plan' && !itemSeleccionado) {
+        alert('Debes seleccionar un servicio del plan');
+        return;
+      }
 
-    if (modoSeleccion === 'libre' && !servicioSeleccionado) {
-      alert('Debes seleccionar un servicio');
-      return;
+      if (modoSeleccion === 'libre' && !servicioSeleccionado) {
+        alert('Debes seleccionar un servicio');
+        return;
+      }
     }
 
     // Confirmación antes de enviar
@@ -159,12 +343,14 @@ export default function ModalRegistrarEpisodio({
         diagnostico: formData.diagnostico || undefined,
         descripcion_procedimiento: formData.descripcion_procedimiento || undefined,
         notas_privadas: formData.notas_privadas || undefined,
-        // 🎯 GUÍA 18: Vincular a ítem del plan si está en modo plan
-        item_plan_tratamiento: modoSeleccion === 'plan' && itemSeleccionado 
-          ? itemSeleccionado.id 
-          : undefined,
+        // 🎯 GUÍA 20a: Si hay itemPlanInfo, usar itemPlanId directamente
+        item_plan_tratamiento: itemPlanInfo
+          ? (itemPlanId ?? undefined)  // Usar el ID que viene de la cita
+          : modoSeleccion === 'plan' && itemSeleccionado
+            ? itemSeleccionado.id
+            : undefined,
         // Si es episodio libre, vincular servicio directamente
-        servicio: modoSeleccion === 'libre' && servicioSeleccionado
+        servicio: !itemPlanInfo && modoSeleccion === 'libre' && servicioSeleccionado
           ? servicioSeleccionado
           : undefined
       };
@@ -263,8 +449,13 @@ export default function ModalRegistrarEpisodio({
         {/* Formulario */}
         <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
           
-          {/* Selector de Modo: Plan vs Libre */}
-          {cargandoPlanes ? (
+          {/* Información del Plan (Solo Lectura) - cuando la cita está vinculada a un plan */}
+          {esCitaPlan && itemPlanInfo && (
+            <PlanInfoReadOnly itemPlanInfo={itemPlanInfo} />
+          )}
+
+          {/* Selector de Modo: Plan vs Libre - SOLO si NO hay itemPlanInfo */}
+          {!itemPlanInfo && cargandoPlanes ? (
             <div style={{ 
               textAlign: 'center', 
               padding: '24px', 
@@ -380,8 +571,8 @@ export default function ModalRegistrarEpisodio({
             </div>
           )}
 
-          {/* Selector de Plan e Ítem (Modo Plan) */}
-          {modoSeleccion === 'plan' && planesActivos.length > 0 && (
+          {/* Selector de Plan e Ítem (Modo Plan) - SOLO si NO hay itemPlanInfo */}
+          {!itemPlanInfo && modoSeleccion === 'plan' && planesActivos.length > 0 && (
             <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Selector de Plan */}
               <div>
@@ -534,8 +725,8 @@ export default function ModalRegistrarEpisodio({
             </div>
           )}
 
-          {/* Selector de Servicio (Modo Libre) */}
-          {modoSeleccion === 'libre' && (
+          {/* Selector de Servicio (Modo Libre) - SOLO si NO hay itemPlanInfo */}
+          {!itemPlanInfo && modoSeleccion === 'libre' && (
             <div style={{ marginBottom: '20px' }}>
               <label style={{
                 display: 'block',

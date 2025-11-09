@@ -21,9 +21,17 @@ export interface ItemPlanInfo {
   servicio_id: number;
   servicio_nombre: string;
   servicio_descripcion: string;
-  estado: string;
-  estado_display: string;
-  precio_total_formateado: string;
+  notas: string;
+  precio_servicio: string;
+  precio_servicio_snapshot: string;
+  precio_laboratorio: string;
+  precio_total: string;
+  estado: 'PENDIENTE' | 'EN_PROGRESO' | 'COMPLETADO' | 'CANCELADO';
+  completado: boolean;
+  plan_id: number;
+  plan_nombre: string;
+  sesiones_previstas: number;
+  sesiones_completadas: number;
 }
 
 export interface Cita {

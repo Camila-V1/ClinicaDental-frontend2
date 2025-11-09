@@ -388,6 +388,7 @@ export default function AgendaCitas() {
           servicioId={citaSeleccionada.item_plan_info?.servicio_id ?? citaSeleccionada.servicio ?? null}
           itemPlanId={citaSeleccionada.item_plan ?? null}
           citaId={citaSeleccionada.id}
+          itemPlanInfo={citaSeleccionada.item_plan_info ?? null}
         />
       )}
     </div>
