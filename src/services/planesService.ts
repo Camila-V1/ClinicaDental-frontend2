@@ -287,11 +287,26 @@ export const completarItemManual = async (itemId: number): Promise<ItemPlanTrata
  */
 export const obtenerPlanesActivos = async (pacienteId: number): Promise<PlanDeTratamiento[]> => {
   console.log('🔍 Obteniendo planes activos del paciente:', pacienteId);
-  const response = await api.get<PlanDeTratamiento[]>(
-    `/api/tratamientos/planes/?paciente=${pacienteId}&estado=ACEPTADO,EN_PROGRESO`
-  );
-  console.log('✅ Planes activos encontrados:', response.data.length);
-  return response.data;
+  
+  try {
+    // Intentar obtener todos los planes y filtrar en el frontend
+    const response = await api.get<PlanDeTratamiento[]>(
+      `/api/tratamientos/planes/?paciente=${pacienteId}`
+    );
+    
+    console.log('📋 Todos los planes del paciente:', response.data);
+    
+    // Filtrar solo los activos (ACEPTADO o EN_PROGRESO)
+    const planesActivos = response.data.filter(plan => 
+      plan.estado === 'ACEPTADO' || plan.estado === 'EN_PROGRESO'
+    );
+    
+    console.log('✅ Planes activos encontrados:', planesActivos.length, planesActivos);
+    return planesActivos;
+  } catch (error: any) {
+    console.error('❌ Error al obtener planes activos:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 /**
