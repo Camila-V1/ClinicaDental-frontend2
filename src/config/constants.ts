@@ -90,9 +90,9 @@ export const JWT_CONFIG = {
 
 // 👤 Tipos de Usuario
 export const USER_TYPES = {
-  ADMIN: 'admin',
-  DOCTOR: 'doctor',
-  PACIENTE: 'paciente',
+  ADMIN: 'ADMIN',
+  ODONTOLOGO: 'ODONTOLOGO',
+  PACIENTE: 'PACIENTE',
 } as const;
 
 // 📅 Estados de Cita

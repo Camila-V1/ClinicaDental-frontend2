@@ -20,11 +20,8 @@ function DashboardPage() {
   // Renderizar dashboard según el tipo de usuario
   switch (normalizedUserType) {
     case 'admin':
-    case 'administrador':
       return <AdminDashboard />;
-    case 'doctor':
     case 'odontologo':
-    case 'odontólogo':
       return <DoctorDashboard />;
     case 'paciente':
       return <PacienteDashboard />;

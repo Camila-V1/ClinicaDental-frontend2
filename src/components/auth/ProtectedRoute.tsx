@@ -34,7 +34,7 @@ function ProtectedRoute({ children, requiredRole = null }: ProtectedRouteProps) 
   }
 
   // Verificar rol requerido
-  if (requiredRole && user?.tipo_usuario !== requiredRole) {
+  if (requiredRole && user?.tipo_usuario?.toUpperCase() !== requiredRole.toUpperCase()) {
     return <Navigate to="/unauthorized" replace />;
   }
 

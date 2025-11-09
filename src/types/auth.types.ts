@@ -4,7 +4,7 @@
  */
 
 // 👤 Tipos de Usuario
-export type TipoUsuario = 'ADMIN' | 'ODONTOLOGO' | 'PACIENTE' | 'admin' | 'doctor' | 'paciente' | 'odontologo';
+export type TipoUsuario = 'ADMIN' | 'ODONTOLOGO' | 'PACIENTE';
 
 // 🔐 Credenciales de Login
 export interface LoginCredentials {

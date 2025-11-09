@@ -153,13 +153,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 🎭 Verificar rol del usuario
   const hasRole = (requiredRole: string): boolean => {
-    return state.user?.tipo_usuario === requiredRole;
+    return state.user?.tipo_usuario?.toUpperCase() === requiredRole.toUpperCase();
   };
 
-  // 🎭 Verificar si tiene alguno de los roles
+  // 👤 Verificar si tiene alguno de los roles
   const hasAnyRole = (roles: string[]): boolean => {
     if (!state.user) return false;
-    return roles.includes(state.user.tipo_usuario);
+    return roles.map(r => r.toUpperCase()).includes(state.user.tipo_usuario?.toUpperCase());
   };
 
   // Valor del contexto
@@ -206,16 +206,12 @@ export const useRoleCheck = () => {
   const { hasRole, hasAnyRole, userType } = useAuthContext();
   
   return {
-    isAdmin: hasRole('admin'),
-    isDoctor: hasRole('doctor'),
-    isPaciente: hasRole('paciente'),
-    isRecepcionista: hasRole('recepcionista'),
-    
-    isStaff: hasAnyRole(['admin', 'doctor', 'recepcionista']),
-    canManageUsers: hasAnyRole(['admin']),
-    canManageCitas: hasAnyRole(['admin', 'doctor', 'recepcionista']),
-    canViewReports: hasAnyRole(['admin', 'doctor']),
-    
+    isAdmin: hasRole('ADMIN'),
+    isDoctor: hasRole('ODONTOLOGO'),
+    isPaciente: hasRole('PACIENTE'),
+    // Eliminado recepcionista y staff
+    canManageUsers: hasAnyRole(['ADMIN']),
+    canViewReports: hasAnyRole(['ADMIN', 'ODONTOLOGO']),
     userType,
   };
 };

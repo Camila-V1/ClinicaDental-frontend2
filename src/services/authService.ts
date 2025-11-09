@@ -255,7 +255,7 @@ class AuthService {
    */
   hasRole(requiredRole: string): boolean {
     const user = this.getCurrentUser();
-    return user?.tipo_usuario === requiredRole;
+    return user?.tipo_usuario?.toUpperCase() === requiredRole.toUpperCase();
   }
 
   /**
@@ -264,7 +264,7 @@ class AuthService {
   hasAnyRole(roles: string[]): boolean {
     const user = this.getCurrentUser();
     if (!user) return false;
-    return roles.includes(user.tipo_usuario);
+    return roles.map(r => r.toUpperCase()).includes(user.tipo_usuario?.toUpperCase());
   }
 
   /**
@@ -274,12 +274,12 @@ class AuthService {
     const user = this.getCurrentUser();
     if (!user) return [];
 
-    switch (user.tipo_usuario) {
-      case 'admin':
+    switch (user.tipo_usuario?.toUpperCase()) {
+      case 'ADMIN':
         return ['all'];
-      case 'doctor':
+      case 'ODONTOLOGO':
         return ['view_patients', 'edit_patients', 'view_appointments', 'edit_appointments', 'view_treatments'];
-      case 'paciente':
+      case 'PACIENTE':
         return ['view_own_appointments', 'view_own_treatments'];
       default:
         return [];
