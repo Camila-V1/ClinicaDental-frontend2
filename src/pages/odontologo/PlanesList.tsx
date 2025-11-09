@@ -230,7 +230,7 @@ export default function PlanesList() {
                     {plan.titulo}
                   </h3>
                   <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
-                    👤 {plan.paciente_info.nombre_completo}
+                    👤 {plan.paciente_info?.nombre_completo || 'Sin paciente'}
                   </p>
                 </div>
 

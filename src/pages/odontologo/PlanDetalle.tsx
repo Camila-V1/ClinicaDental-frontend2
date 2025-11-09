@@ -281,7 +281,7 @@ export default function PlanDetalle() {
               </span>
             </div>
             <p style={{ color: '#6b7280', marginTop: '4px' }}>
-              👤 {plan.paciente_info.nombre_completo}
+              👤 {plan.paciente_info?.nombre_completo || 'Sin paciente'}
             </p>
             <p style={{ fontSize: '14px', color: '#9ca3af', marginTop: '4px' }}>
               Creado: {new Date(plan.fecha_creacion).toLocaleDateString('es-ES', { 
