@@ -36,9 +36,13 @@ export default function PlanDetalle() {
       setLoading(true);
       const data = await obtenerPlan(Number(id));
       setPlan(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al cargar plan:', error);
-      alert('Error al cargar plan de tratamiento');
+      const errorMsg = error.response?.data?.detail 
+        || error.response?.data?.message 
+        || error.message 
+        || 'Error desconocido';
+      alert(`❌ Error al cargar plan de tratamiento:\n\n${errorMsg}\n\nSerás redirigido a la lista de planes.`);
       navigate('/odontologo/planes');
     } finally {
       setLoading(false);
