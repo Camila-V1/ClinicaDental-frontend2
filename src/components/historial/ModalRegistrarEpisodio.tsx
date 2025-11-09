@@ -222,8 +222,10 @@ export default function ModalRegistrarEpisodio({
   // Resetear formulario cuando se abre el modal
   useEffect(() => {
     if (isOpen) {
-      console.log('🩺 Modal abierto, inicializando formulario');
-      console.log('📋 Datos de la cita:', { esCitaPlan, servicioId, itemPlanId, itemPlanInfo });
+      console.group('🔍 ANÁLISIS DE CITA (GUÍA 21)');
+      console.log('es_cita_plan:', esCitaPlan);
+      console.log('item_plan_id:', itemPlanId);
+      console.log('item_plan_info:', itemPlanInfo);
       
       setFormData({
         motivo_consulta: motivoCita,
@@ -235,34 +237,15 @@ export default function ModalRegistrarEpisodio({
       setPlanSeleccionado(null);
       setItemSeleccionado(null);
       
-      // Decidir el modo basado en la cita
-      if (esCitaPlan && itemPlanInfo) {
-        // CASO 1: Cita vinculada a plan CON itemPlanInfo completo (GUÍA 20a)
-        console.log('✅ Cita es parte de un plan (itemPlanInfo disponible)');
-        console.log('📋 Plan:', itemPlanInfo.plan_nombre);
-        console.log('🦷 Servicio:', itemPlanInfo.servicio_nombre);
-        console.log('💰 Precio:', itemPlanInfo.precio_total);
-        console.log('📊 Estado:', itemPlanInfo.estado);
-        setModoSeleccion('plan');
-        setServicioSeleccionado(null);
-        // Ya no necesitamos cargar planes porque tenemos la info del plan
-        setPlanesActivos([]);
-        setCargandoPlanes(false);
-        // Cargar servicios por si acaso
-        cargarServicios();
-      } else if (esCitaPlan && !itemPlanInfo) {
-        // CASO 2: Cita vinculada a plan SIN itemPlanInfo (vincular manualmente)
-        console.log('⚠️ Cita es parte de un plan pero sin itemPlanInfo (vincular manualmente)');
-        setModoSeleccion('plan');
-        setServicioSeleccionado(null);
-        // Cargar planes activos para selección manual
-        cargarPlanesActivos();
-        cargarServicios();
-      } else {
-        // CASO 3: Cita de servicio libre
-        console.log('✅ Cita es de servicio libre');
+      // ========================================
+      // LÓGICA DE DETECCIÓN (GUÍA 21)
+      // ========================================
+      
+      // CASO 1: Cita Simple (Normal)
+      if (!esCitaPlan) {
+        console.log('📌 TIPO: Cita Simple (normal)');
+        console.log('→ Mostrar selectores editables');
         setModoSeleccion('libre');
-        // No necesitamos cargar planes si no es cita de plan
         setPlanesActivos([]);
         setCargandoPlanes(false);
         
@@ -274,6 +257,43 @@ export default function ModalRegistrarEpisodio({
           }
         });
       }
+      
+      // CASO 2: Plan Sin Info (Vincular Manual)
+      else if (esCitaPlan && itemPlanId && !itemPlanInfo) {
+        console.warn('⚠️ TIPO: Plan Sin Info (vincular manual)');
+        console.log('→ Cargar planes y pre-seleccionar item');
+        setModoSeleccion('plan');
+        setServicioSeleccionado(null);
+        // Cargar planes activos para selección manual
+        cargarPlanesActivos();
+        cargarServicios();
+      }
+      
+      // CASO 3: Plan Completo ✅
+      else if (esCitaPlan && itemPlanInfo) {
+        console.log('✅ TIPO: Plan Completo (solo lectura)');
+        console.log('→ Pre-llenar y mostrar info del plan');
+        console.log('📋 Plan:', itemPlanInfo.plan_nombre);
+        console.log('🦷 Servicio:', itemPlanInfo.servicio_nombre);
+        console.log('💰 Precio:', itemPlanInfo.precio_total);
+        console.log('📊 Estado:', itemPlanInfo.estado);
+        
+        setModoSeleccion('plan');
+        setServicioSeleccionado(null);
+        // NO cargar planes porque tenemos toda la info
+        setPlanesActivos([]);
+        setCargandoPlanes(false);
+        // Cargar servicios por si acaso (aunque no se usarán)
+        cargarServicios();
+      }
+      
+      // CASO ERROR
+      else {
+        console.error('❌ TIPO: Configuración Inválida');
+        console.error('→ es_cita_plan=true pero sin item_plan');
+      }
+      
+      console.groupEnd();
     }
   }, [isOpen, motivoCita, pacienteId, esCitaPlan, servicioId, itemPlanId, itemPlanInfo]);
 
@@ -378,7 +398,8 @@ export default function ModalRegistrarEpisodio({
 
   if (!isOpen) return null;
 
-  const itemsDisponibles = planSeleccionado ? obtenerItemsDisponibles(planSeleccionado) : [];
+  // Solo obtener ítems disponibles si NO hay itemPlanInfo y hay plan seleccionado
+  const itemsDisponibles = !itemPlanInfo && planSeleccionado ? obtenerItemsDisponibles(planSeleccionado) : [];
 
   return (
     <div 
