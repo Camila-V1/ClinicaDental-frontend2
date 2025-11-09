@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { crearEpisodio, type CrearEpisodioDTO } from '../../services/historialService';
 import { obtenerPlanesActivos, obtenerItemsDisponibles, type PlanDeTratamiento, type ItemPlanTratamiento } from '../../services/planesService';
 import { obtenerServicios, type Servicio } from '../../services/serviciosService';
+import { atenderCita } from '../../services/agendaService';
 
 interface Props {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface Props {
   esCitaPlan: boolean;
   servicioId: number | null;
   itemPlanId: number | null;
+  citaId?: number; // ID de la cita para marcarla como atendida después de registrar el episodio
 }
 
 export default function ModalRegistrarEpisodio({
@@ -30,7 +32,8 @@ export default function ModalRegistrarEpisodio({
   onEpisodioCreado,
   esCitaPlan,
   servicioId,
-  itemPlanId
+  itemPlanId,
+  citaId
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -168,6 +171,12 @@ export default function ModalRegistrarEpisodio({
 
       console.log('📝 Creando episodio:', datos);
       await crearEpisodio(datos);
+      
+      // Marcar cita como atendida si viene de una cita
+      if (citaId) {
+        console.log('✅ Episodio creado, marcando cita como atendida:', citaId);
+        await atenderCita(citaId);
+      }
       
       alert('✅ Episodio registrado exitosamente');
       onEpisodioCreado();

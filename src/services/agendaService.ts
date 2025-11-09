@@ -16,6 +16,16 @@ export interface Odontologo {
   nombre: string;
 }
 
+export interface ItemPlanInfo {
+  id: number;
+  servicio_id: number;
+  servicio_nombre: string;
+  servicio_descripcion: string;
+  estado: string;
+  estado_display: string;
+  precio_total_formateado: string;
+}
+
 export interface Cita {
   id: number;
   paciente: number; // ID del paciente
@@ -34,6 +44,7 @@ export interface Cita {
   es_cita_plan?: boolean;
   servicio?: number | null;
   item_plan?: number | null;
+  item_plan_info?: ItemPlanInfo | null;
 }
 
 export interface FiltrosCitas {

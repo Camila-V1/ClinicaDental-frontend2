@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { obtenerCitas, cancelarCita, atenderCita, type Cita } from '../../services/agendaService';
+import { obtenerCitas, cancelarCita, type Cita } from '../../services/agendaService';
 import ModalRegistrarEpisodio from '../../components/historial/ModalRegistrarEpisodio';
 
 export default function AgendaCitas() {
@@ -55,32 +55,24 @@ export default function AgendaCitas() {
   };
 
   const handleAtenderCita = async (cita: Cita) => {
-    // Confirmación antes de atender
-    if (!confirm(`¿Confirmar que atendió al paciente ${cita.paciente_nombre || cita.paciente_email}?`)) {
-      return;
-    }
-
+    console.log('🩺 Preparando para atender cita:', cita.id);
+    console.log('📋 Datos completos de la cita:', cita);
+    console.log('🔍 Campos de vinculación:', {
+      es_cita_plan: cita.es_cita_plan,
+      servicio: cita.servicio,
+      item_plan: cita.item_plan
+    });
+    
     try {
-      console.log('🩺 Intentando atender cita:', cita.id);
-      console.log('📋 Datos completos de la cita:', cita);
-      console.log('🔍 Campos de vinculación:', {
-        es_cita_plan: cita.es_cita_plan,
-        servicio: cita.servicio,
-        item_plan: cita.item_plan
-      });
-      
-      // 1. Cambiar estado de la cita a ATENDIDA
-      await atenderCita(cita.id);
-      
-      // 2. Guardar la cita para el modal
+      // 1. Guardar la cita para el modal PRIMERO
       setCitaSeleccionada(cita);
       
-      // 3. Abrir modal para registrar episodio
+      // 2. Abrir modal para registrar episodio
       setModalAbierto(true);
       
-      console.log('✅ Cita atendida, abriendo modal');
+      console.log('✅ Modal abierto, esperando registro de episodio');
     } catch (error: any) {
-      console.error('Error al atender cita:', error);
+      console.error('Error al abrir modal:', error);
       alert('❌ Error: ' + (error.response?.data?.error || error.message));
     }
   };
@@ -393,8 +385,9 @@ export default function AgendaCitas() {
           motivoCita={citaSeleccionada.motivo}
           onEpisodioCreado={handleEpisodioCreado}
           esCitaPlan={citaSeleccionada.es_cita_plan ?? false}
-          servicioId={citaSeleccionada.servicio ?? null}
+          servicioId={citaSeleccionada.item_plan_info?.servicio_id ?? citaSeleccionada.servicio ?? null}
           itemPlanId={citaSeleccionada.item_plan ?? null}
+          citaId={citaSeleccionada.id}
         />
       )}
     </div>
