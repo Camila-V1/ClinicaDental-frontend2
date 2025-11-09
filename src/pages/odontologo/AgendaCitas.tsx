@@ -62,6 +62,13 @@ export default function AgendaCitas() {
 
     try {
       console.log('🩺 Intentando atender cita:', cita.id);
+      console.log('📋 Datos completos de la cita:', cita);
+      console.log('🔍 Campos de vinculación:', {
+        es_cita_plan: cita.es_cita_plan,
+        servicio: cita.servicio,
+        item_plan: cita.item_plan
+      });
+      
       // 1. Cambiar estado de la cita a ATENDIDA
       await atenderCita(cita.id);
       
@@ -385,9 +392,9 @@ export default function AgendaCitas() {
           pacienteNombre={citaSeleccionada.paciente_nombre || citaSeleccionada.paciente_email}
           motivoCita={citaSeleccionada.motivo}
           onEpisodioCreado={handleEpisodioCreado}
-          esCitaPlan={citaSeleccionada.es_cita_plan}
-          servicioId={citaSeleccionada.servicio}
-          itemPlanId={citaSeleccionada.item_plan}
+          esCitaPlan={citaSeleccionada.es_cita_plan ?? false}
+          servicioId={citaSeleccionada.servicio ?? null}
+          itemPlanId={citaSeleccionada.item_plan ?? null}
         />
       )}
     </div>

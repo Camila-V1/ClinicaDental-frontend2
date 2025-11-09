@@ -30,10 +30,10 @@ export interface Cita {
   created_at?: string;
   updated_at?: string;
   
-  // Información de vinculación a planes
-  es_cita_plan: boolean;
-  servicio: number | null;
-  item_plan: number | null;
+  // Información de vinculación a planes (opcionales para compatibilidad con backend antiguo)
+  es_cita_plan?: boolean;
+  servicio?: number | null;
+  item_plan?: number | null;
 }
 
 export interface FiltrosCitas {

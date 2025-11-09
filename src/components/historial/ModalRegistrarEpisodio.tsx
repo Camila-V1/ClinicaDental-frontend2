@@ -67,24 +67,29 @@ export default function ModalRegistrarEpisodio({
       setPlanSeleccionado(null);
       setItemSeleccionado(null);
       
-      // Cargar servicios primero
-      cargarServicios();
-      
       // Decidir el modo basado en la cita
       if (esCitaPlan) {
         console.log('✅ Cita es parte de un plan');
         setModoSeleccion('plan');
+        setServicioSeleccionado(null);
         // Cargar planes (el usuario deberá seleccionar el ítem específico)
         cargarPlanesActivos();
-        setServicioSeleccionado(null);
+        // Cargar servicios por si acaso
+        cargarServicios();
       } else {
         console.log('✅ Cita es de servicio libre');
         setModoSeleccion('libre');
-        // Pre-seleccionar servicio si viene de la cita
-        setServicioSeleccionado(servicioId || null);
         // No necesitamos cargar planes si no es cita de plan
         setPlanesActivos([]);
         setCargandoPlanes(false);
+        
+        // Cargar servicios primero, LUEGO pre-seleccionar
+        cargarServicios().then(() => {
+          if (servicioId) {
+            console.log('🎯 Pre-seleccionando servicio:', servicioId);
+            setServicioSeleccionado(servicioId);
+          }
+        });
       }
     }
   }, [isOpen, motivoCita, pacienteId, esCitaPlan, servicioId, itemPlanId]);
@@ -107,9 +112,10 @@ export default function ModalRegistrarEpisodio({
     }
   };
 
-  const cargarServicios = async () => {
+  const cargarServicios = async (): Promise<void> => {
     try {
       const data = await obtenerServicios({ activo: true });
+      console.log('📋 Servicios cargados:', data.length);
       setServicios(data);
     } catch (error) {
       console.error('Error al cargar servicios:', error);
