@@ -25,7 +25,7 @@ function RegisterForm() {
     confirmPassword: '',
     first_name: '',
     last_name: '',
-    tipo_usuario: 'paciente'
+    tipo_usuario: 'PACIENTE'
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -156,8 +156,8 @@ function RegisterForm() {
                 value={formData.tipo_usuario}
                 onChange={handleChange}
               >
-                <option value="paciente">Paciente</option>
-                <option value="doctor">Doctor</option>
+                <option value="PACIENTE">Paciente</option>
+                <option value="ODONTOLOGO">Odontólogo</option>
               </select>
               <p className="mt-1 text-xs text-gray-500">
                 Los administradores son creados por otros administradores

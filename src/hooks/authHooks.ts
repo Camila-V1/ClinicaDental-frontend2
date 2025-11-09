@@ -15,7 +15,7 @@ export const usePermissions = (userType?: TipoUsuario) => {
     if (!userType) {
       return {
         isAdmin: false,
-        isDoctor: false,
+        isOdontologo: false,
         isPaciente: false,
         isStaff: false,
         canManageUsers: false,
@@ -26,16 +26,18 @@ export const usePermissions = (userType?: TipoUsuario) => {
       };
     }
     
+    const normalizedType = userType.toUpperCase();
+    
     return {
-      isAdmin: userType === 'admin',
-      isDoctor: userType === 'doctor',
-      isPaciente: userType === 'paciente',
-      isStaff: ['admin', 'doctor'].includes(userType),
-      canManageUsers: userType === 'admin',
-      canViewAllPatients: ['admin', 'doctor'].includes(userType),
-      canManageAppointments: ['admin', 'doctor'].includes(userType),
-      canViewReports: ['admin', 'doctor'].includes(userType),
-      canManageInventory: ['admin', 'doctor'].includes(userType),
+      isAdmin: normalizedType === 'ADMIN',
+      isOdontologo: normalizedType === 'ODONTOLOGO',
+      isPaciente: normalizedType === 'PACIENTE',
+      isStaff: ['ADMIN', 'ODONTOLOGO'].includes(normalizedType),
+      canManageUsers: normalizedType === 'ADMIN',
+      canViewAllPatients: ['ADMIN', 'ODONTOLOGO'].includes(normalizedType),
+      canManageAppointments: ['ADMIN', 'ODONTOLOGO'].includes(normalizedType),
+      canViewReports: ['ADMIN', 'ODONTOLOGO'].includes(normalizedType),
+      canManageInventory: ['ADMIN', 'ODONTOLOGO'].includes(normalizedType),
     };
   }, [userType]);
 };

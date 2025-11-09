@@ -20,17 +20,17 @@ export interface Usuario {
   direccion?: string;
 }
 
-// 👨‍⚕️ Doctor
-export interface Doctor extends Usuario {
-  tipo_usuario: 'doctor';
+// 👨‍⚕️ Odontólogo
+export interface Odontologo extends Usuario {
+  tipo_usuario: 'ODONTOLOGO';
   especialidad?: string;
   numero_licencia?: string;
   horario_trabajo?: HorarioTrabajo[];
 }
 
-//  Paciente
+// 🦷 Paciente
 export interface Paciente extends Usuario {
-  tipo_usuario: 'paciente';
+  tipo_usuario: 'PACIENTE';
   fecha_nacimiento?: string;
   genero?: 'M' | 'F' | 'Otro';
   documento_identidad?: string;
