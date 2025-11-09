@@ -34,6 +34,14 @@ export const obtenerUsuarios = async (filtros?: {
 };
 
 /**
+ * Obtener lista de pacientes
+ */
+export const obtenerPacientes = async (): Promise<Usuario[]> => {
+  const response = await api.get<Usuario[]>('/api/usuarios/pacientes/');
+  return response.data;
+};
+
+/**
  * Obtener perfil del usuario actual
  */
 export const obtenerPerfil = async (): Promise<Usuario> => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { crearPlan, type CrearPlanDTO } from '../../services/planesService';
-import { obtenerUsuarios, type Usuario } from '../../services/usuariosService';
+import { obtenerPacientes, type Usuario } from '../../services/usuariosService';
 import { useAuthContext } from '../../context/AuthContext';
 
 export default function PlanNuevo() {
@@ -28,7 +28,7 @@ export default function PlanNuevo() {
   const cargarPacientes = async () => {
     try {
       setBuscandoPacientes(true);
-      const data = await obtenerUsuarios({ tipo_usuario: 'PACIENTE' });
+      const data = await obtenerPacientes();
       setPacientes(data);
     } catch (error) {
       console.error('Error al cargar pacientes:', error);
