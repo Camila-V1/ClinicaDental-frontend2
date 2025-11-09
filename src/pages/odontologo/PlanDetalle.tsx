@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   obtenerPlan,
   presentarPlan,
-  aceptarPlan,
-  rechazarPlan,
+  // aceptarPlan, // Removido: Solo pacientes pueden aceptar
+  // rechazarPlan, // Removido: Solo pacientes pueden rechazar
   cancelarPlan,
   eliminarItemPlan,
   completarItemManual,
@@ -78,6 +78,10 @@ export default function PlanDetalle() {
     }
   };
 
+  /* 
+  NOTA: Funciones comentadas porque SOLO PACIENTES pueden aceptar/rechazar planes
+  Estas funciones deberían estar en una vista de PACIENTE, no de odontólogo.
+  
   const handleAceptarPlan = async () => {
     if (!plan) return;
     
@@ -117,6 +121,7 @@ export default function PlanDetalle() {
       setProcesando(false);
     }
   };
+  */
 
   const handleCancelarPlan = async () => {
     if (!plan) return;
@@ -345,71 +350,12 @@ export default function PlanDetalle() {
               </button>
             )}
             
-            {plan.estado === 'PRESENTADO' && (
-              <>
-                <button
-                  onClick={handleAceptarPlan}
-                  disabled={procesando}
-                  style={{
-                    backgroundColor: '#16a34a',
-                    color: 'white',
-                    padding: '12px 24px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    fontWeight: '500',
-                    opacity: procesando ? 0.5 : 1
-                  }}
-                  onMouseOver={(e) => !procesando && (e.currentTarget.style.backgroundColor = '#15803d')}
-                  onMouseOut={(e) => !procesando && (e.currentTarget.style.backgroundColor = '#16a34a')}
-                >
-                  ✔️ Aceptar Plan
-                </button>
-                <button
-                  onClick={handleRechazarPlan}
-                  disabled={procesando}
-                  style={{
-                    backgroundColor: '#dc2626',
-                    color: 'white',
-                    padding: '12px 24px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    opacity: procesando ? 0.5 : 1
-                  }}
-                  onMouseOver={(e) => !procesando && (e.currentTarget.style.backgroundColor = '#b91c1c')}
-                  onMouseOut={(e) => !procesando && (e.currentTarget.style.backgroundColor = '#dc2626')}
-                >
-                  ✖️ Rechazar
-                </button>
-              </>
-            )}
-            
-            {(plan.estado === 'PROPUESTO' || plan.estado === 'PRESENTADO') && (
-              <button
-                onClick={handleRechazarPlan}
-                disabled={procesando}
-                style={{
-                  backgroundColor: '#dc2626',
-                  color: 'white',
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  opacity: procesando ? 0.5 : 1,
-                  display: plan.estado === 'PRESENTADO' ? 'none' : 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-                onMouseOver={(e) => !procesando && (e.currentTarget.style.backgroundColor = '#b91c1c')}
-                onMouseOut={(e) => !procesando && (e.currentTarget.style.backgroundColor = '#dc2626')}
-              >
-                ✖️ Rechazar
-              </button>
-            )}
+            {/* 
+              NOTA: Los botones "Aceptar Plan" y "Rechazar" se removieron de aquí
+              porque SOLO los PACIENTES pueden aceptar/rechazar planes.
+              Los odontólogos solo pueden presentar, iniciar y finalizar planes.
+              Estos botones deberían estar en una vista de PACIENTE, no de odontólogo.
+            */}
             
             {(plan.estado === 'ACEPTADO' || plan.estado === 'EN_PROGRESO') && (
               <button
