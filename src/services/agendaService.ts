@@ -29,6 +29,11 @@ export interface Cita {
   notas?: string;
   created_at?: string;
   updated_at?: string;
+  
+  // Información de vinculación a planes
+  es_cita_plan: boolean;
+  servicio: number | null;
+  item_plan: number | null;
 }
 
 export interface FiltrosCitas {

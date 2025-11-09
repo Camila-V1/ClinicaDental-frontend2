@@ -14,6 +14,11 @@ interface Props {
   pacienteNombre: string;
   motivoCita: string;
   onEpisodioCreado: () => void;
+  
+  // Información de la cita para pre-selección
+  esCitaPlan: boolean;
+  servicioId: number | null;
+  itemPlanId: number | null;
 }
 
 export default function ModalRegistrarEpisodio({
@@ -22,7 +27,10 @@ export default function ModalRegistrarEpisodio({
   pacienteId,
   pacienteNombre,
   motivoCita,
-  onEpisodioCreado
+  onEpisodioCreado,
+  esCitaPlan,
+  servicioId,
+  itemPlanId
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -47,6 +55,8 @@ export default function ModalRegistrarEpisodio({
   useEffect(() => {
     if (isOpen) {
       console.log('🩺 Modal abierto, inicializando formulario');
+      console.log('📋 Datos de la cita:', { esCitaPlan, servicioId, itemPlanId });
+      
       setFormData({
         motivo_consulta: motivoCita,
         diagnostico: '',
@@ -54,16 +64,30 @@ export default function ModalRegistrarEpisodio({
         notas_privadas: ''
       });
       setLoading(false);
-      setModoSeleccion('libre');
       setPlanSeleccionado(null);
       setItemSeleccionado(null);
-      setServicioSeleccionado(null);
       
-      // Cargar planes activos y servicios
-      cargarPlanesActivos();
+      // Cargar servicios primero
       cargarServicios();
+      
+      // Decidir el modo basado en la cita
+      if (esCitaPlan) {
+        console.log('✅ Cita es parte de un plan');
+        setModoSeleccion('plan');
+        // Cargar planes (el usuario deberá seleccionar el ítem específico)
+        cargarPlanesActivos();
+        setServicioSeleccionado(null);
+      } else {
+        console.log('✅ Cita es de servicio libre');
+        setModoSeleccion('libre');
+        // Pre-seleccionar servicio si viene de la cita
+        setServicioSeleccionado(servicioId || null);
+        // No necesitamos cargar planes si no es cita de plan
+        setPlanesActivos([]);
+        setCargandoPlanes(false);
+      }
     }
-  }, [isOpen, motivoCita, pacienteId]);
+  }, [isOpen, motivoCita, pacienteId, esCitaPlan, servicioId, itemPlanId]);
 
   const cargarPlanesActivos = async () => {
     try {
@@ -510,16 +534,19 @@ export default function ModalRegistrarEpisodio({
               <select
                 value={servicioSeleccionado || ''}
                 onChange={(e) => setServicioSeleccionado(Number(e.target.value))}
+                disabled={!!servicioId}
                 style={{
                   width: '100%',
                   padding: '10px 12px',
                   border: '1px solid #ddd',
                   borderRadius: '8px',
                   fontSize: '14px',
-                  outline: 'none'
+                  outline: 'none',
+                  backgroundColor: servicioId ? '#f5f5f5' : 'white',
+                  cursor: servicioId ? 'not-allowed' : 'default'
                 }}
-                onFocus={(e) => e.currentTarget.style.borderColor = '#3498db'}
-                onBlur={(e) => e.currentTarget.style.borderColor = '#ddd'}
+                onFocus={(e) => !servicioId && (e.currentTarget.style.borderColor = '#3498db')}
+                onBlur={(e) => !servicioId && (e.currentTarget.style.borderColor = '#ddd')}
               >
                 <option value="">-- Seleccionar servicio --</option>
                 {servicios.map(servicio => (
@@ -528,6 +555,12 @@ export default function ModalRegistrarEpisodio({
                   </option>
                 ))}
               </select>
+              
+              {!!servicioId && (
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  ℹ️ Servicio pre-seleccionado automáticamente desde la cita.
+                </p>
+              )}
             </div>
           )}
           

@@ -385,6 +385,9 @@ export default function AgendaCitas() {
           pacienteNombre={citaSeleccionada.paciente_nombre || citaSeleccionada.paciente_email}
           motivoCita={citaSeleccionada.motivo}
           onEpisodioCreado={handleEpisodioCreado}
+          esCitaPlan={citaSeleccionada.es_cita_plan}
+          servicioId={citaSeleccionada.servicio}
+          itemPlanId={citaSeleccionada.item_plan}
         />
       )}
     </div>
