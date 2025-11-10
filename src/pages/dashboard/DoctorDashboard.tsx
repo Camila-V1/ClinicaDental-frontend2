@@ -5,6 +5,7 @@
 import { useAuthContext } from '../../context/AuthContext';
 import TenantInfo from '../../components/tenant/TenantInfo';
 import { Link } from 'react-router-dom';
+import MetricasDelDia from '../../components/dashboard/MetricasDelDia';
 
 function DoctorDashboard() {
   const { userName, logout } = useAuthContext();
@@ -18,10 +19,6 @@ function DoctorDashboard() {
     // { name: 'Mis Citas', path: '/agenda/mis-citas', icon: '📆' },
     // { name: 'Pacientes', path: '/pacientes', icon: '👥' },
     // { name: 'Inventario', path: '/inventario', icon: '📦' },
-  ];
-
-  const citasHoy = [
-    { hora: '09:00', paciente: 'No hay citas', tipo: '-' },
   ];
 
   return (
@@ -70,39 +67,8 @@ function DoctorDashboard() {
       </div>
 
       <div style={{ padding: '30px 40px' }}>
-        {/* Citas de Hoy */}
-        <div style={{ 
-          backgroundColor: 'white',
-          padding: '30px',
-          borderRadius: '10px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0',
-          marginBottom: '30px'
-        }}>
-          <h2 style={{ margin: '0 0 20px 0', fontSize: '20px', fontWeight: '600', color: '#333' }}>📅 Citas de Hoy</h2>
-          <div style={{ border: '2px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead style={{ backgroundColor: '#f8f9fa' }}>
-                <tr>
-                  <th style={{ padding: '16px', textAlign: 'left', borderBottom: '2px solid #e0e0e0', fontWeight: '600', fontSize: '14px', color: '#555' }}>Hora</th>
-                  <th style={{ padding: '16px', textAlign: 'left', borderBottom: '2px solid #e0e0e0', fontWeight: '600', fontSize: '14px', color: '#555' }}>Paciente</th>
-                  <th style={{ padding: '16px', textAlign: 'left', borderBottom: '2px solid #e0e0e0', fontWeight: '600', fontSize: '14px', color: '#555' }}>Tipo</th>
-                  <th style={{ padding: '16px', textAlign: 'left', borderBottom: '2px solid #e0e0e0', fontWeight: '600', fontSize: '14px', color: '#555' }}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody style={{ backgroundColor: 'white' }}>
-                {citasHoy.map((cita, index) => (
-                  <tr key={index}>
-                    <td style={{ padding: '16px', borderBottom: '1px solid #e0e0e0', color: '#333' }}>{cita.hora}</td>
-                    <td style={{ padding: '16px', borderBottom: '1px solid #e0e0e0', color: '#333' }}>{cita.paciente}</td>
-                    <td style={{ padding: '16px', borderBottom: '1px solid #e0e0e0', color: '#333' }}>{cita.tipo}</td>
-                    <td style={{ padding: '16px', borderBottom: '1px solid #e0e0e0', color: '#999' }}>-</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        {/* Métricas del Día en Tiempo Real */}
+        <MetricasDelDia />
 
         {/* Acceso Rápido */}
         <div style={{ 
@@ -110,71 +76,32 @@ function DoctorDashboard() {
           padding: '30px',
           borderRadius: '10px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0',
-          marginBottom: '30px'
+          border: '1px solid #e8e8e8',
+          marginTop: '30px'
         }}>
-          <h2 style={{ margin: '0 0 25px 0', fontSize: '20px', fontWeight: '600', color: '#333' }}>Acceso Rápido</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+          <h2 style={{ margin: '0 0 25px 0', fontSize: '20px', fontWeight: '600', color: '#2c3e50' }}>🚀 Acceso Rápido</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
             {menuItems.map((item) => (
               <Link 
                 key={item.path} 
                 to={item.path}
                 style={{ 
-                  border: '2px solid #e0e0e0', 
-                  padding: '25px', 
+                  border: '2px solid #e8e8e8', 
+                  padding: '30px', 
                   textDecoration: 'none',
-                  color: '#333',
-                  borderRadius: '8px',
+                  color: '#2c3e50',
+                  borderRadius: '12px',
                   textAlign: 'center',
                   display: 'block',
                   backgroundColor: '#fafafa',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                 }}
               >
-                <div style={{ fontSize: '36px', marginBottom: '12px' }}>{item.icon}</div>
-                <div style={{ fontWeight: '600', fontSize: '14px' }}>{item.name}</div>
+                <div style={{ fontSize: '48px', marginBottom: '16px' }}>{item.icon}</div>
+                <div style={{ fontWeight: '600', fontSize: '16px' }}>{item.name}</div>
               </Link>
             ))}
-          </div>
-        </div>
-
-        {/* Estadísticas */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-          <div style={{ 
-            backgroundColor: 'white',
-            border: '2px solid #e0e0e0', 
-            padding: '25px', 
-            borderRadius: '10px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
-          }}>
-            <div style={{ fontSize: '13px', color: '#666', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Citas Hoy
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: 'bold', marginTop: '12px', color: '#2c5aa0' }}>0</div>
-          </div>
-          <div style={{ 
-            backgroundColor: 'white',
-            border: '2px solid #e0e0e0', 
-            padding: '25px', 
-            borderRadius: '10px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
-          }}>
-            <div style={{ fontSize: '13px', color: '#666', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Pacientes Activos
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: 'bold', marginTop: '12px', color: '#2c5aa0' }}>0</div>
-          </div>
-          <div style={{ 
-            backgroundColor: 'white',
-            border: '2px solid #e0e0e0', 
-            padding: '25px', 
-            borderRadius: '10px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
-          }}>
-            <div style={{ fontSize: '13px', color: '#666', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Tratamientos en Curso
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: 'bold', marginTop: '12px', color: '#2c5aa0' }}>0</div>
           </div>
         </div>
       </div>

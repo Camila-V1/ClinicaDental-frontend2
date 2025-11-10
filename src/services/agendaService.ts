@@ -129,3 +129,36 @@ export const atenderCita = async (citaId: number, observaciones?: string): Promi
   console.log('✅ Cita atendida:', response.data);
   return response.data.cita;
 };
+
+/**
+ * Interface para las métricas del día
+ */
+export interface MetricasCita {
+  id: number;
+  paciente: {
+    full_name: string;
+  };
+  hora: string;
+  motivo: string;
+  estado: 'PENDIENTE' | 'CONFIRMADA' | 'COMPLETADA' | 'CANCELADA' | 'ATENDIDA';
+}
+
+export interface MetricasDelDia {
+  fecha: string;
+  citas_hoy: number; // Total de citas del día (número)
+  citas_pendientes: number;
+  citas_confirmadas: number;
+  citas_atendidas: number;
+  pacientes_atendidos: number;
+  proxima_cita: MetricasCita | null;
+}
+
+/**
+ * Obtener métricas del día actual del odontólogo
+ */
+export const obtenerMetricasDia = async (): Promise<MetricasDelDia> => {
+  console.log('📊 Obteniendo métricas del día...');
+  const response = await api.get<MetricasDelDia>('/api/agenda/citas/metricas-dia/');
+  console.log('✅ Métricas recibidas:', response.data);
+  return response.data;
+};
