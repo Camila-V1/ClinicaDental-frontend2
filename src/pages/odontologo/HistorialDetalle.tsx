@@ -272,11 +272,11 @@ export default function HistorialDetalle() {
           {/* Tab General */}
           {tabActiva === 'general' && (
             <div>
-              <p style={{ marginBottom: '8px' }}>
+              <p style={{ marginBottom: '8px', color: '#333' }}>
                 <strong>Última actualización:</strong> {formatearFecha(historial.actualizado)}
               </p>
               {historial.ultimo_episodio && (
-                <p style={{ margin: 0 }}>
+                <p style={{ margin: 0, color: '#333' }}>
                   <strong>Última atención:</strong> {formatearFecha(historial.ultimo_episodio)}
                 </p>
               )}
@@ -301,7 +301,7 @@ export default function HistorialDetalle() {
                         backgroundColor: '#fafafa'
                       }}
                     >
-                      <h4 style={{ margin: '0 0 4px 0' }}>
+                      <h4 style={{ margin: '0 0 4px 0', color: '#2c3e50' }}>
                         {episodio.motivo_consulta}
                       </h4>
                       <p style={{ fontSize: '14px', color: '#666', margin: '0 0 8px 0' }}>
@@ -310,15 +310,15 @@ export default function HistorialDetalle() {
                       
                       {episodio.diagnostico && (
                         <div style={{ marginTop: '12px' }}>
-                          <strong>Diagnóstico:</strong>
-                          <p style={{ margin: '4px 0 0 0' }}>{episodio.diagnostico}</p>
+                          <strong style={{ color: '#333' }}>Diagnóstico:</strong>
+                          <p style={{ margin: '4px 0 0 0', color: '#333' }}>{episodio.diagnostico}</p>
                         </div>
                       )}
                       
                       {episodio.descripcion_procedimiento && (
                         <div style={{ marginTop: '12px' }}>
-                          <strong>Procedimiento:</strong>
-                          <p style={{ margin: '4px 0 0 0' }}>{episodio.descripcion_procedimiento}</p>
+                          <strong style={{ color: '#333' }}>Procedimiento:</strong>
+                          <p style={{ margin: '4px 0 0 0', color: '#333' }}>{episodio.descripcion_procedimiento}</p>
                         </div>
                       )}
                     </div>
@@ -346,7 +346,7 @@ export default function HistorialDetalle() {
                         backgroundColor: '#fafafa'
                       }}
                     >
-                      <h4 style={{ margin: '0 0 4px 0' }}>
+                      <h4 style={{ margin: '0 0 4px 0', color: '#2c3e50' }}>
                         Odontograma {formatearFecha(odontograma.fecha_snapshot)}
                       </h4>
                       <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
@@ -355,8 +355,8 @@ export default function HistorialDetalle() {
                       
                       {odontograma.notas && (
                         <div style={{ marginTop: '12px' }}>
-                          <strong>Notas:</strong>
-                          <p style={{ margin: '4px 0 0 0' }}>{odontograma.notas}</p>
+                          <strong style={{ color: '#333' }}>Notas:</strong>
+                          <p style={{ margin: '4px 0 0 0', color: '#333' }}>{odontograma.notas}</p>
                         </div>
                       )}
                     </div>

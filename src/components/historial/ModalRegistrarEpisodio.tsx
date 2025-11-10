@@ -647,7 +647,7 @@ export default function ModalRegistrarEpisodio({
                 </button>
               </div>
             </div>
-          ) : (
+          ) : !itemPlanInfo && (
             <div style={{ 
               marginBottom: '24px', 
               backgroundColor: '#eff6ff', 
