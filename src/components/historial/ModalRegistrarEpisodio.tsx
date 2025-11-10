@@ -688,6 +688,7 @@ export default function ModalRegistrarEpisodio({
                     border: '1px solid #ddd',
                     borderRadius: '8px',
                     fontSize: '14px',
+                    color: '#333',
                     outline: 'none'
                   }}
                   onFocus={(e) => e.currentTarget.style.borderColor = '#3498db'}
@@ -839,6 +840,7 @@ export default function ModalRegistrarEpisodio({
                   fontSize: '14px',
                   outline: 'none',
                   backgroundColor: servicioId ? '#f5f5f5' : 'white',
+                  color: '#333',
                   cursor: servicioId ? 'not-allowed' : 'default'
                 }}
                 onFocus={(e) => !servicioId && (e.currentTarget.style.borderColor = '#3498db')}
