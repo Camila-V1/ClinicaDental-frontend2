@@ -299,58 +299,103 @@ export default function ModalRegistrarEpisodio({
 
   // Ya no se usa cuando hay itemPlanInfo, pero se mantiene para citas sin vincular a plan
   const cargarPlanesActivos = async () => {
+    console.group('📋 Cargando Planes Activos del Paciente');
+    console.log('👤 Paciente ID:', pacienteId);
+    
     try {
       setCargandoPlanes(true);
+      console.log('🔄 Solicitando planes al backend...');
+      
       const planes = await obtenerPlanesActivos(pacienteId);
       setPlanesActivos(planes);
       
-      // Si hay planes activos, sugerir modo plan
+      console.log('✅ Planes recibidos:', planes.length);
+      
       if (planes.length > 0) {
+        console.log('📊 Lista de planes:');
+        planes.forEach((plan, index) => {
+          console.log(`  ${index + 1}. ${plan.titulo} (${plan.estado_display}) - ${plan.porcentaje_completado}% completado`);
+        });
         setModoSeleccion('plan');
+        console.log('→ Modo cambiado a "plan"');
+      } else {
+        console.warn('⚠️ No hay planes activos para este paciente');
       }
+      
     } catch (error) {
-      console.error('Error al cargar planes activos:', error);
+      console.error('❌ Error al cargar planes activos:', error);
       setPlanesActivos([]);
     } finally {
       setCargandoPlanes(false);
+      console.groupEnd();
     }
   };
 
   const cargarServicios = async (): Promise<void> => {
+    console.group('🦷 Cargando Servicios Disponibles');
+    
     try {
+      console.log('🔄 Solicitando servicios activos al backend...');
       const data = await obtenerServicios({ activo: true });
-      console.log('📋 Servicios cargados:', data.length);
+      
+      console.log('✅ Servicios recibidos:', data.length);
+      console.log('📊 Categorías disponibles:');
+      
+      const categorias = [...new Set(data.map(s => s.categoria_nombre))];
+      categorias.forEach(cat => {
+        const serviciosCat = data.filter(s => s.categoria_nombre === cat);
+        console.log(`  - ${cat}: ${serviciosCat.length} servicios`);
+      });
+      
       setServicios(data);
     } catch (error) {
-      console.error('Error al cargar servicios:', error);
+      console.error('❌ Error al cargar servicios:', error);
+    } finally {
+      console.groupEnd();
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('📝 handleSubmit llamado');
     
+    console.group('📝 SUBMIT EPISODIO - Guardando Atención');
+    console.log('🔄 Formulario enviado, validando datos...');
+    
+    // Validación básica
     if (!formData.motivo_consulta.trim()) {
+      console.error('❌ Validación fallida: Motivo de consulta vacío');
       alert('El motivo de consulta es obligatorio');
+      console.groupEnd();
       return;
     }
 
     // Validación: si NO hay itemPlanInfo (debe seleccionar manualmente)
     if (!itemPlanInfo) {
+      console.log('⚙️ itemPlanInfo NO existe, validando selección manual...');
+      
       if (modoSeleccion === 'plan' && !itemSeleccionado) {
+        console.error('❌ Validación fallida: Modo plan pero sin ítem seleccionado');
         alert('Debes seleccionar un servicio del plan');
+        console.groupEnd();
         return;
       }
 
       if (modoSeleccion === 'libre' && !servicioSeleccionado) {
+        console.error('❌ Validación fallida: Modo libre pero sin servicio seleccionado');
         alert('Debes seleccionar un servicio');
+        console.groupEnd();
         return;
       }
+      
+      console.log('✅ Validación manual OK');
+    } else {
+      console.log('✅ itemPlanInfo existe, usando vinculación automática');
     }
 
     // Confirmación antes de enviar
     if (!confirm('¿Confirmar registro de este episodio de atención?')) {
       console.log('❌ Usuario canceló el registro');
+      console.groupEnd();
       return;
     }
 
@@ -375,24 +420,48 @@ export default function ModalRegistrarEpisodio({
           : undefined
       };
 
-      console.log('📝 Creando episodio:', datos);
+      console.group('📤 Enviando datos al backend');
+      console.log('🏥 historial_clinico (paciente ID):', datos.historial_clinico);
+      console.log('📝 motivo_consulta:', datos.motivo_consulta);
+      console.log('🩺 diagnostico:', datos.diagnostico || '(vacío)');
+      console.log('🔧 descripcion_procedimiento:', datos.descripcion_procedimiento || '(vacío)');
+      console.log('🔒 notas_privadas:', datos.notas_privadas || '(vacío)');
+      console.log('📋 item_plan_tratamiento:', datos.item_plan_tratamiento || '(no vinculado a plan)');
+      console.log('🦷 servicio:', datos.servicio || '(no especificado)');
+      console.groupEnd();
+      
+      console.log('🔄 Paso 1: Creando episodio en el historial clínico...');
       await crearEpisodio(datos);
+      console.log('✅ Paso 1 completado: Episodio creado exitosamente');
       
       // Marcar cita como atendida si viene de una cita
       if (citaId) {
-        console.log('✅ Episodio creado, marcando cita como atendida:', citaId);
+        console.log('🔄 Paso 2: Marcando cita como ATENDIDA...');
+        console.log('  - Cita ID:', citaId);
         await atenderCita(citaId);
+        console.log('✅ Paso 2 completado: Cita marcada como ATENDIDA');
+      } else {
+        console.log('ℹ️ No hay citaId, episodio creado sin vincular a cita');
       }
       
+      console.log('🎉 PROCESO COMPLETADO EXITOSAMENTE');
       alert('✅ Episodio registrado exitosamente');
+      
+      console.log('🔄 Cerrando modal y notificando a componente padre...');
       onEpisodioCreado();
       onClose();
       
     } catch (error: any) {
-      console.error('Error al crear episodio:', error);
+      console.error('❌ ERROR EN EL PROCESO:', error);
+      console.error('📋 Detalles del error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       alert('❌ Error al registrar episodio: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
+      console.groupEnd();
     }
   };
 

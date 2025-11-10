@@ -55,32 +55,72 @@ export default function AgendaCitas() {
   };
 
   const handleAtenderCita = async (cita: Cita) => {
-    console.log('🩺 Preparando para atender cita:', cita.id);
-    console.log('📋 Datos completos de la cita:', cita);
-    console.log('🔍 Campos de vinculación:', {
-      es_cita_plan: cita.es_cita_plan,
-      servicio: cita.servicio,
-      item_plan: cita.item_plan
-    });
+    console.group('🩺 ATENDER CITA - Inicio del Proceso');
+    console.log('📌 ID Cita:', cita.id);
+    console.log('👤 Paciente:', cita.paciente_nombre || cita.paciente_email);
+    console.log('📅 Fecha:', cita.fecha_hora);
+    console.log('📝 Motivo:', cita.motivo);
+    console.log('🏷️ Estado actual:', cita.estado);
+    
+    console.group('🔍 Análisis de Vinculación a Plan');
+    console.log('es_cita_plan:', cita.es_cita_plan);
+    console.log('servicio:', cita.servicio);
+    console.log('item_plan:', cita.item_plan);
+    console.log('item_plan_info:', cita.item_plan_info);
+    
+    if (cita.item_plan_info) {
+      console.log('✅ Info del plan disponible:');
+      console.log('  - Plan ID:', cita.item_plan_info.plan_id);
+      console.log('  - Plan Nombre:', cita.item_plan_info.plan_nombre);
+      console.log('  - Servicio ID:', cita.item_plan_info.servicio_id);
+      console.log('  - Servicio Nombre:', cita.item_plan_info.servicio_nombre);
+      console.log('  - Estado:', cita.item_plan_info.estado);
+      console.log('  - Precio:', cita.item_plan_info.precio_total);
+    } else if (cita.es_cita_plan && cita.item_plan) {
+      console.warn('⚠️ Cita de plan PERO sin item_plan_info (se necesitará vincular manualmente)');
+      console.log('  - item_plan ID que se debe buscar:', cita.item_plan);
+    } else {
+      console.log('📋 Cita simple (sin vinculación a plan)');
+    }
+    console.groupEnd();
     
     try {
-      // 1. Guardar la cita para el modal PRIMERO
+      console.log('🔄 Paso 1: Guardando cita seleccionada en estado');
       setCitaSeleccionada(cita);
       
-      // 2. Abrir modal para registrar episodio
+      console.log('🔄 Paso 2: Abriendo modal para registrar episodio');
       setModalAbierto(true);
       
-      console.log('✅ Modal abierto, esperando registro de episodio');
+      console.log('✅ Modal abierto, esperando que odontólogo registre episodio');
+      console.log('📋 Props que se pasarán al modal:');
+      console.log('  - pacienteId:', cita.paciente);
+      console.log('  - pacienteNombre:', cita.paciente_nombre || cita.paciente_email);
+      console.log('  - motivoCita:', cita.motivo);
+      console.log('  - esCitaPlan:', cita.es_cita_plan ?? false);
+      console.log('  - servicioId:', cita.item_plan_info?.servicio_id ?? cita.servicio ?? null);
+      console.log('  - itemPlanId:', cita.item_plan ?? null);
+      console.log('  - itemPlanInfo:', cita.item_plan_info ?? null);
+      console.log('  - citaId:', cita.id);
+      
     } catch (error: any) {
-      console.error('Error al abrir modal:', error);
+      console.error('❌ Error al abrir modal:', error);
       alert('❌ Error: ' + (error.response?.data?.error || error.message));
     }
+    
+    console.groupEnd();
   };
 
   const handleEpisodioCreado = () => {
-    console.log('✅ Episodio creado, recargando citas...');
+    console.group('✅ EPISODIO CREADO - Finalizando Proceso');
+    console.log('🔄 Cerrando modal...');
+    console.log('🔄 Recargando lista de citas para reflejar cambios...');
+    console.log('📊 La cita debería cambiar de estado a ATENDIDA');
+    
     // Recargar citas para reflejar el cambio de estado
     cargarCitas();
+    
+    console.log('✅ Proceso de atención completado exitosamente');
+    console.groupEnd();
   };
 
   const obtenerColorEstado = (estado: string) => {
