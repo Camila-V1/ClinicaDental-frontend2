@@ -19,6 +19,8 @@ import HistorialDetalle from './pages/odontologo/HistorialDetalle';
 import PlanesList from './pages/odontologo/PlanesList';
 import PlanNuevo from './pages/odontologo/PlanNuevo';
 import PlanDetalle from './pages/odontologo/PlanDetalle';
+import CalendarioCitas from './components/Calendario/CalendarioCitas';
+import OdontogramaDemo from './pages/odontologo/OdontogramaDemo';
 
 function App() {
   return (
@@ -47,6 +49,26 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AgendaCitas />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Ruta de Calendario para Odontólogo */}
+            <Route
+              path="/odontologo/calendario"
+              element={
+                <ProtectedRoute>
+                  <CalendarioCitas />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Ruta de Demo Odontograma */}
+            <Route
+              path="/odontologo/odontograma-demo"
+              element={
+                <ProtectedRoute>
+                  <OdontogramaDemo />
                 </ProtectedRoute>
               }
             />

@@ -13,6 +13,7 @@ function DoctorDashboard() {
   // 🎯 Solo mostrar funcionalidades implementadas
   const menuItems = [
     { name: 'Mi Agenda', path: '/odontologo/agenda', icon: '📅' },
+    { name: 'Calendario', path: '/odontologo/calendario', icon: '🗓️' },
     { name: 'Historiales Clínicos', path: '/odontologo/historiales', icon: '📋' },
     { name: 'Planes de Tratamiento', path: '/odontologo/planes', icon: '🦷' },
     // ⚠️ Funcionalidades pendientes (ocultas por ahora):
@@ -80,7 +81,7 @@ function DoctorDashboard() {
           marginTop: '30px'
         }}>
           <h2 style={{ margin: '0 0 25px 0', fontSize: '20px', fontWeight: '600', color: '#2c3e50' }}>🚀 Acceso Rápido</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
             {menuItems.map((item) => (
               <Link 
                 key={item.path} 

@@ -4,7 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import { obtenerCitas, cancelarCita, type Cita } from '../../services/agendaService';
-import ModalRegistrarEpisodio from '../../components/historial/ModalRegistrarEpisodio';
+import { obtenerHistorialCompleto } from '../../services/historialService';
+import ModalRegistrarEpisodioMejorado from '../../components/historial/ModalRegistrarEpisodioMejorado';
 
 export default function AgendaCitas() {
   const [citas, setCitas] = useState<Cita[]>([]);
@@ -16,6 +17,8 @@ export default function AgendaCitas() {
   // Estado del modal
   const [modalAbierto, setModalAbierto] = useState(false);
   const [citaSeleccionada, setCitaSeleccionada] = useState<Cita | null>(null);
+  const [historialIdActual, setHistorialIdActual] = useState<number>(0);
+  const [cargandoHistorial, setCargandoHistorial] = useState(false);
 
   // Cargar citas al montar componente
   useEffect(() => {
@@ -86,27 +89,79 @@ export default function AgendaCitas() {
     
     try {
       console.log('🔄 Paso 1: Guardando cita seleccionada en estado');
+      console.log('📊 Cita completa:', JSON.stringify(cita, null, 2));
       setCitaSeleccionada(cita);
       
-      console.log('🔄 Paso 2: Abriendo modal para registrar episodio');
-      setModalAbierto(true);
+      // Paso 2: Obtener historial clínico del paciente
+      console.log('🔄 Paso 2: Obteniendo historial clínico del paciente...');
+      console.log('👤 ID del paciente:', cita.paciente);
+      console.log('📧 Email del paciente:', cita.paciente_email);
+      console.log('🏥 Llamando a obtenerHistorialCompleto(' + cita.paciente + ')...');
       
-      console.log('✅ Modal abierto, esperando que odontólogo registre episodio');
-      console.log('📋 Props que se pasarán al modal:');
-      console.log('  - pacienteId:', cita.paciente);
-      console.log('  - pacienteNombre:', cita.paciente_nombre || cita.paciente_email);
-      console.log('  - motivoCita:', cita.motivo);
-      console.log('  - esCitaPlan:', cita.es_cita_plan ?? false);
-      console.log('  - servicioId:', cita.item_plan_info?.servicio_id ?? cita.servicio ?? null);
-      console.log('  - itemPlanId:', cita.item_plan ?? null);
-      console.log('  - itemPlanInfo:', cita.item_plan_info ?? null);
-      console.log('  - citaId:', cita.id);
+      setCargandoHistorial(true);
+      
+      try {
+        console.log('⏳ ANTES de obtenerHistorialCompleto - Timestamp:', new Date().toISOString());
+        const historial = await obtenerHistorialCompleto(cita.paciente);
+        console.log('✅ DESPUÉS de obtenerHistorialCompleto - Timestamp:', new Date().toISOString());
+        console.log('✅ Historial obtenido exitosamente!');
+        console.log('📋 Historial completo:', JSON.stringify(historial, null, 2));
+        console.log('📋 ID del historial clínico (historial.paciente):', historial.paciente);
+        console.log('📊 Total de odontogramas en historial:', historial.total_odontogramas);
+        console.log('🦷 Array de odontogramas:', historial.odontogramas);
+        
+        // El ID del historial es el ID del paciente
+        console.log('💾 Guardando historialIdActual =', historial.paciente);
+        setHistorialIdActual(historial.paciente);
+        
+        // Actualizar la cita con el historial_clinico_id
+        const citaConHistorial = {
+          ...cita,
+          historial_clinico_id: historial.paciente
+        };
+        console.log('🔗 Cita actualizada con historial_clinico_id:', citaConHistorial.historial_clinico_id);
+        setCitaSeleccionada(citaConHistorial);
+        
+        console.log('🔄 Paso 3: Abriendo modal para registrar episodio');
+        console.log('🎯 historialIdActual actual:', historial.paciente);
+        console.log('🎯 cargandoHistorial:', true);
+        console.log('🎯 modalAbierto será:', true);
+        
+        setModalAbierto(true);
+        
+        console.log('✅ Modal abierto, esperando que odontólogo registre episodio');
+        console.log('📋 Props que se pasarán al modal:');
+        console.log('  - pacienteId:', cita.paciente);
+        console.log('  - pacienteNombre:', cita.paciente_nombre || cita.paciente_email);
+        console.log('  - historialId:', historial.paciente);
+        console.log('  - citaId:', cita.id);
+        
+      } catch (errorHistorial: any) {
+        console.error('❌ ERROR CRÍTICO al obtener historial:', errorHistorial);
+        console.error('📊 Detalles del error:', {
+          mensaje: errorHistorial.message,
+          response: errorHistorial.response?.data,
+          status: errorHistorial.response?.status,
+          config: errorHistorial.config
+        });
+        alert('❌ Error al cargar historial del paciente. No se puede atender la cita.');
+        setCargandoHistorial(false);
+        return;
+      }
+      
+      console.log('🏁 Finalizando carga de historial...');
+      console.log('💾 Cambiando cargandoHistorial a false');
+      setCargandoHistorial(false);
+      console.log('✅ Proceso completado exitosamente!');
       
     } catch (error: any) {
-      console.error('❌ Error al abrir modal:', error);
+      console.error('❌ ERROR GENERAL al abrir modal:', error);
+      console.error('📊 Stack trace:', error.stack);
       alert('❌ Error: ' + (error.response?.data?.error || error.message));
+      setCargandoHistorial(false);
     }
     
+    console.log('🏁 FIN DEL PROCESO handleAtenderCita');
     console.groupEnd();
   };
 
@@ -115,6 +170,11 @@ export default function AgendaCitas() {
     console.log('🔄 Cerrando modal...');
     console.log('🔄 Recargando lista de citas para reflejar cambios...');
     console.log('📊 La cita debería cambiar de estado a ATENDIDA');
+    
+    // Limpiar estado del modal
+    setModalAbierto(false);
+    setCitaSeleccionada(null);
+    setHistorialIdActual(0);
     
     // Recargar citas para reflejar el cambio de estado
     cargarCitas();
@@ -412,24 +472,79 @@ export default function AgendaCitas() {
         }
       `}</style>
 
-      {/* Modal para registrar episodio */}
-      {citaSeleccionada && (
-        <ModalRegistrarEpisodio
-          isOpen={modalAbierto}
-          onClose={() => {
+      {/* Modal para registrar episodio MEJORADO */}
+      {(() => {
+        console.log('🎨 RENDER - Evaluando condiciones del modal:');
+        console.log('  - citaSeleccionada:', citaSeleccionada ? `ID ${citaSeleccionada.id}` : 'NULL');
+        console.log('  - historialIdActual:', historialIdActual);
+        console.log('  - cargandoHistorial:', cargandoHistorial);
+        console.log('  - modalAbierto:', modalAbierto);
+        console.log('  - Condición completa:', citaSeleccionada && historialIdActual > 0 && !cargandoHistorial);
+        
+        if (citaSeleccionada && historialIdActual > 0 && !cargandoHistorial) {
+          console.log('✅ MODAL SE VA A RENDERIZAR con props:');
+          console.log('  - abierto:', modalAbierto);
+          console.log('  - pacienteId:', citaSeleccionada.paciente);
+          console.log('  - pacienteNombre:', citaSeleccionada.paciente_nombre || citaSeleccionada.paciente_email);
+          console.log('  - historialId:', historialIdActual);
+          console.log('  - citaId:', citaSeleccionada.id);
+        } else {
+          console.log('❌ MODAL NO SE RENDERIZARÁ');
+        }
+        return null;
+      })()}
+      
+      {citaSeleccionada && historialIdActual > 0 && !cargandoHistorial && (
+        <ModalRegistrarEpisodioMejorado
+          abierto={modalAbierto}
+          onCerrar={() => {
             setModalAbierto(false);
             setCitaSeleccionada(null);
+            setHistorialIdActual(0);
           }}
           pacienteId={citaSeleccionada.paciente}
-          pacienteNombre={citaSeleccionada.paciente_nombre || citaSeleccionada.paciente_email}
-          motivoCita={citaSeleccionada.motivo}
+          pacienteNombre={citaSeleccionada.paciente_nombre || citaSeleccionada.paciente_email || 'Sin nombre'}
+          historialId={historialIdActual}
           onEpisodioCreado={handleEpisodioCreado}
-          esCitaPlan={citaSeleccionada.es_cita_plan ?? false}
-          servicioId={citaSeleccionada.item_plan_info?.servicio_id ?? citaSeleccionada.servicio ?? null}
-          itemPlanId={citaSeleccionada.item_plan ?? null}
           citaId={citaSeleccionada.id}
-          itemPlanInfo={citaSeleccionada.item_plan_info ?? null}
         />
+      )}
+      
+      {/* Loading mientras se carga el historial */}
+      {cargandoHistorial && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '40px',
+            borderRadius: '12px',
+            textAlign: 'center',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+          }}>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              border: '5px solid #f3f3f3',
+              borderTop: '5px solid #1976d2',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 20px'
+            }} />
+            <p style={{ margin: 0, fontSize: '16px', color: '#333', fontWeight: 'bold' }}>
+              ⏳ Cargando historial del paciente...
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

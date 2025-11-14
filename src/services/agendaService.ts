@@ -47,6 +47,7 @@ export interface Cita {
   notas?: string;
   created_at?: string;
   updated_at?: string;
+  historial_clinico_id?: number; // ID del historial clínico del paciente
   
   // Información de vinculación a planes (opcionales para compatibilidad con backend antiguo)
   es_cita_plan?: boolean;

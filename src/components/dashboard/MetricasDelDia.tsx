@@ -223,7 +223,7 @@ const MetricasDelDiaComponent: React.FC = () => {
       setCargando(false);
       console.log('✅ Estado cargando actualizado');
     }
-  }, [metricas]);
+  }, []); // ✅ Sin dependencias para evitar loop infinito
 
   // Cargar métricas al montar el componente
   useEffect(() => {

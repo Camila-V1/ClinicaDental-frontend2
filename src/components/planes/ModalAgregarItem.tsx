@@ -51,13 +51,23 @@ export default function ModalAgregarItem({ isOpen, onClose, planId, onItemAgrega
   };
 
   const handleSeleccionarServicio = (servicio: Servicio) => {
+    console.group('🎯 Servicio Seleccionado');
+    console.log('📋 Nombre:', servicio.nombre);
+    console.log('🔧 tiene_materiales_opcionales:', servicio.tiene_materiales_opcionales);
+    console.log('📦 materiales_fijos:', servicio.materiales_fijos);
+    console.log('🎨 materiales_opcionales:', servicio.materiales_opcionales);
+    console.log('📊 Cantidad de materiales opcionales:', servicio.materiales_opcionales?.length || 0);
+    console.groupEnd();
+    
     setServicioSeleccionado(servicio);
     setInsumoSeleccionado(null);
     
     // Si el servicio tiene materiales opcionales, ir al paso 2
     if (servicio.tiene_materiales_opcionales) {
+      console.log('✅ Ir al Paso 2: Seleccionar materiales');
       setStep('seleccionar_materiales');
     } else {
+      console.log('⏭️ Saltar al Paso 3: Confirmar (sin materiales opcionales)');
       // Si no tiene materiales opcionales, ir directo a confirmar
       setStep('confirmar');
     }
@@ -359,17 +369,41 @@ export default function ModalAgregarItem({ isOpen, onClose, planId, onItemAgrega
               </div>
 
               {/* Materiales Opcionales */}
-              {servicioSeleccionado.materiales_opcionales.map((materialOpcional, idx) => (
+              {servicioSeleccionado.materiales_opcionales.map((materialOpcional, idx) => {
+                console.log(`📦 Material Opcional ${idx}:`, materialOpcional);
+                console.log(`  - Opciones disponibles:`, materialOpcional.opciones_disponibles);
+                console.log(`  - Opciones válidas:`, materialOpcional.opciones_disponibles?.filter(i => i != null).length || 0);
+                
+                // Si no hay opciones disponibles, mostrar mensaje
+                const opcionesValidas = materialOpcional.opciones_disponibles?.filter(i => i != null) || [];
+                
+                if (opcionesValidas.length === 0) {
+                  console.warn(`⚠️ Material opcional sin opciones disponibles:`, materialOpcional);
+                  return (
+                    <div key={idx} style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                      <h4 style={{ fontWeight: '600', color: '#991b1b', marginBottom: '8px' }}>
+                        ⚠️ {materialOpcional.nombre_personalizado || `Seleccionar ${(materialOpcional as any).categoria_nombre || materialOpcional.categoria_insumo?.nombre || 'material'}`}
+                      </h4>
+                      <p style={{ color: '#dc2626', fontSize: '14px', margin: 0 }}>
+                        No hay opciones de insumos configuradas para esta categoría en el backend.
+                        <br />
+                        <strong>Categoría:</strong> {(materialOpcional as any).categoria_nombre || materialOpcional.categoria_insumo?.nombre || 'No especificada'}
+                      </p>
+                    </div>
+                  );
+                }
+                
+                return (
                 <div key={idx} style={{ marginBottom: '24px' }}>
                   <h4 style={{ fontWeight: '600', color: '#111827', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    🎨 {materialOpcional.nombre_personalizado || `Seleccionar ${materialOpcional.categoria_insumo.nombre}`}
+                    🎨 {materialOpcional.nombre_personalizado || `Seleccionar ${materialOpcional.categoria_insumo?.nombre || 'material'}`}
                     {materialOpcional.es_obligatorio && (
                       <span style={{ color: '#dc2626', fontSize: '14px' }}>*</span>
                     )}
                   </h4>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
-                    {materialOpcional.opciones_disponibles.map(insumo => (
+                    {opcionesValidas.map(insumo => (
                       <div
                         key={insumo.id}
                         onClick={() => setInsumoSeleccionado(insumo.id)}
@@ -414,7 +448,8 @@ export default function ModalAgregarItem({ isOpen, onClose, planId, onItemAgrega
                     ))}
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               {/* Botones */}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>

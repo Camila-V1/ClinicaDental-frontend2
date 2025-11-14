@@ -85,6 +85,26 @@ export const obtenerServicios = async (filtros?: {
   );
   
   console.log('✅ Servicios recibidos:', response.data.length);
+  
+  // Log detallado de servicios con materiales opcionales
+  response.data.forEach(servicio => {
+    if (servicio.tiene_materiales_opcionales && servicio.materiales_opcionales.length > 0) {
+      console.group(`🔍 Servicio con materiales opcionales: ${servicio.nombre}`);
+      console.log('📊 Total materiales opcionales:', servicio.materiales_opcionales.length);
+      servicio.materiales_opcionales.forEach((mat, idx) => {
+        console.log(`  📦 Material ${idx}:`, {
+          id: mat.id,
+          nombre_personalizado: mat.nombre_personalizado,
+          categoria_insumo: mat.categoria_insumo,
+          opciones_disponibles: mat.opciones_disponibles,
+          cantidad_opciones: mat.opciones_disponibles?.length || 0,
+          es_obligatorio: mat.es_obligatorio
+        });
+      });
+      console.groupEnd();
+    }
+  });
+  
   return response.data;
 };
 
