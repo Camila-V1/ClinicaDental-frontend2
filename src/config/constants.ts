@@ -14,11 +14,11 @@ export const API_CONFIG = {
 
 // 🔐 Endpoints de Autenticación
 export const AUTH_ENDPOINTS = {
-  LOGIN: '/api/token/',
-  REGISTER: '/api/usuarios/register/',
-  REFRESH: '/api/token/refresh/',
-  PROFILE: '/api/usuarios/me/',
-  LOGOUT: '/api/logout/',
+  LOGIN: '/api/v1/token/',
+  REGISTER: '/api/v1/usuarios/register/',
+  REFRESH: '/api/v1/token/refresh/',
+  PROFILE: '/api/v1/usuarios/me/',
+  LOGOUT: '/api/v1/logout/',
 } as const;
 
 // 👥 Endpoints de Usuarios
