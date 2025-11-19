@@ -23,54 +23,54 @@ export const AUTH_ENDPOINTS = {
 
 // 👥 Endpoints de Usuarios
 export const USUARIOS_ENDPOINTS = {
-  BASE: '/api/usuarios/',
-  ME: '/api/usuarios/me/',
-  DOCTORES: '/api/usuarios/doctores/',
-  PACIENTES: '/api/usuarios/pacientes/',
-  PERFIL: (id: number) => `/api/usuarios/${id}/`,
+  BASE: '/api/v1/usuarios/',
+  ME: '/api/v1/usuarios/me/',
+  DOCTORES: '/api/v1/usuarios/doctores/',
+  PACIENTES: '/api/v1/usuarios/pacientes/',
+  PERFIL: (id: number) => `/api/v1/usuarios/${id}/`,
 } as const;
 
 // 📅 Endpoints de Agenda
 export const AGENDA_ENDPOINTS = {
-  CITAS: '/api/agenda/citas/',
-  CITA_DETAIL: (id: number) => `/api/agenda/citas/${id}/`,
-  DISPONIBILIDAD: '/api/agenda/disponibilidad/',
+  CITAS: '/api/v1/agenda/citas/',
+  CITA_DETAIL: (id: number) => `/api/v1/agenda/citas/${id}/`,
+  DISPONIBILIDAD: '/api/v1/agenda/disponibilidad/',
 } as const;
 
 // 🦷 Endpoints de Tratamientos
 export const TRATAMIENTOS_ENDPOINTS = {
-  SERVICIOS: '/api/tratamientos/servicios/',
-  PLANES: '/api/tratamientos/planes/',
-  PRESUPUESTOS: '/api/tratamientos/presupuestos/',
+  SERVICIOS: '/api/v1/tratamientos/servicios/',
+  PLANES: '/api/v1/tratamientos/planes/',
+  PRESUPUESTOS: '/api/v1/tratamientos/presupuestos/',
 } as const;
 
 // 📋 Endpoints de Historial Clínico
 export const HISTORIAL_ENDPOINTS = {
-  BASE: '/api/historial-clinico/historiales/',
-  EPISODIOS: '/api/historial-clinico/episodios/',
-  ODONTOGRAMA: (historialId: number) => `/api/historial-clinico/historiales/${historialId}/odontograma/`,
+  BASE: '/api/v1/historial-clinico/historiales/',
+  EPISODIOS: '/api/v1/historial-clinico/episodios/',
+  ODONTOGRAMA: (historialId: number) => `/api/v1/historial-clinico/historiales/${historialId}/odontograma/`,
 } as const;
 
 // 💰 Endpoints de Facturación
 export const FACTURACION_ENDPOINTS = {
-  FACTURAS: '/api/facturacion/facturas/',
-  PAGOS: '/api/facturacion/pagos/',
-  ESTADO_CUENTA: (pacienteId: number) => `/api/facturacion/estado-cuenta/${pacienteId}/`,
+  FACTURAS: '/api/v1/facturacion/facturas/',
+  PAGOS: '/api/v1/facturacion/pagos/',
+  ESTADO_CUENTA: (pacienteId: number) => `/api/v1/facturacion/estado-cuenta/${pacienteId}/`,
 } as const;
 
 // 📦 Endpoints de Inventario
 export const INVENTARIO_ENDPOINTS = {
-  CATEGORIAS: '/api/inventario/categorias/',
-  INSUMOS: '/api/inventario/insumos/',
-  MOVIMIENTOS: '/api/inventario/movimientos/',
+  CATEGORIAS: '/api/v1/inventario/categorias/',
+  INSUMOS: '/api/v1/inventario/insumos/',
+  MOVIMIENTOS: '/api/v1/inventario/movimientos/',
 } as const;
 
 // 📊 Endpoints de Reportes
 export const REPORTES_ENDPOINTS = {
-  DASHBOARD: '/api/reportes/dashboard/',
-  INGRESOS: '/api/reportes/ingresos/',
-  CITAS: '/api/reportes/citas/',
-  PACIENTES: '/api/reportes/pacientes/',
+  DASHBOARD: '/api/v1/reportes/dashboard/',
+  INGRESOS: '/api/v1/reportes/ingresos/',
+  CITAS: '/api/v1/reportes/citas/',
+  PACIENTES: '/api/v1/reportes/pacientes/',
 } as const;
 
 // 🔑 Keys para LocalStorage
