@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (result.success && result.data) {
       console.log('✅ AuthContext: Login exitoso, guardando usuario:', result.data.user.email);
       dispatch({ type: 'LOGIN_SUCCESS', payload: result.data.user });
-      return { success: true };
+      return { success: true, user: result.data.user }; // ← RETORNAR EL USUARIO
     } else {
       console.error('❌ AuthContext: Error en login:', result.error);
       dispatch({ type: 'SET_LOADING', payload: false });
@@ -200,6 +200,9 @@ export const useAuthContext = () => {
   
   return context;
 };
+
+// 🔄 Alias para compatibilidad con otros componentes
+export const useAuth = useAuthContext;
 
 // 🎭 Hook para verificar roles específicos
 export const useRoleCheck = () => {

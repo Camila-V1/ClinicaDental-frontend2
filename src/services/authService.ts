@@ -23,6 +23,9 @@ class AuthService {
   async login(credentials: LoginCredentials): Promise<ServiceResult<AuthResponse>> {
     try {
       console.log('🔑 authService: Paso 1 - Obteniendo tokens...');
+      console.log('📧 Email enviado:', credentials.email);
+      console.log('🔐 Password enviado:', credentials.password ? '***(' + credentials.password.length + ' caracteres)' : 'VACÍO');
+      console.log('🌐 URL completa:', AUTH_ENDPOINTS.LOGIN);
       
       // PASO 1: Obtener tokens JWT
       const tokenResponse = await api.post<{ access: string; refresh: string }>(
@@ -80,6 +83,8 @@ class AuthService {
     } catch (error: unknown) {
       const err = error as { response?: { data?: { detail?: string }; status?: number }; message?: string };
       console.error('❌ authService: Error en login:', err.response?.data || err.message);
+      console.error('❌ Status code:', err.response?.status);
+      console.error('❌ Error completo:', err);
       return {
         success: false,
         error: err.response?.data?.detail || err.message || 'Error al iniciar sesión',

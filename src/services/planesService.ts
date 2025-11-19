@@ -49,29 +49,40 @@ export interface ItemPlanTratamiento {
 
 export interface PlanDeTratamiento {
   id: number;
-  titulo: string;
+  titulo?: string; // ⚠️ Para admin
+  nombre?: string; // ⚠️ Para pacientes (backend unifica)
   descripcion: string;
   paciente: number;
-  paciente_info: PacienteInfo;
+  paciente_id?: number; // ⚠️ Alias backend
+  paciente_info?: PacienteInfo;
   odontologo: number;
-  odontologo_info: OdontologoInfo;
+  odontologo_id?: number; // ⚠️ Alias backend
+  odontologo_info?: OdontologoInfo;
+  odontologo_nombre?: string; // ⚠️ Versión simplificada backend
   estado: string;
-  estado_display: string;
-  prioridad: string;
-  prioridad_display: string;
+  estado_display?: string;
+  prioridad?: string;
+  prioridad_display?: string;
   fecha_creacion: string;
-  fecha_presentacion: string | null;
-  fecha_aceptacion: string | null;
-  fecha_inicio: string | null;
-  fecha_finalizacion: string | null;
-  items: ItemPlanTratamiento[];
-  precio_total_plan: string;
-  cantidad_items: number;
-  porcentaje_completado: number;
-  puede_ser_editado: boolean;
-  notas_internas: string;
-  creado: string;
-  actualizado: string;
+  fecha_presentacion?: string | null;
+  fecha_aceptacion?: string | null;
+  fecha_inicio?: string | null;
+  fecha_finalizacion?: string | null;
+  items?: ItemPlanTratamiento[];
+  precio_total_plan?: string;
+  costo_total?: string; // ⚠️ Alias backend
+  cantidad_items?: number;
+  total_items?: number; // ⚠️ Backend
+  items_completados?: number; // ⚠️ Backend
+  porcentaje_completado?: number; // ⚠️ Admin
+  progreso_porcentaje?: number; // ⚠️ Backend
+  progreso?: number; // ⚠️ Backend (valor real 0-100)
+  observaciones?: string; // ⚠️ Backend
+  observaciones_generales?: string; // ⚠️ Alias backend
+  puede_ser_editado?: boolean;
+  notas_internas?: string;
+  creado?: string;
+  actualizado?: string;
 }
 
 export interface CrearItemPlanDTO {
@@ -117,6 +128,19 @@ export const obtenerPlan = async (id: number): Promise<PlanDeTratamiento> => {
   console.log('📋 Obteniendo plan:', id);
   const response = await api.get<PlanDeTratamiento>(`/api/tratamientos/planes/${id}/`);
   console.log('✅ Plan recibido:', response.data);
+  return response.data;
+};
+
+/**
+ * Obtiene los detalles completos de un plan de tratamiento
+ * Alias de obtenerPlan para compatibilidad con la guía
+ */
+export const obtenerDetallePlan = async (planId: number): Promise<PlanDeTratamiento> => {
+  console.log('📋 Obteniendo detalles del plan:', planId);
+  
+  const response = await api.get<PlanDeTratamiento>(`/api/tratamientos/planes/${planId}/`);
+  
+  console.log('✅ Detalles del plan obtenidos:', response.data);
   return response.data;
 };
 
@@ -314,9 +338,104 @@ export const obtenerPlanesActivos = async (pacienteId: number): Promise<PlanDeTr
  * (solo PENDIENTE o EN_PROGRESO)
  */
 export const obtenerItemsDisponibles = (plan: PlanDeTratamiento): ItemPlanTratamiento[] => {
-  const disponibles = plan.items.filter(item => 
+  const disponibles = plan.items?.filter(item => 
     item.estado === 'PENDIENTE' || item.estado === 'EN_PROGRESO'
-  );
-  console.log(`📋 Ítems disponibles del plan "${plan.titulo}":`, disponibles.length);
+  ) || [];
+  console.log(`📋 Ítems disponibles del plan "${plan.titulo || plan.nombre || 'sin nombre'}":`, disponibles.length);
   return disponibles;
+};
+
+/**
+ * Descarga un documento clínico
+ */
+export const descargarDocumento = async (documentoId: number): Promise<void> => {
+  console.log('📥 Descargando documento:', documentoId);
+  
+  const response = await api.get(`/api/historial/documentos/${documentoId}/descargar/`, {
+    responseType: 'blob'
+  });
+  
+  // Crear URL temporal para descargar
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `documento_${documentoId}.pdf`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+  
+  console.log('✅ Documento descargado');
+};
+
+// ============================================================================
+// FUNCIONES PARA SOLICITUDES Y APROBACIONES (GUÍA 32)
+// ============================================================================
+
+/**
+ * Obtener planes propuestos para el paciente
+ */
+export const obtenerPlanesPropuestos = async (estado: string = 'propuesto'): Promise<PlanDeTratamiento[]> => {
+  console.log('🔍 Obteniendo planes propuestos...');
+  
+  try {
+    const params = new URLSearchParams();
+    params.append('estado', estado.toLowerCase()); // Normalizar a minúsculas
+    
+    const response = await api.get<any>(`/api/tratamientos/planes/propuestos/?${params.toString()}`);
+    
+    // Manejar respuestas con/sin paginación
+    const data = response.data.results ? response.data.results : response.data;
+    
+    console.log('📋 Planes propuestos cargados:', data.length);
+    return data;
+  } catch (error: any) {
+    console.error('❌ Error al obtener planes propuestos:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+/**
+ * Aprobar un plan de tratamiento propuesto
+ */
+export const aprobarPlanPropuesto = async (planId: number): Promise<PlanDeTratamiento> => {
+  console.log('✅ Aprobando plan:', planId);
+  
+  try {
+    const response = await api.post<PlanDeTratamiento>(`/api/tratamientos/planes/${planId}/aprobar/`);
+    console.log('✅ Plan aprobado exitosamente:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error al aprobar plan:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+/**
+ * Rechazar un plan de tratamiento propuesto
+ */
+export const rechazarPlanPropuesto = async (planId: number, motivo: string): Promise<PlanDeTratamiento> => {
+  console.log('❌ Rechazando plan:', planId, 'Motivo:', motivo);
+  
+  // Validar motivo
+  if (!motivo || !motivo.trim()) {
+    throw new Error('El motivo del rechazo es obligatorio');
+  }
+  
+  try {
+    const body = {
+      motivo: motivo.trim()
+    };
+    
+    const response = await api.post<PlanDeTratamiento>(
+      `/api/tratamientos/planes/${planId}/rechazar/`,
+      body
+    );
+    
+    console.log('✅ Plan rechazado exitosamente:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error al rechazar plan:', error.response?.data || error.message);
+    throw error;
+  }
 };

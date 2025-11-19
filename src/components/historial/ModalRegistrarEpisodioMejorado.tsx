@@ -19,7 +19,21 @@ interface ModalRegistrarEpisodioMejoradoProps {
   pacienteNombre: string;
   historialId: number;
   onEpisodioCreado: () => void;
-  citaId?: number; // Para vincular episodio a cita (futuro)
+  citaId?: number;
+  // 🆕 Guía 20: Props para citas vinculadas a planes
+  esCitaPlan?: boolean;
+  servicioId?: number | null;
+  itemPlanId?: number | null;
+  itemPlanInfo?: {
+    id: number;
+    servicio_id: number;
+    servicio_nombre: string;
+    servicio_descripcion: string;
+    plan_id: number;
+    plan_nombre: string;
+    estado: string;
+    notas: string;
+  } | null;
 }
 
 export default function ModalRegistrarEpisodioMejorado({
@@ -29,7 +43,12 @@ export default function ModalRegistrarEpisodioMejorado({
   pacienteNombre,
   historialId,
   onEpisodioCreado,
-  citaId // Reservado para futuro uso
+  citaId,
+  // 🆕 Guía 20: Nuevos props
+  esCitaPlan = false,
+  servicioId: servicioIdInicial = null,
+  itemPlanId = null,
+  itemPlanInfo = null
 }: ModalRegistrarEpisodioMejoradoProps) {
   console.group('🏥 [ModalEpisodioMejorado] RENDER');
   console.log('📋 Props recibidas:');
@@ -38,6 +57,11 @@ export default function ModalRegistrarEpisodioMejorado({
   console.log('  - pacienteNombre:', pacienteNombre);
   console.log('  - historialId:', historialId, '⚠️ CRÍTICO: debe ser > 0');
   console.log('  - citaId:', citaId);
+  // 🆕 Guía 20: Logs para citas de plan
+  console.log('  - esCitaPlan:', esCitaPlan);
+  console.log('  - servicioId:', servicioIdInicial);
+  console.log('  - itemPlanId:', itemPlanId);
+  console.log('  - itemPlanInfo:', itemPlanInfo);
   console.log('⚠️ Si historialId = 0, habrá error 404 al cargar odontogramas');
   console.groupEnd();
 
@@ -49,7 +73,7 @@ export default function ModalRegistrarEpisodioMejorado({
   const [diagnostico, setDiagnostico] = useState('');
   const [descripcionProcedimiento, setDescripcionProcedimiento] = useState('');
   const [notasPrivadas, setNotasPrivadas] = useState('');
-  const [servicioSeleccionado, setServicioSeleccionado] = useState<number | null>(null);
+  const [servicioSeleccionado, setServicioSeleccionado] = useState<number | null>(servicioIdInicial);
   const [servicios, setServicios] = useState<Servicio[]>([]);
   
   // Estados de historial
@@ -61,6 +85,7 @@ export default function ModalRegistrarEpisodioMejorado({
   const [odontogramaActual, setOdontogramaActual] = useState<OdontogramaType | null>(null);
   const [odontogramaModificado, setOdontogramaModificado] = useState(false);
   const [cargandoOdontogramas, setCargandoOdontogramas] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState(false); // Nuevo: controla si está editando
   
   // Modal de edición de pieza
   const [modalPiezaAbierto, setModalPiezaAbierto] = useState(false);
@@ -89,6 +114,22 @@ export default function ModalRegistrarEpisodioMejorado({
     }
     console.groupEnd();
   }, [abierto]);
+
+  // 🆕 Guía 20: Pre-llenar campos cuando es cita de plan
+  useEffect(() => {
+    if (abierto && esCitaPlan && servicioIdInicial && itemPlanId) {
+      console.log('✅ Cita vinculada a plan detectada');
+      console.log('📋 Plan:', itemPlanInfo?.plan_nombre);
+      console.log('🦷 Servicio:', itemPlanInfo?.servicio_nombre);
+      
+      setServicioSeleccionado(servicioIdInicial);
+      
+      // Pre-llenar descripción con notas del plan si existen
+      if (itemPlanInfo?.notas) {
+        setDescripcionProcedimiento(itemPlanInfo.notas);
+      }
+    }
+  }, [abierto, esCitaPlan, servicioIdInicial, itemPlanId, itemPlanInfo]);
 
   const cargarServicios = async () => {
     try {
@@ -145,12 +186,15 @@ export default function ModalRegistrarEpisodioMejorado({
       
       setOdontogramas(datos);
       
-      // Seleccionar el más reciente
+      // NO seleccionar automáticamente - dejar en modo vista
+      // El usuario debe hacer clic en "Nuevo" para editar
       if (datos.length > 0) {
-        console.log('🎯 Seleccionando odontograma más reciente:', datos[datos.length - 1].id);
-        setOdontogramaActual(datos[datos.length - 1]);
+        console.log('📋 Odontogramas cargados:', datos.length);
+        console.log('💡 El usuario debe hacer clic en "Nuevo" o seleccionar uno histórico');
+        setOdontogramaActual(null); // Empezar sin selección
       } else {
         console.log('ℹ️ No hay odontogramas previos');
+        setOdontogramaActual(null);
       }
       
       console.log('✅ Odontogramas cargados correctamente:', datos.length);
@@ -170,40 +214,111 @@ export default function ModalRegistrarEpisodioMejorado({
 
   // Handlers de odontograma
   const handleCrearOdontograma = () => {
+    console.group('➕ [Modal] handleCrearOdontograma()');
+    console.log('📋 historialId:', historialId);
+    console.log('📋 Odontogramas disponibles:', odontogramas.length);
+    
+    // Copiar estado del odontograma más reciente si existe
+    let estadoPiezasInicial = {};
+    if (odontogramas.length > 0) {
+      // Ordenar por ID descendente para obtener el más reciente (ID más alto)
+      const odontogramasOrdenados = [...odontogramas].sort((a, b) => (b.id || 0) - (a.id || 0));
+      const masReciente = odontogramasOrdenados[0];
+      estadoPiezasInicial = { ...masReciente.estado_piezas };
+      console.log('📋 Copiando estado del odontograma más reciente:', masReciente.id);
+      console.log('📊 Estado copiado:', estadoPiezasInicial);
+      console.log('🔍 Todos los IDs disponibles:', odontogramas.map(o => o.id));
+    } else {
+      console.log('ℹ️ No hay odontogramas previos, empezando vacío');
+    }
+    
     const nuevoOdontograma: OdontogramaType = {
       historial_clinico: historialId,
       fecha: new Date().toISOString().split('T')[0],
       tipo_denticion: 'ADULTO',
-      estado_piezas: {},
+      estado_piezas: estadoPiezasInicial, // Copiar estado anterior
       notas_generales: `Odontograma - Atención del ${new Date().toLocaleDateString()}`
     };
 
+    console.log('✅ Nuevo odontograma creado con estado copiado:', nuevoOdontograma);
     setOdontogramaActual(nuevoOdontograma);
     setOdontogramaModificado(true);
+    setModoEdicion(true); // Activar modo edición
+    console.log('✅ Estado actualizado - Odontograma listo para edición');
+    console.groupEnd();
+  };
+
+  const handleCancelarEdicion = () => {
+    console.log('❌ Cancelando edición de odontograma');
+    if (odontogramas.length > 0) {
+      // Volver al más reciente
+      setOdontogramaActual(odontogramas[odontogramas.length - 1]);
+    } else {
+      setOdontogramaActual(null);
+    }
+    setOdontogramaModificado(false);
+    setModoEdicion(false);
   };
 
   const handlePiezaClick = (pieza: PiezaFDI) => {
+    console.log('👆 [Modal] Click en pieza:', pieza.numero, pieza.nombre);
+    console.log('📋 odontogramaActual existe:', !!odontogramaActual);
+    console.log('📋 modoEdicion:', modoEdicion);
+    
+    if (!odontogramaActual) {
+      console.error('❌ No hay odontograma actual - crear uno primero');
+      alert('⚠️ Debes crear un odontograma primero');
+      return;
+    }
+    
+    // Solo permitir edición si está en modo edición
+    if (!modoEdicion) {
+      console.warn('⚠️ No se puede editar - modo solo lectura');
+      console.log('💡 Haz clic en "Nuevo Odontograma" para editar');
+      return; // No abrir modal si no está en modo edición
+    }
+    
     setPiezaSeleccionada(pieza);
     setModalPiezaAbierto(true);
+    console.log('✅ Modal de pieza abierto para:', pieza.numero);
   };
 
   const handleGuardarPieza = (estado: EstadoPiezaDental) => {
-    if (!piezaSeleccionada || !odontogramaActual) return;
+    console.group('💾 [Modal] handleGuardarPieza()');
+    console.log('📋 Pieza seleccionada:', piezaSeleccionada);
+    console.log('📋 Estado a guardar:', estado);
+    console.log('📋 odontogramaActual existe:', !!odontogramaActual);
+    
+    if (!piezaSeleccionada || !odontogramaActual) {
+      console.error('❌ Faltan datos para guardar');
+      console.groupEnd();
+      return;
+    }
 
+    console.log('🔄 Actualizando estado del odontograma...');
     setOdontogramaActual(prev => {
-      if (!prev) return prev;
-      return {
+      if (!prev) {
+        console.error('❌ prev es null');
+        return prev;
+      }
+      
+      const nuevoEstado = {
         ...prev,
         estado_piezas: {
           ...prev.estado_piezas,
           [piezaSeleccionada.numero]: estado
         }
       };
+      
+      console.log('✅ Nuevo estado del odontograma:', nuevoEstado);
+      return nuevoEstado;
     });
 
     setOdontogramaModificado(true);
     setModalPiezaAbierto(false);
     setPiezaSeleccionada(null);
+    console.log('✅ Pieza guardada exitosamente');
+    console.groupEnd();
   };
 
   const handleGuardarOdontograma = async () => {
@@ -221,6 +336,7 @@ export default function ModalRegistrarEpisodioMejorado({
       
       setOdontogramaModificado(false);
       await cargarOdontogramas();
+      setModoEdicion(false); // Salir del modo edición
       alert('✅ Odontograma guardado');
     } catch (err) {
       console.error('Error guardando odontograma:', err);
@@ -248,6 +364,8 @@ export default function ModalRegistrarEpisodioMejorado({
         descripcion_procedimiento: descripcionProcedimiento || undefined,
         notas_privadas: notasPrivadas || undefined,
         servicio: servicioSeleccionado || undefined,
+        // 🆕 Guía 20: Vincular con item de plan si corresponde
+        item_plan_tratamiento: itemPlanId || undefined,
       };
 
       await crearEpisodio(datos);
@@ -511,27 +629,144 @@ export default function ModalRegistrarEpisodioMejorado({
 
                 {/* Servicio */}
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#333' }}>
-                    Servicio Realizado
-                  </label>
-                  <select
-                    value={servicioSeleccionado || ''}
-                    onChange={(e) => setServicioSeleccionado(e.target.value ? Number(e.target.value) : null)}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '2px solid #e0e0e0',
+                  {esCitaPlan && itemPlanInfo ? (
+                    // ============================================================
+                    // MODO 1: CITA VINCULADA A PLAN (Solo Lectura)
+                    // ============================================================
+                    <div style={{
+                      backgroundColor: '#d1fae5',
+                      border: '2px solid #10b981',
                       borderRadius: '8px',
-                      fontSize: '14px'
-                    }}
-                  >
-                    <option value="">Seleccionar servicio...</option>
-                    {servicios.map(servicio => (
-                      <option key={servicio.id} value={servicio.id}>
-                        {servicio.nombre}
-                      </option>
-                    ))}
-                  </select>
+                      padding: '16px'
+                    }}>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '8px',
+                        marginBottom: '12px'
+                      }}>
+                        <span style={{ fontSize: '20px' }}>✅</span>
+                        <strong style={{ color: '#065f46' }}>
+                          Cita Vinculada a Plan de Tratamiento
+                        </strong>
+                      </div>
+
+                      <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: '1fr 1fr', 
+                        gap: '12px',
+                        marginTop: '12px'
+                      }}>
+                        {/* Plan */}
+                        <div>
+                          <label style={{ 
+                            fontSize: '12px', 
+                            color: '#065f46',
+                            fontWeight: '600',
+                            display: 'block',
+                            marginBottom: '4px'
+                          }}>
+                            📋 Plan de Tratamiento
+                          </label>
+                          <div style={{
+                            backgroundColor: 'white',
+                            padding: '10px 12px',
+                            borderRadius: '6px',
+                            border: '1px solid #10b981',
+                            fontSize: '14px',
+                            color: '#111827'
+                          }}>
+                            {itemPlanInfo.plan_nombre}
+                          </div>
+                        </div>
+
+                        {/* Servicio */}
+                        <div>
+                          <label style={{ 
+                            fontSize: '12px', 
+                            color: '#065f46',
+                            fontWeight: '600',
+                            display: 'block',
+                            marginBottom: '4px'
+                          }}>
+                            🦷 Tratamiento
+                          </label>
+                          <div style={{
+                            backgroundColor: 'white',
+                            padding: '10px 12px',
+                            borderRadius: '6px',
+                            border: '1px solid #10b981',
+                            fontSize: '14px',
+                            color: '#111827'
+                          }}>
+                            {itemPlanInfo.servicio_nombre}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Notas del Plan */}
+                      {itemPlanInfo.notas && (
+                        <div style={{ marginTop: '12px' }}>
+                          <label style={{ 
+                            fontSize: '12px', 
+                            color: '#065f46',
+                            fontWeight: '600',
+                            display: 'block',
+                            marginBottom: '4px'
+                          }}>
+                            📝 Notas del Plan
+                          </label>
+                          <div style={{
+                            backgroundColor: 'white',
+                            padding: '10px 12px',
+                            borderRadius: '6px',
+                            border: '1px solid #10b981',
+                            fontSize: '13px',
+                            color: '#6b7280',
+                            fontStyle: 'italic'
+                          }}>
+                            {itemPlanInfo.notas}
+                          </div>
+                        </div>
+                      )}
+
+                      <p style={{ 
+                        fontSize: '12px', 
+                        color: '#065f46',
+                        marginTop: '12px',
+                        marginBottom: 0 
+                      }}>
+                        ℹ️ El tratamiento y plan ya están vinculados. No es necesario seleccionarlos.
+                      </p>
+                    </div>
+                  ) : (
+                    // ============================================================
+                    // MODO 2: CITA NORMAL (Campo Editable)
+                    // ============================================================
+                    <>
+                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#333' }}>
+                        Servicio Realizado
+                      </label>
+                      <select
+                        value={servicioSeleccionado || ''}
+                        onChange={(e) => setServicioSeleccionado(e.target.value ? Number(e.target.value) : null)}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          border: '2px solid #e0e0e0',
+                          borderRadius: '8px',
+                          fontSize: '14px'
+                        }}
+                      >
+                        <option value="">Seleccionar servicio...</option>
+                        {servicios.map(servicio => (
+                          <option key={servicio.id} value={servicio.id}>
+                            {servicio.nombre}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                 </div>
 
                 {/* Notas Privadas */}
@@ -653,15 +888,51 @@ export default function ModalRegistrarEpisodioMejorado({
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                   <h3 style={{ margin: 0, color: '#333' }}>
-                    Odontogramas {odontogramaModificado && <span style={{ color: '#ff9800' }}>• (modificado)</span>}
+                    Odontogramas {modoEdicion && <span style={{ color: '#ff9800' }}>• (editando)</span>}
                   </h3>
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    {odontogramaModificado && (
+                    {modoEdicion ? (
+                      // Modo edición: mostrar Guardar y Cancelar
+                      <>
+                        <button
+                          onClick={handleGuardarOdontograma}
+                          disabled={!odontogramaModificado}
+                          style={{
+                            padding: '10px 20px',
+                            backgroundColor: odontogramaModificado ? '#4caf50' : '#ccc',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: odontogramaModificado ? 'pointer' : 'not-allowed',
+                            fontSize: '14px',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          💾 Guardar Odontograma
+                        </button>
+                        <button
+                          onClick={handleCancelarEdicion}
+                          style={{
+                            padding: '10px 20px',
+                            backgroundColor: '#f44336',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          ✕ Cancelar
+                        </button>
+                      </>
+                    ) : (
+                      // Modo solo lectura: mostrar Nuevo
                       <button
-                        onClick={handleGuardarOdontograma}
+                        onClick={handleCrearOdontograma}
                         style={{
                           padding: '10px 20px',
-                          backgroundColor: '#4caf50',
+                          backgroundColor: '#1976d2',
                           color: 'white',
                           border: 'none',
                           borderRadius: '8px',
@@ -670,24 +941,9 @@ export default function ModalRegistrarEpisodioMejorado({
                           fontWeight: 'bold'
                         }}
                       >
-                        💾 Guardar Odontograma
+                        + Nuevo Odontograma
                       </button>
                     )}
-                    <button
-                      onClick={handleCrearOdontograma}
-                      style={{
-                        padding: '10px 20px',
-                        backgroundColor: '#1976d2',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      + Nuevo Odontograma
-                    </button>
                   </div>
                 </div>
 
@@ -705,14 +961,90 @@ export default function ModalRegistrarEpisodioMejorado({
                   }}>
                     <p style={{ fontSize: '48px', margin: '0 0 16px 0' }}>🦷</p>
                     <p style={{ fontSize: '18px', color: '#666', margin: '0 0 8px 0' }}>
-                      No hay odontogramas registrados
+                      {odontogramas.length === 0 
+                        ? 'No hay odontogramas registrados' 
+                        : 'Selecciona un odontograma para visualizar'}
                     </p>
                     <p style={{ fontSize: '14px', color: '#999' }}>
-                      Haz clic en "Nuevo Odontograma" para crear uno
+                      {odontogramas.length === 0
+                        ? 'Haz clic en "Nuevo Odontograma" para crear el primero'
+                        : 'Haz clic en "Nuevo" para editar o selecciona uno histórico abajo'}
                     </p>
+                    {odontogramas.length > 0 && (
+                      <div style={{ marginTop: '24px' }}>
+                        <h4 style={{ color: '#333', marginBottom: '12px' }}>
+                          Odontogramas Disponibles ({odontogramas.length})
+                        </h4>
+                        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                          {odontogramas
+                            .slice()
+                            .reverse()
+                            .map((odonto) => (
+                              <button
+                                key={odonto.id}
+                                onClick={() => {
+                                  console.log('📅 Cargando odontograma:', odonto.id);
+                                  console.log('📊 Estado de piezas:', odonto.estado_piezas);
+                                  setOdontogramaActual(odonto);
+                                  setOdontogramaModificado(false);
+                                  setModoEdicion(false);
+                                }}
+                                style={{
+                                  padding: '12px 16px',
+                                  backgroundColor: 'white',
+                                  border: '2px solid #1976d2',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  fontSize: '14px',
+                                  transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#e3f2fd';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'white';
+                                }}
+                              >
+                                📅 {odonto.fecha}
+                                <br />
+                                <span style={{ fontSize: '12px', color: '#666' }}>
+                                  {Object.keys(odonto.estado_piezas || {}).length} piezas
+                                </span>
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <>
+                    {/* Indicador del odontograma actual */}
+                    {odontogramaActual && (
+                      <div style={{
+                        backgroundColor: '#e3f2fd',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        marginBottom: '16px',
+                        border: '2px solid #1976d2'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <strong style={{ color: '#1976d2' }}>
+                              {odontogramaActual.id ? '📋 Visualizando:' : '🆕 Nuevo Odontograma'}
+                            </strong>
+                            {odontogramaActual.id && (
+                              <span style={{ marginLeft: '8px', color: '#666' }}>
+                                {odontogramaActual.fecha}
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ color: '#666', fontSize: '14px' }}>
+                            {Object.keys(odontogramaActual.estado_piezas || {}).length} piezas registradas
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     <div style={{
                       backgroundColor: 'white',
                       borderRadius: '12px',
@@ -721,27 +1053,33 @@ export default function ModalRegistrarEpisodioMejorado({
                     }}>
                       <Odontograma
                         odontograma={odontogramaActual}
-                        onPiezaClick={handlePiezaClick}
-                        readonly={false}
+                        onPiezaClick={modoEdicion ? handlePiezaClick : undefined}
+                        readonly={!modoEdicion}
                       />
                     </div>
 
                     {/* Lista de odontogramas anteriores */}
-                    {odontogramas.length > 1 && (
+                    {odontogramas.length > 0 && (
                       <div>
                         <h4 style={{ color: '#333', marginBottom: '12px' }}>
-                          Odontogramas Anteriores ({odontogramas.length - 1})
+                          {odontogramaActual?.id 
+                            ? `Otros Odontogramas (${odontogramas.filter(o => o.id !== odontogramaActual.id).length})`
+                            : `Odontogramas Registrados (${odontogramas.length})`
+                          }
                         </h4>
                         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                           {odontogramas
-                            .filter(o => o.id !== odontogramaActual.id)
+                            .filter(o => o.id !== odontogramaActual?.id)
                             .reverse()
                             .map((odonto) => (
                               <button
                                 key={odonto.id}
                                 onClick={() => {
+                                  console.log('📅 Cargando odontograma anterior:', odonto.id);
+                                  console.log('📊 Estado de piezas:', odonto.estado_piezas);
                                   setOdontogramaActual(odonto);
                                   setOdontogramaModificado(false);
+                                  setModoEdicion(false); // Salir del modo edición al ver histórico
                                 }}
                                 style={{
                                   padding: '12px 16px',
@@ -749,13 +1087,20 @@ export default function ModalRegistrarEpisodioMejorado({
                                   border: '2px solid #1976d2',
                                   borderRadius: '8px',
                                   cursor: 'pointer',
-                                  fontSize: '14px'
+                                  fontSize: '14px',
+                                  transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#e3f2fd';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'white';
                                 }}
                               >
                                 📅 {odonto.fecha}
                                 <br />
                                 <span style={{ fontSize: '12px', color: '#666' }}>
-                                  {Object.keys(odonto.estado_piezas).length} piezas
+                                  {Object.keys(odonto.estado_piezas || {}).length} piezas
                                 </span>
                               </button>
                             ))}

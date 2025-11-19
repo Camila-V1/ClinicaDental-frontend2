@@ -48,10 +48,12 @@ export interface EstadoPiezaDental {
 export interface Odontograma {
   id?: number;
   historial_clinico: number;
-  fecha: string; // ISO date
-  tipo_denticion: TipoDenticion;
+  fecha?: string; // ISO date (frontend)
+  fecha_snapshot?: string; // ISO date (backend)
+  tipo_denticion?: TipoDenticion; // Opcional porque el backend no siempre lo envía
   estado_piezas: Record<string, EstadoPiezaDental>; // Key: número pieza (FDI)
   notas_generales?: string;
+  notas?: string; // Backend usa 'notas'
   odontologo?: number;
   odontologo_nombre?: string;
   creado?: string;

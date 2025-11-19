@@ -139,7 +139,7 @@ const ModalEditarPieza = ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 1000
+        zIndex: 3000
       }}
       onClick={onCerrar}
     >

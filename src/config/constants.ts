@@ -5,11 +5,11 @@
 
 // 🌐 URLs del API
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
-  PUBLIC_URL: import.meta.env.VITE_PUBLIC_API_URL || 'http://localhost:8000/public',
-  TENANT_URL: import.meta.env.VITE_TENANT_API_URL || 'http://localhost:8000/api',
-  TIMEOUT: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
-  BASE_DOMAIN: import.meta.env.VITE_BASE_DOMAIN || 'localhost',
+  BASE_URL: import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://clinica-dental-backend.onrender.com',
+  PUBLIC_URL: import.meta.env.VITE_PUBLIC_API_URL || 'https://clinica-dental-backend.onrender.com/public',
+  TENANT_URL: import.meta.env.VITE_TENANT_API_URL || 'https://clinica-dental-backend.onrender.com/api',
+  TIMEOUT: Number(import.meta.env.VITE_API_TIMEOUT) || 15000,
+  BASE_DOMAIN: import.meta.env.VITE_BASE_DOMAIN || 'onrender.com',
 } as const;
 
 // 🔐 Endpoints de Autenticación

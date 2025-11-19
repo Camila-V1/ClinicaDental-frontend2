@@ -5,12 +5,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { obtenerHistorialCompleto, type HistorialCompleto } from '../../services/historialService';
+import GestionDocumentos from '../../components/historial/GestionDocumentos';
 
 export default function HistorialDetalle() {
   const { pacienteId } = useParams<{ pacienteId: string }>();
   const [historial, setHistorial] = useState<HistorialCompleto | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tabActiva, setTabActiva] = useState<'general' | 'episodios' | 'odontogramas'>('general');
+  const [tabActiva, setTabActiva] = useState<'general' | 'episodios' | 'odontogramas' | 'documentos'>('general');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -265,6 +266,20 @@ export default function HistorialDetalle() {
           >
             🦷 Odontogramas ({historial.odontogramas.length})
           </button>
+          
+          <button
+            onClick={() => setTabActiva('documentos')}
+            style={{
+              padding: '12px 20px',
+              border: 'none',
+              backgroundColor: tabActiva === 'documentos' ? '#3498db' : '#f5f5f5',
+              color: tabActiva === 'documentos' ? 'white' : '#333',
+              cursor: 'pointer',
+              borderRadius: '4px'
+            }}
+          >
+            📄 Documentos ({historial.total_documentos})
+          </button>
         </div>
 
         {/* Contenido de tabs */}
@@ -363,6 +378,16 @@ export default function HistorialDetalle() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Tab Documentos */}
+          {tabActiva === 'documentos' && (
+            <div>
+              <GestionDocumentos 
+                historialId={historial.paciente} 
+                episodioId={undefined}
+              />
             </div>
           )}
         </div>

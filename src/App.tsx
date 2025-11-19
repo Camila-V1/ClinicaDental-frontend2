@@ -22,6 +22,21 @@ import PlanDetalle from './pages/odontologo/PlanDetalle';
 import CalendarioCitas from './components/Calendario/CalendarioCitas';
 import OdontogramaDemo from './pages/odontologo/OdontogramaDemo';
 
+// Páginas del Paciente
+import DashboardPaciente from './pages/paciente/Dashboard';
+import PerfilPaciente from './pages/paciente/Perfil';
+import MisCitas from './pages/paciente/Citas';
+import SolicitarCita from './pages/paciente/SolicitarCita';
+import HistorialClinico from './pages/paciente/Historial';
+import HistorialClinicoCompleto from './pages/paciente/HistorialClinicoCompleto';
+import DetalleEpisodio from './pages/paciente/DetalleEpisodio';
+import PlanesTratamiento from './pages/paciente/Planes';
+import DetallePlanPaciente from './pages/paciente/DetallePlan';
+import SolicitudesPlanes from './pages/paciente/SolicitudesPlanes';
+import Facturas from './pages/paciente/Facturas';
+import DetalleFactura from './pages/paciente/DetalleFactura';
+import Odontograma from './pages/paciente/Odontograma';
+
 function App() {
   return (
     <BrowserRouter>
@@ -117,10 +132,136 @@ function App() {
               }
             />
             
-            {/* Ruta raíz redirige al dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* ============ RUTAS DEL MÓDULO PACIENTE ============ */}
             
-            {/* 404 - Not Found */}
+            {/* Dashboard del paciente */}
+            <Route
+              path="/paciente/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardPaciente />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Perfil del paciente */}
+            <Route
+              path="/paciente/perfil"
+              element={
+                <ProtectedRoute>
+                  <PerfilPaciente />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Citas del paciente */}
+            <Route
+              path="/paciente/citas"
+              element={
+                <ProtectedRoute>
+                  <MisCitas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/paciente/citas/solicitar"
+              element={
+                <ProtectedRoute>
+                  <SolicitarCita />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Historial clínico */}
+            <Route
+              path="/paciente/historial"
+              element={
+                <ProtectedRoute>
+                  <HistorialClinicoCompleto />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Historial clínico (vista anterior) */}
+            <Route
+              path="/paciente/historial-simple"
+              element={
+                <ProtectedRoute>
+                  <HistorialClinico />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Detalle de episodio clínico */}
+            <Route
+              path="/paciente/historial/episodio/:episodioId"
+              element={
+                <ProtectedRoute>
+                  <DetalleEpisodio />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Odontograma interactivo */}
+            <Route
+              path="/paciente/odontograma"
+              element={
+                <ProtectedRoute>
+                  <Odontograma />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Planes de tratamiento */}
+            <Route
+              path="/paciente/planes"
+              element={
+                <ProtectedRoute>
+                  <PlanesTratamiento />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/paciente/planes/:id"
+              element={
+                <ProtectedRoute>
+                  <DetallePlanPaciente />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Solicitudes de planes (aprobar/rechazar) */}
+            <Route
+              path="/paciente/solicitudes"
+              element={
+                <ProtectedRoute>
+                  <SolicitudesPlanes />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Facturas */}
+            <Route
+              path="/paciente/facturas"
+              element={
+                <ProtectedRoute>
+                  <Facturas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/paciente/facturas/:id"
+              element={
+                <ProtectedRoute>
+                  <DetalleFactura />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* ============ FIN RUTAS PACIENTE ============ */}
+
+            {/* Ruta raíz redirige al dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />            {/* 404 - Not Found */}
             <Route path="*" element={
               <div style={{ 
                 minHeight: '100vh', 

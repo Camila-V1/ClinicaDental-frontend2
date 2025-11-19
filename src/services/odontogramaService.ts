@@ -8,6 +8,47 @@ import apiClient from '../config/apiConfig';
 import type { Odontograma } from '../types/odontograma.types';
 
 /**
+ * Detecta el tipo de dentición basándose en las piezas presentes
+ */
+const detectarTipoDenticion = (estado_piezas: Record<string, any>): 'ADULTO' | 'NIÑO' => {
+  const piezas = Object.keys(estado_piezas);
+  
+  // Si hay piezas de adulto (11-48), es ADULTO
+  const hayPiezasAdulto = piezas.some(p => {
+    const num = parseInt(p);
+    return num >= 11 && num <= 48;
+  });
+  
+  if (hayPiezasAdulto) return 'ADULTO';
+  
+  // Si hay piezas de niño (51-85), es NIÑO
+  const hayPiezasNino = piezas.some(p => {
+    const num = parseInt(p);
+    return num >= 51 && num <= 85;
+  });
+  
+  if (hayPiezasNino) return 'NIÑO';
+  
+  // Por defecto, ADULTO
+  return 'ADULTO';
+};
+
+/**
+ * Normaliza un odontograma del backend al formato del frontend
+ */
+const normalizarOdontograma = (odonto: any): Odontograma => {
+  // Detectar tipo de dentición si no viene
+  const tipo_denticion = odonto.tipo_denticion || detectarTipoDenticion(odonto.estado_piezas || {});
+  
+  return {
+    ...odonto,
+    fecha: odonto.fecha || odonto.fecha_snapshot,
+    tipo_denticion,
+    notas_generales: odonto.notas_generales || odonto.notas
+  };
+};
+
+/**
  * Obtener todos los odontogramas de un historial clínico
  */
 export const getOdontogramas = async (historialId: number): Promise<Odontograma[]> => {
@@ -29,10 +70,14 @@ export const getOdontogramas = async (historialId: number): Promise<Odontograma[
     
     console.log('✅ Respuesta recibida exitosamente');
     console.log('📊 Cantidad de odontogramas:', response.data.length);
-    console.log('📋 Datos:', response.data);
+    console.log('📋 Datos raw:', response.data);
     console.groupEnd();
     
-    return response.data;
+    // Normalizar todos los odontogramas
+    const normalizados = response.data.map(normalizarOdontograma);
+    console.log('✅ [ODONTOGRAMA] Odontogramas normalizados:', normalizados);
+    
+    return normalizados;
   } catch (error: any) {
     console.error('❌ ERROR en petición');
     console.error('📊 Error completo:', error);
@@ -59,7 +104,7 @@ export const getOdontograma = async (
     );
     
     console.log('✅ [ODONTOGRAMA] Odontograma obtenido:', response.data);
-    return response.data;
+    return normalizarOdontograma(response.data);
   } catch (error) {
     console.error('❌ [ODONTOGRAMA] Error al obtener odontograma:', error);
     throw error;
@@ -82,13 +127,16 @@ export const createOdontograma = async (
       historial_clinico: historialId
     };
     
+    console.log('📦 [ODONTOGRAMA] Payload completo a enviar:', JSON.stringify(payload, null, 2));
+    console.log('🔍 [ODONTOGRAMA] historial_clinico en payload:', payload.historial_clinico);
+    
     const response = await apiClient.post<Odontograma>(
       `/api/historial/odontogramas/`,
       payload
     );
     
     console.log('✅ [ODONTOGRAMA] Odontograma creado:', response.data);
-    return response.data;
+    return normalizarOdontograma(response.data);
   } catch (error) {
     console.error('❌ [ODONTOGRAMA] Error al crear odontograma:', error);
     throw error;
@@ -116,7 +164,7 @@ export const updateOdontograma = async (
     );
     
     console.log('✅ [ODONTOGRAMA] Odontograma actualizado:', response.data);
-    return response.data;
+    return normalizarOdontograma(response.data);
   } catch (error) {
     console.error('❌ [ODONTOGRAMA] Error al actualizar odontograma:', error);
     throw error;
@@ -138,7 +186,7 @@ export const duplicarOdontograma = async (
     );
     
     console.log('✅ [ODONTOGRAMA] Odontograma duplicado:', response.data);
-    return response.data;
+    return normalizarOdontograma(response.data);
   } catch (error) {
     console.error('❌ [ODONTOGRAMA] Error al duplicar odontograma:', error);
     throw error;

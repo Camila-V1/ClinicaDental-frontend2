@@ -507,6 +507,11 @@ export default function AgendaCitas() {
           historialId={historialIdActual}
           onEpisodioCreado={handleEpisodioCreado}
           citaId={citaSeleccionada.id}
+          // 🔑 Campos para citas vinculadas a planes (Guía 20)
+          esCitaPlan={citaSeleccionada.es_cita_plan ?? false}
+          servicioId={citaSeleccionada.item_plan_info?.servicio_id ?? null}
+          itemPlanId={citaSeleccionada.item_plan ?? null}
+          itemPlanInfo={citaSeleccionada.item_plan_info ?? null}
         />
       )}
       

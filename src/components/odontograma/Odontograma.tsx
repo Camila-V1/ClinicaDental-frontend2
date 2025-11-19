@@ -38,10 +38,11 @@ const Odontograma = ({
     tieneOnPiezaClick: !!onPiezaClick
   });
 
-  // Obtener piezas según tipo de dentición
-  const piezas = obtenerPiezasPorTipo(odontograma.tipo_denticion);
+  // Obtener piezas según tipo de dentición (usar ADULTO por defecto si no está definido)
+  const tipoDenticion = odontograma.tipo_denticion || 'ADULTO';
+  const piezas = obtenerPiezasPorTipo(tipoDenticion);
   
-  console.log(`🦷 [Odontograma] Piezas cargadas para ${odontograma.tipo_denticion}`, {
+  console.log(`🦷 [Odontograma] Piezas cargadas para ${tipoDenticion}`, {
     totalPiezas: piezas.length,
     primerasPiezas: piezas.slice(0, 5).map(p => `${p.numero}: ${p.nombre}`)
   });
