@@ -2,6 +2,8 @@
  * 🏢 CONFIGURACIÓN MULTI-TENANT
  * Detecta y maneja subdominios para django-tenants
  * CORREGIDO: Protegido contra SSR y carga temprana
+ * 
+ * ⚠️ ACTUALIZADO: Frontend NO es multi-tenant, siempre usa el backend en Render
  */
 
 export const TENANT_CONFIG = {
@@ -10,8 +12,8 @@ export const TENANT_CONFIG = {
     tenant: 'http://{tenant}.localhost:8000'
   },
   production: {
-    public: 'https://admin.clinica-dental.com',
-    tenant: 'https://{tenant}.clinica-dental.com'
+    public: 'https://clinica-dental-backend.onrender.com',
+    tenant: 'https://clinica-dental-backend.onrender.com' // Mismo para todos
   }
 } as const;
 
@@ -45,17 +47,23 @@ export const getCurrentTenant = (): string => {
 
 /**
  * 🌐 Construir la URL base de la API según el tenant actual
+ * 
+ * ✅ SIMPLIFICADO: Frontend NO es multi-tenant
+ * Siempre retorna la URL del backend en Render (producción) o localhost (desarrollo)
  */
 export const getApiBaseUrl = (): string => {
-  const tenant = getCurrentTenant();
-  const isProduction = import.meta.env.VITE_ENV === 'production';
-  const config = isProduction ? TENANT_CONFIG.production : TENANT_CONFIG.development;
-
-  if (tenant === 'public') {
-    return config.public;
+  // Usar variables de entorno con fallback
+  const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  
+  if (apiUrl) {
+    return apiUrl;
   }
 
-  return config.tenant.replace('{tenant}', tenant);
+  // Fallback basado en entorno
+  const isProduction = import.meta.env.VITE_ENV === 'production';
+  return isProduction 
+    ? 'https://clinica-dental-backend.onrender.com'
+    : 'http://localhost:8000';
 };
 
 /**
@@ -67,6 +75,9 @@ export const isPublicSchema = (): boolean => {
 
 /**
  * 🔄 Cambiar a otro tenant (redirige a su subdominio)
+ * 
+ * ⚠️ DEPRECADO: Frontend no soporta multi-tenant en producción
+ * Esta función solo funciona en desarrollo local
  */
 export const switchTenant = (newTenant: string): void => {
   if (typeof window === 'undefined') {
@@ -77,10 +88,11 @@ export const switchTenant = (newTenant: string): void => {
   const protocol = window.location.protocol;
   const port = window.location.port ? `:${window.location.port}` : '';
 
-  if (import.meta.env.VITE_ENV === 'production') {
-    window.location.href = `${protocol}//${newTenant}.clinica-dental.com`;
-  } else {
+  // Solo funciona en desarrollo
+  if (import.meta.env.VITE_ENV !== 'production') {
     window.location.href = `${protocol}//${newTenant}.localhost${port}`;
+  } else {
+    console.warn('⚠️ Cambio de tenant no soportado en producción');
   }
 };
 
