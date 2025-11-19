@@ -2,8 +2,6 @@
  * 📖 LEYENDA ODONTOGRAMA - Explicación de colores y estados
  */
 
-import React from 'react';
-
 export default function LeyendaOdontograma() {
   const estados = [
     { codigo: 'SANO', nombre: 'Sano', emoji: '🦷', bg: '#ecfdf5', border: '#10b981', text: '#065f46', descripcion: 'Diente en perfecto estado' },

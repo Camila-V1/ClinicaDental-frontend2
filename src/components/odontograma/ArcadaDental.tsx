@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import { getColorEstadoDiente } from '../../services/historialService';
 
 interface Props {
   dientes: any[];
