@@ -28,7 +28,7 @@ function LoginForm() {
     setIsLoading(true);
     setError('');
     try {
-      const result = await login(credentials);
+      const result: any = await login(credentials);
       if (result.success) {
         let dashboardUrl = '/dashboard';
         if (result.user?.tipo_usuario === 'PACIENTE') {

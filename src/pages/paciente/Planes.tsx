@@ -282,7 +282,7 @@ const PlanesTratamiento = () => {
                           alignItems: 'start',
                           gap: '8px'
                         }}>
-                          <FileText size={16} strokeWidth={1.5} style={{ color: '#f59e0b', marginTop: '2px', flexShrink: 0 }} />
+                          <span style={{ fontSize: '16px', color: '#f59e0b', marginTop: '2px', flexShrink: 0 }}>📋</span>
                           <p style={{ margin: 0, fontSize: '13px', color: '#78350f', lineHeight: '1.5' }}>
                             {observaciones}
                           </p>
@@ -333,7 +333,7 @@ const PlanesTratamiento = () => {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <User size={14} strokeWidth={1.5} style={{ color: '#64748b' }} />
                             <p style={{ margin: 0, fontSize: '14px', color: '#1e293b', fontWeight: '600' }}>
-                              {plan.odontologo_nombre || `${plan.odontologo_info?.nombre || ''} ${plan.odontologo_info?.apellido || ''}`.trim() || 'Sin asignar'}
+                              {plan.odontologo_nombre || `${(plan.odontologo_info as any)?.nombre || ''} ${(plan.odontologo_info as any)?.apellido || ''}`.trim() || 'Sin asignar'}
                             </p>
                           </div>
                         </div>

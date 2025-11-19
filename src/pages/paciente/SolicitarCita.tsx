@@ -133,12 +133,12 @@ const SolicitarCita = () => {
     // Validación crítica: ID del paciente
     // ⚠️ IMPORTANTE: user.perfil_paciente.id puede no existir según el serializer del backend
     // Fallback: usar user.id directamente (PerfilPaciente tiene OneToOneField con Usuario)
-    const pacienteId = user?.perfil_paciente?.id || user?.id;
+    const pacienteId = (user as any)?.perfil_paciente?.id || user?.id;
     
     console.log('👤 Usuario completo:', user);
     console.log('👤 Usuario ID:', user?.id);
-    console.log('👤 Perfil paciente:', user?.perfil_paciente);
-    console.log('👤 Perfil paciente ID:', user?.perfil_paciente?.id);
+    console.log('👤 Perfil paciente:', (user as any)?.perfil_paciente);
+    console.log('👤 Perfil paciente ID:', (user as any)?.perfil_paciente?.id);
     console.log('👤 ID final usado (con fallback):', pacienteId);
     
     if (!pacienteId) {

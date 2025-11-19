@@ -27,7 +27,7 @@ const LoginPaciente = () => {
     console.log('📧 Email:', email);
 
     try {
-      const userData = await login({ email, password });
+      const userData: any = await login({ email, password });
       
       console.log('✅ Login exitoso');
       console.log('👤 Usuario:', userData);

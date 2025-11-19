@@ -61,8 +61,8 @@ export default function DetallePlan() {
       console.log('💰 INFORMACIÓN FINANCIERA:');
       console.log('  • Costo total:', data.costo_total);
       console.log('  • Precio total plan:', data.precio_total_plan);
-      console.log('  • Monto pagado:', data.monto_pagado);
-      console.log('  • Saldo pendiente:', data.saldo_pendiente);
+      console.log('  • Monto pagado:', (data as any).monto_pagado);
+      console.log('  • Saldo pendiente:', (data as any).saldo_pendiente);
       console.log('───────────────────────────────────────────────────────');
       console.log('📊 PROGRESO Y ESTADÍSTICAS:');
       console.log('  • Progreso:', data.progreso);
@@ -70,8 +70,8 @@ export default function DetallePlan() {
       console.log('  • Porcentaje completado:', data.porcentaje_completado);
       console.log('  • Total items:', data.total_items);
       console.log('  • Items completados:', data.items_completados);
-      console.log('  • Items en progreso:', data.items_en_progreso);
-      console.log('  • Items pendientes:', data.items_pendientes);
+      console.log('  • Items en progreso:', (data as any).items_en_progreso);
+      console.log('  • Items pendientes:', (data as any).items_pendientes);
       console.log('  • Cantidad items:', data.cantidad_items);
       console.log('───────────────────────────────────────────────────────');
       console.log('📝 OBSERVACIONES Y NOTAS:');
@@ -109,13 +109,13 @@ export default function DetallePlan() {
       
       console.log('───────────────────────────────────────────────────────');
       console.log('📄 DOCUMENTOS:');
-      console.log('  • Tiene documentos?:', !!data.documentos);
-      console.log('  • Total documentos:', data.documentos?.length || 0);
+      console.log('  • Tiene documentos?:', !!(data as any).documentos);
+      console.log('  • Total documentos:', (data as any).documentos?.length || 0);
       
       console.log('───────────────────────────────────────────────────────');
       console.log('💳 FACTURAS:');
-      console.log('  • Tiene facturas?:', !!data.facturas);
-      console.log('  • Total facturas:', data.facturas?.length || 0);
+      console.log('  • Tiene facturas?:', !!(data as any).facturas);
+      console.log('  • Total facturas:', (data as any).facturas?.length || 0);
       
       console.log('───────────────────────────────────────────────────────');
       console.log('🔑 TODAS LAS PROPIEDADES DISPONIBLES:');

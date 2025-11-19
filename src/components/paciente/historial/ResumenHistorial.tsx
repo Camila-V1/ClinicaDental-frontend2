@@ -1,5 +1,5 @@
 import React from 'react';
-import { HistorialClinicoPaciente } from '../../../services/historialService';
+import type { HistorialClinicoPaciente } from '../../../services/historialService';
 import { AlertCircle, Pill, FileText, Calendar } from 'lucide-react';
 
 interface Props {
