@@ -22,7 +22,7 @@ const api: AxiosInstance = axios.create({
 });
 
 /**
- * 📤 INTERCEPTOR REQUEST: Añadir JWT y establecer baseURL dinámicamente
+ * 📤 INTERCEPTOR REQUEST: Añadir JWT, Tenant ID y establecer baseURL dinámicamente
  * Se ejecuta antes de cada petición
  */
 api.interceptors.request.use(
@@ -32,10 +32,21 @@ api.interceptors.request.use(
       config.baseURL = getApiBaseUrl();
     }
 
+    // 1️⃣ Agregar token de autenticación
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
     
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // 2️⃣ ⭐ NUEVO: Agregar Tenant ID desde el subdominio
+    if (typeof window !== 'undefined') {
+      const { getTenantIdFromHostname } = require('./tenantConfig');
+      const tenantId = getTenantIdFromHostname();
+      
+      if (config.headers) {
+        config.headers['X-Tenant-ID'] = tenantId;
+      }
     }
 
     // Log de debugging (solo en desarrollo)
@@ -46,6 +57,7 @@ api.interceptors.request.use(
         url: config.url,
         fullURL: `${config.baseURL}${config.url}`,
         hasToken: !!token,
+        tenantId: config.headers?.['X-Tenant-ID'],
       });
     }
 
