@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TenantProvider } from './context/TenantContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import TenantDebugInfo from './components/TenantDebugInfo';
+import { TenantDebugInfo } from './components/TenantDebugInfo';
 
 // Pages
 import LoginPage from './pages/auth/LoginPage';
