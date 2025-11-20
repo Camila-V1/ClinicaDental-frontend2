@@ -44,7 +44,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     },
     {
       label: 'Tasa de Ocupación',
-      value: `${stats.tasa_ocupacion.toFixed(1)}%`,
+      value: `${typeof stats.tasa_ocupacion === 'number' ? stats.tasa_ocupacion.toFixed(1) : '0.0'}%`,
       color: 'text-indigo-600',
     },
   ];

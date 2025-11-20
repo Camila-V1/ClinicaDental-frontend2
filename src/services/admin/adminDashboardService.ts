@@ -51,9 +51,8 @@ export const adminDashboardService = {
    * Obtener insumos con stock bajo
    */
   async getStockBajo() {
-    const { data } = await api.get('/api/inventario/insumos/', {
+    const { data } = await api.get('/api/inventario/insumos/bajo_stock/', {
       params: { 
-        stock_bajo: true,
         page_size: 10
       }
     });

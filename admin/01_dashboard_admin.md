@@ -70,15 +70,18 @@ Response: {
 }
 
 // 5. Inventario con stock bajo
-GET /api/inventario/insumos/?stock_bajo=true
+GET /api/inventario/insumos/bajo_stock/
 Response: {
   count: 3,
+  next: null,
+  previous: null,
   results: [
     {
       id: 1,
       nombre: "Resina 3M Filtek",
       stock_actual: 5,
       stock_minimo: 10,
+      categoria: { id: 1, nombre: "Materiales Restaurativos" },
       ...
     }
   ]
@@ -356,10 +359,10 @@ export const dashboardService = {
     return data;
   },
 
-  // Stock bajo
+  // Stock bajo (usando acción custom)
   async getStockBajo() {
-    const { data } = await api.get('/inventario/insumos/', {
-      params: { stock_bajo: true, page_size: 10 }
+    const { data } = await api.get('/inventario/insumos/bajo_stock/', {
+      params: { page_size: 10 }
     });
     return data;
   },
