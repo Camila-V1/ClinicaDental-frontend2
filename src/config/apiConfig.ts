@@ -49,24 +49,25 @@ api.interceptors.request.use(
       }
     }
 
-    // Log de debugging (solo en desarrollo)
-    if (DEBUG) {
-      console.log('🚀 Request:', {
-        method: config.method?.toUpperCase(),
-        baseURL: config.baseURL,
-        url: config.url,
-        fullURL: `${config.baseURL}${config.url}`,
-        hasToken: !!token,
-        tenantId: config.headers?.['X-Tenant-ID'],
-      });
-    }
+    // ✅ Log DETALLADO de cada request
+    console.log('🚀 [API REQUEST] ==================');
+    console.log('  Method:', config.method?.toUpperCase());
+    console.log('  BaseURL:', config.baseURL);
+    console.log('  URL:', config.url);
+    console.log('  Full URL:', `${config.baseURL}${config.url}`);
+    console.log('  Headers:', {
+      'Content-Type': config.headers?.['Content-Type'],
+      'Authorization': config.headers?.Authorization ? 'Bearer ***' : 'none',
+      'X-Tenant-ID': config.headers?.['X-Tenant-ID'],
+    });
+    console.log('  Params:', config.params);
+    console.log('  Data:', config.data);
+    console.log('====================================');
 
     return config;
   },
   (error: AxiosError) => {
-    if (DEBUG) {
-      console.error('❌ Request Error:', error);
-    }
+    console.error('❌ [API REQUEST ERROR]:', error);
     return Promise.reject(error);
   }
 );
@@ -77,27 +78,30 @@ api.interceptors.request.use(
  */
 api.interceptors.response.use(
   (response) => {
-    // Log de debugging (solo en desarrollo)
-    if (DEBUG) {
-      console.log('✅ Response:', {
-        status: response.status,
-        url: response.config.url,
-        data: response.data,
-      });
-    }
+    // ✅ Log DETALLADO de cada response exitosa
+    console.log('✅ [API RESPONSE] ==================');
+    console.log('  Status:', response.status, response.statusText);
+    console.log('  URL:', response.config.url);
+    console.log('  Data:', response.data);
+    console.log('  Headers:', response.headers);
+    console.log('====================================');
     return response;
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (DEBUG) {
-      console.error('❌ Response Error:', {
-        status: error.response?.status,
-        url: originalRequest?.url,
-        message: error.message,
-        data: error.response?.data,
-      });
-    }
+    // ❌ Log DETALLADO de errores
+    console.error('❌ [API RESPONSE ERROR] ==================');
+    console.error('  Status:', error.response?.status);
+    console.error('  Status Text:', error.response?.statusText);
+    console.error('  URL:', originalRequest?.url);
+    console.error('  Full URL:', `${originalRequest?.baseURL}${originalRequest?.url}`);
+    console.error('  Method:', originalRequest?.method?.toUpperCase());
+    console.error('  Message:', error.message);
+    console.error('  Response Data:', error.response?.data);
+    console.error('  Response Headers:', error.response?.headers);
+    console.error('  Request Headers:', originalRequest?.headers);
+    console.error('==========================================');
 
     // 🔄 Manejo automático de 401 Unauthorized (token expirado)
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {

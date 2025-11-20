@@ -15,37 +15,119 @@ import ActivityTimeline from '@/components/admin/ActivityTimeline';
 import Button from '@/components/ui/Button';
 
 export default function Dashboard() {
-  // Fetch de datos
-  const { data: kpis, isLoading: loadingKpis, refetch: refetchKpis } = useQuery({
+  console.log('🎯 [AdminDashboard] Componente montado');
+
+  // Fetch de datos con logging detallado
+  const { data: kpis, isLoading: loadingKpis, error: errorKpis, refetch: refetchKpis } = useQuery({
     queryKey: ['dashboard-kpis'],
-    queryFn: adminDashboardService.getKPIs,
-    refetchInterval: 30000, // Refetch cada 30 segundos
+    queryFn: async () => {
+      console.log('📊 [AdminDashboard] Fetching KPIs...');
+      try {
+        const result = await adminDashboardService.getKPIs();
+        console.log('✅ [AdminDashboard] KPIs obtenidos:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ [AdminDashboard] Error obteniendo KPIs:', error);
+        if (error instanceof Error) {
+          console.error('❌ [AdminDashboard] Error message:', error.message);
+          console.error('❌ [AdminDashboard] Error stack:', error.stack);
+        }
+        throw error;
+      }
+    },
+    refetchInterval: 30000,
+    retry: 2,
   });
 
-  const { data: tendencia } = useQuery({
+  const { data: tendencia, error: errorTendencia } = useQuery({
     queryKey: ['tendencia-citas', 15],
-    queryFn: () => adminDashboardService.getTendenciaCitas(15),
+    queryFn: async () => {
+      console.log('📈 [AdminDashboard] Fetching tendencia citas...');
+      try {
+        const result = await adminDashboardService.getTendenciaCitas(15);
+        console.log('✅ [AdminDashboard] Tendencia obtenida:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ [AdminDashboard] Error obteniendo tendencia:', error);
+        throw error;
+      }
+    },
+    retry: 2,
   });
 
-  const { data: topProcedimientos } = useQuery({
+  const { data: topProcedimientos, error: errorProcedimientos } = useQuery({
     queryKey: ['top-procedimientos', 5],
-    queryFn: () => adminDashboardService.getTopProcedimientos(5),
+    queryFn: async () => {
+      console.log('🔝 [AdminDashboard] Fetching top procedimientos...');
+      try {
+        const result = await adminDashboardService.getTopProcedimientos(5);
+        console.log('✅ [AdminDashboard] Top procedimientos obtenidos:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ [AdminDashboard] Error obteniendo procedimientos:', error);
+        throw error;
+      }
+    },
+    retry: 2,
   });
 
-  const { data: estadisticas } = useQuery({
+  const { data: estadisticas, error: errorEstadisticas } = useQuery({
     queryKey: ['estadisticas-generales'],
-    queryFn: adminDashboardService.getEstadisticasGenerales,
+    queryFn: async () => {
+      console.log('📋 [AdminDashboard] Fetching estadísticas generales...');
+      try {
+        const result = await adminDashboardService.getEstadisticasGenerales();
+        console.log('✅ [AdminDashboard] Estadísticas obtenidas:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ [AdminDashboard] Error obteniendo estadísticas:', error);
+        throw error;
+      }
+    },
+    retry: 2,
   });
 
-  const { data: stockBajo } = useQuery({
+  const { data: stockBajo, error: errorStock } = useQuery({
     queryKey: ['stock-bajo'],
-    queryFn: adminDashboardService.getStockBajo,
+    queryFn: async () => {
+      console.log('📦 [AdminDashboard] Fetching stock bajo...');
+      try {
+        const result = await adminDashboardService.getStockBajo();
+        console.log('✅ [AdminDashboard] Stock bajo obtenido:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ [AdminDashboard] Error obteniendo stock bajo:', error);
+        throw error;
+      }
+    },
+    retry: 2,
   });
 
-  const { data: actividad } = useQuery({
+  const { data: actividad, error: errorActividad } = useQuery({
     queryKey: ['actividad-reciente'],
-    queryFn: adminDashboardService.getActividadReciente,
+    queryFn: async () => {
+      console.log('📅 [AdminDashboard] Fetching actividad reciente...');
+      try {
+        const result = await adminDashboardService.getActividadReciente();
+        console.log('✅ [AdminDashboard] Actividad obtenida:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ [AdminDashboard] Error obteniendo actividad:', error);
+        throw error;
+      }
+    },
+    retry: 2,
   });
+
+  // Log de errores consolidado
+  React.useEffect(() => {
+    if (errorKpis) console.error('🔴 [AdminDashboard] Error KPIs:', errorKpis);
+    if (errorTendencia) console.error('🔴 [AdminDashboard] Error Tendencia:', errorTendencia);
+    if (errorProcedimientos) console.error('🔴 [AdminDashboard] Error Procedimientos:', errorProcedimientos);
+    if (errorEstadisticas) console.error('🔴 [AdminDashboard] Error Estadísticas:', errorEstadisticas);
+    if (errorStock) console.error('🔴 [AdminDashboard] Error Stock:', errorStock);
+    if (errorActividad) console.error('🔴 [AdminDashboard] Error Actividad:', errorActividad);
+  }, [errorKpis, errorTendencia, errorProcedimientos, errorEstadisticas, errorStock, errorActividad]);
 
   const handleRefresh = () => {
     refetchKpis();
