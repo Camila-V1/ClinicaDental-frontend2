@@ -79,7 +79,7 @@ export default function LineChart({
   };
 
   return (
-    <div className="h-64">
+    <div style={{ height: '256px' }}>
       <Line data={chartData} options={options} />
     </div>
   );

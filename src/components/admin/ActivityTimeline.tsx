@@ -14,9 +14,9 @@ interface ActivityTimelineProps {
 export default function ActivityTimeline({ activities }: ActivityTimelineProps) {
   if (activities.length === 0) {
     return (
-      <div className="text-center text-gray-500 py-8">
-        <Clock className="w-12 h-12 mx-auto mb-2" />
-        <p>No hay actividad reciente</p>
+      <div style={{ textAlign: 'center', color: '#6b7280', padding: '32px 0' }}>
+        <Clock size={48} style={{ margin: '0 auto 8px auto', color: '#9ca3af' }} />
+        <p style={{ margin: 0 }}>No hay actividad reciente</p>
       </div>
     );
   }
@@ -29,29 +29,42 @@ export default function ActivityTimeline({ activities }: ActivityTimelineProps) 
   };
 
   return (
-    <div className="space-y-4">
-      {activities.map((activity) => {
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {activities.map((activity, index) => {
         const Icon = getIcon(activity.accion_display);
+        const isLast = index === activities.length - 1;
         
         return (
-          <div key={activity.id} className="flex gap-4">
+          <div key={activity.id} style={{ display: 'flex', gap: '16px' }}>
             {/* Icono */}
-            <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <Icon className="w-5 h-5 text-blue-600" />
+            <div style={{ flexShrink: 0 }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#dbeafe',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Icon size={20} style={{ color: '#2563eb' }} />
               </div>
             </div>
 
             {/* Contenido */}
-            <div className="flex-1 pb-4 border-b border-gray-100 last:border-0">
-              <div className="flex items-start justify-between">
+            <div style={{
+              flex: 1,
+              paddingBottom: '16px',
+              borderBottom: isLast ? 'none' : '1px solid #f3f4f6'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                 <div>
-                  <p className="font-medium text-gray-900">{activity.descripcion}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p style={{ fontWeight: '500', color: '#111827', margin: 0 }}>{activity.descripcion}</p>
+                  <p style={{ fontSize: '14px', color: '#4b5563', marginTop: '4px', margin: 0 }}>
                     Por: {activity.usuario_nombre}
                   </p>
                 </div>
-                <span className="text-sm text-gray-500">
+                <span style={{ fontSize: '14px', color: '#6b7280' }}>
                   {timeAgo(activity.fecha_hora)}
                 </span>
               </div>

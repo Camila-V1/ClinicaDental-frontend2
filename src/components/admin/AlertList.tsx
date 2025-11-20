@@ -14,9 +14,9 @@ interface AlertListProps {
 export default function AlertList({ alerts }: AlertListProps) {
   if (alerts.length === 0) {
     return (
-      <div className="text-center text-gray-500 py-8">
-        <CheckCircle className="w-12 h-12 mx-auto mb-2 text-green-500" />
-        <p>No hay alertas pendientes</p>
+      <div style={{ textAlign: 'center', color: '#6b7280', padding: '32px 0' }}>
+        <CheckCircle size={48} style={{ margin: '0 auto 8px auto', color: '#22c55e' }} />
+        <p style={{ margin: 0 }}>No hay alertas pendientes</p>
       </div>
     );
   }
@@ -24,54 +24,76 @@ export default function AlertList({ alerts }: AlertListProps) {
   const getIcon = (type: Alerta['type']) => {
     switch (type) {
       case 'error':
-        return <AlertTriangle className="w-5 h-5 text-red-600" />;
+        return <AlertTriangle size={20} style={{ color: '#dc2626' }} />;
       case 'warning':
-        return <AlertCircle className="w-5 h-5 text-orange-600" />;
+        return <AlertCircle size={20} style={{ color: '#ea580c' }} />;
       case 'info':
-        return <Info className="w-5 h-5 text-blue-600" />;
+        return <Info size={20} style={{ color: '#2563eb' }} />;
       case 'success':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle size={20} style={{ color: '#16a34a' }} />;
     }
   };
 
-  const getBgColor = (type: Alerta['type']) => {
+  const getStyles = (type: Alerta['type']) => {
     switch (type) {
-      case 'error': return 'bg-red-50 border-red-200';
-      case 'warning': return 'bg-orange-50 border-orange-200';
-      case 'info': return 'bg-blue-50 border-blue-200';
-      case 'success': return 'bg-green-50 border-green-200';
+      case 'error': return { bg: '#fef2f2', border: '#fecaca' };
+      case 'warning': return { bg: '#fff7ed', border: '#fed7aa' };
+      case 'info': return { bg: '#eff6ff', border: '#bfdbfe' };
+      case 'success': return { bg: '#f0fdf4', border: '#bbf7d0' };
     }
   };
 
   return (
-    <div className="space-y-3">
-      {alerts.map((alert, index) => (
-        <div 
-          key={index} 
-          className={`p-4 rounded-lg border ${getBgColor(alert.type)}`}
-        >
-          <div className="flex items-start gap-3">
-            {getIcon(alert.type)}
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">{alert.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{alert.message}</p>
-              {alert.link && (
-                <Link 
-                  to={alert.link}
-                  className="text-sm text-blue-600 hover:underline mt-2 inline-block"
-                >
-                  Ver detalles →
-                </Link>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {alerts.map((alert, index) => {
+        const styles = getStyles(alert.type);
+        return (
+          <div 
+            key={index} 
+            style={{
+              padding: '16px',
+              borderRadius: '8px',
+              border: `1px solid ${styles.border}`,
+              backgroundColor: styles.bg
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              {getIcon(alert.type)}
+              <div style={{ flex: 1 }}>
+                <h3 style={{ fontWeight: '600', color: '#111827', margin: 0 }}>{alert.title}</h3>
+                <p style={{ fontSize: '14px', color: '#4b5563', marginTop: '4px', marginBottom: 0 }}>{alert.message}</p>
+                {alert.link && (
+                  <Link 
+                    to={alert.link}
+                    style={{
+                      fontSize: '14px',
+                      color: '#2563eb',
+                      textDecoration: 'none',
+                      marginTop: '8px',
+                      display: 'inline-block'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                    onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
+                  >
+                    Ver detalles →
+                  </Link>
+                )}
+              </div>
+              {alert.count !== undefined && (
+                <span style={{
+                  backgroundColor: 'white',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  {alert.count}
+                </span>
               )}
             </div>
-            {alert.count !== undefined && (
-              <span className="bg-white px-2 py-1 rounded text-sm font-semibold">
-                {alert.count}
-              </span>
-            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

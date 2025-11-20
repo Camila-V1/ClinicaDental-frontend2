@@ -69,7 +69,7 @@ export default function BarChart({
   };
 
   return (
-    <div className="h-64">
+    <div style={{ height: '256px' }}>
       <Bar data={chartData} options={options} />
     </div>
   );

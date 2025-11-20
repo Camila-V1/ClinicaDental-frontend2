@@ -15,46 +15,61 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     {
       label: 'Pacientes Activos',
       value: formatNumber(stats.total_pacientes_activos),
-      color: 'text-blue-600',
+      color: '#2563eb', // blue-600
     },
     {
       label: 'Odontólogos',
       value: formatNumber(stats.total_odontologos),
-      color: 'text-purple-600',
+      color: '#9333ea', // purple-600
     },
     {
       label: 'Citas Este Mes',
       value: formatNumber(stats.citas_mes_actual),
-      color: 'text-green-600',
+      color: '#16a34a', // green-600
     },
     {
       label: 'Tratamientos Completados',
       value: formatNumber(stats.tratamientos_completados),
-      color: 'text-orange-600',
+      color: '#ea580c', // orange-600
     },
     {
       label: 'Ingresos del Mes',
       value: formatCurrency(stats.ingresos_mes_actual),
-      color: 'text-emerald-600',
+      color: '#059669', // emerald-600
     },
     {
       label: 'Promedio por Factura',
       value: formatCurrency(stats.promedio_factura),
-      color: 'text-cyan-600',
+      color: '#0891b2', // cyan-600
     },
     {
       label: 'Tasa de Ocupación',
       value: `${typeof stats.tasa_ocupacion === 'number' ? stats.tasa_ocupacion.toFixed(1) : '0.0'}%`,
-      color: 'text-indigo-600',
+      color: '#4f46e5', // indigo-600
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div style={{ 
+      display: 'grid', 
+      gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+      gap: '16px' 
+    }}>
       {items.map((item, index) => (
-        <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
-          <p className="text-sm text-gray-600 mb-1">{item.label}</p>
-          <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
+        <div 
+          key={index} 
+          style={{
+            padding: '16px',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+            transition: 'box-shadow 0.2s',
+            backgroundColor: 'white'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'}
+          onMouseOut={(e) => e.currentTarget.style.boxShadow = 'none'}
+        >
+          <p style={{ fontSize: '14px', color: '#4b5563', marginBottom: '4px', margin: 0 }}>{item.label}</p>
+          <p style={{ fontSize: '24px', fontWeight: 'bold', color: item.color, margin: 0 }}>{item.value}</p>
         </div>
       ))}
     </div>

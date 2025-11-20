@@ -38,24 +38,52 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-50">
+    <div style={{ height: '100vh', display: 'flex', overflow: 'hidden', backgroundColor: '#f9fafb' }}>
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-gray-200 text-gray-700 transition-all duration-300 flex flex-col shadow-sm`}>
+      <aside style={{
+        width: sidebarOpen ? '256px' : '80px',
+        backgroundColor: 'white',
+        borderRight: '1px solid #e5e7eb',
+        color: '#374151',
+        transition: 'all 0.3s',
+        display: 'flex',
+        flexDirection: 'column',
+        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+      }}>
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100">
+        <div style={{
+          height: '64px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          borderBottom: '1px solid #f3f4f6'
+        }}>
           {sidebarOpen && (
-            <h1 className="text-xl font-bold text-blue-800">Admin Panel</h1>
+            <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e40af', margin: 0 }}>Admin Panel</h1>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
+            style={{
+              padding: '8px',
+              borderRadius: '8px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              color: '#6b7280',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
 
         {/* Menu */}
-        <nav className="flex-1 overflow-y-auto py-4 space-y-1">
+        <nav style={{ flex: 1, overflowY: 'auto', padding: '16px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {menuItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -63,13 +91,32 @@ export default function AdminLayout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 border-l-4 ${
-                  active
-                    ? 'bg-blue-50 border-blue-600 text-blue-700 font-medium'
-                    : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-blue-600'
-                }`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s',
+                  borderLeft: active ? '4px solid #2563eb' : '4px solid transparent',
+                  backgroundColor: active ? '#eff6ff' : 'transparent',
+                  color: active ? '#1d4ed8' : '#4b5563',
+                  fontWeight: active ? '500' : 'normal'
+                }}
+                onMouseOver={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = '#f9fafb';
+                    e.currentTarget.style.color = '#2563eb';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#4b5563';
+                  }
+                }}
               >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500'}`} />
+                <Icon size={20} style={{ flexShrink: 0, color: active ? '#2563eb' : 'inherit' }} />
                 {sidebarOpen && <span>{item.label}</span>}
               </Link>
             );
@@ -77,49 +124,112 @@ export default function AdminLayout() {
         </nav>
 
         {/* User Section */}
-        <div className="border-t border-gray-100 p-4 bg-gray-50">
-          <div className={`flex items-center ${sidebarOpen ? 'gap-3' : 'justify-center'}`}>
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center border border-blue-200">
-              <span className="text-sm font-bold text-blue-700">
+        <div style={{ borderTop: '1px solid #f3f4f6', padding: '16px', backgroundColor: '#f9fafb' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: sidebarOpen ? '12px' : '0', justifyContent: sidebarOpen ? 'flex-start' : 'center' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: '#dbeafe',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #bfdbfe'
+            }}>
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#1d4ed8' }}>
                 {user?.nombre?.[0] || 'A'}
               </span>
             </div>
             {sidebarOpen && (
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-800">{user?.nombre || 'Admin'}</p>
-                <p className="text-xs text-gray-500 font-medium">{user?.tipo_usuario || 'ADMIN'}</p>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937', margin: 0 }}>{user?.nombre || 'Admin'}</p>
+                <p style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500', margin: 0 }}>{user?.tipo_usuario || 'ADMIN'}</p>
               </div>
             )}
           </div>
           <button
             onClick={handleLogout}
-            className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 bg-white border border-red-100 rounded-lg hover:bg-red-50 hover:border-red-200 transition-all shadow-sm"
+            style={{
+              marginTop: '12px',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              color: '#dc2626',
+              backgroundColor: 'white',
+              border: '1px solid #fee2e2',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#fef2f2';
+              e.currentTarget.style.borderColor = '#fecaca';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.borderColor = '#fee2e2';
+            }}
           >
-            <LogOut className="w-4 h-4" />
-            {sidebarOpen && <span className="text-sm font-medium">Cerrar Sesión</span>}
+            <LogOut size={16} />
+            {sidebarOpen && <span style={{ fontSize: '14px', fontWeight: '500' }}>Cerrar Sesión</span>}
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#f9fafb' }}>
         {/* Header */}
-        <header className="h-16 bg-white border-b-2 border-blue-600 flex items-center justify-between px-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl font-bold text-gray-800">
+        <header style={{
+          height: '64px',
+          backgroundColor: 'white',
+          borderBottom: '2px solid #2563eb',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 24px',
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
               {menuItems.find(item => item.path === location.pathname)?.label || 'Admin'}
             </h2>
           </div>
-          <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-full relative transition-colors">
-              <Bell className="w-5 h-5 text-gray-600" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button style={{
+              padding: '8px',
+              borderRadius: '9999px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              <Bell size={20} style={{ color: '#4b5563' }} />
+              <span style={{
+                position: 'absolute',
+                top: '6px',
+                right: '6px',
+                width: '8px',
+                height: '8px',
+                backgroundColor: '#ef4444',
+                borderRadius: '50%',
+                border: '2px solid white'
+              }}></span>
             </button>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           <Outlet />
         </main>
       </div>

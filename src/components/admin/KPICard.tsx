@@ -26,39 +26,53 @@ export default function KPICard({
 }: KPICardProps) {
   const Icon = Icons[icon] as React.ElementType;
 
-  const colorClasses = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    purple: 'bg-purple-100 text-purple-600',
-    orange: 'bg-orange-100 text-orange-600',
-    red: 'bg-red-100 text-red-600',
+  const colorStyles = {
+    blue: { bg: '#dbeafe', text: '#2563eb' },
+    green: { bg: '#dcfce7', text: '#16a34a' },
+    purple: { bg: '#f3e8ff', text: '#9333ea' },
+    orange: { bg: '#ffedd5', text: '#ea580c' },
+    red: { bg: '#fee2e2', text: '#dc2626' },
   };
 
+  const currentStyle = colorStyles[color];
+
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm text-gray-600 font-medium">{label}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+    <div style={{ 
+      backgroundColor: 'white', 
+      borderRadius: '8px', 
+      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', 
+      padding: '24px' 
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: '14px', color: '#4b5563', fontWeight: '500', margin: 0 }}>{label}</p>
+          <p style={{ fontSize: '30px', fontWeight: 'bold', color: '#111827', marginTop: '8px', marginBottom: 0 }}>{value}</p>
           
           {trend && (
-            <div className="flex items-center mt-2">
-              <span className={cn(
-                'text-sm font-medium',
-                trend.isPositive ? 'text-green-600' : 'text-red-600'
-              )}>
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+              <span style={{
+                fontSize: '14px',
+                fontWeight: '500',
+                color: trend.isPositive ? '#16a34a' : '#dc2626'
+              }}>
                 {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
               </span>
-              <span className="text-xs text-gray-500 ml-2">vs mes anterior</span>
+              <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '8px' }}>vs mes anterior</span>
             </div>
           )}
         </div>
 
-        <div className={cn(
-          'w-12 h-12 rounded-lg flex items-center justify-center',
-          colorClasses[color]
-        )}>
-          <Icon className="w-6 h-6" />
+        <div style={{
+          width: '48px',
+          height: '48px',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: currentStyle.bg,
+          color: currentStyle.text
+        }}>
+          <Icon size={24} />
         </div>
       </div>
     </div>

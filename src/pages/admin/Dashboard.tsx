@@ -134,29 +134,34 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Bienvenido al panel de administración</p>
+          <h1 style={{ fontSize: '30px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Dashboard</h1>
+          <p style={{ color: '#4b5563', margin: '4px 0 0 0' }}>Bienvenido al panel de administración</p>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
-          <RefreshCw className="w-4 h-4 mr-2" />
+          <RefreshCw size={16} />
           Actualizar
         </Button>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
+        gap: '24px' 
+      }}>
         {loadingKpis ? (
           <>
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-gray-100 rounded-lg animate-pulse" />
+              <div key={i} style={{ height: '128px', backgroundColor: '#f3f4f6', borderRadius: '8px', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
             ))}
           </>
         ) : (
@@ -198,10 +203,14 @@ export default function Dashboard() {
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+        gap: '24px' 
+      }}>
         {/* Tendencia de Citas */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Tendencia de Citas (15 días)</h2>
+        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#111827' }}>Tendencia de Citas (15 días)</h2>
           {tendencia && tendencia.length > 0 ? (
             <LineChart
               data={tendencia}
@@ -211,15 +220,15 @@ export default function Dashboard() {
               label="Citas"
             />
           ) : (
-            <div className="h-64 flex items-center justify-center text-gray-500">
+            <div style={{ height: '256px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
               No hay datos disponibles
             </div>
           )}
         </div>
 
         {/* Top Procedimientos */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Top Procedimientos</h2>
+        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#111827' }}>Top Procedimientos</h2>
           {topProcedimientos && topProcedimientos.length > 0 ? (
             <BarChart
               data={topProcedimientos}
@@ -229,7 +238,7 @@ export default function Dashboard() {
               label="Cantidad"
             />
           ) : (
-            <div className="h-64 flex items-center justify-center text-gray-500">
+            <div style={{ height: '256px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
               No hay datos disponibles
             </div>
           )}
@@ -237,20 +246,24 @@ export default function Dashboard() {
       </div>
 
       {/* Estadísticas y Alertas */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+        gap: '24px' 
+      }}>
         {/* Estadísticas */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Estadísticas Generales</h2>
+        <div style={{ gridColumn: 'span 2', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#111827' }}>Estadísticas Generales</h2>
           {estadisticas ? (
             <StatsGrid stats={estadisticas} />
           ) : (
-            <div className="text-center text-gray-500 py-8">Cargando...</div>
+            <div style={{ textAlign: 'center', color: '#6b7280', padding: '32px 0' }}>Cargando...</div>
           )}
         </div>
 
         {/* Alertas */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Alertas</h2>
+        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#111827' }}>Alertas</h2>
           <AlertList alerts={[
             ...(stockBajo && stockBajo.count > 0 ? [{
               type: 'warning' as const,
@@ -264,12 +277,12 @@ export default function Dashboard() {
       </div>
 
       {/* Actividad Reciente */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Actividad Reciente</h2>
+      <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '24px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#111827' }}>Actividad Reciente</h2>
         {actividad && actividad.results ? (
           <ActivityTimeline activities={actividad.results} />
         ) : (
-          <div className="text-center text-gray-500 py-8">Cargando...</div>
+          <div style={{ textAlign: 'center', color: '#6b7280', padding: '32px 0' }}>Cargando...</div>
         )}
       </div>
     </div>
