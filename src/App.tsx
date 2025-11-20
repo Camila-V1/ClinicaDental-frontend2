@@ -4,6 +4,7 @@
  */
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { TenantProvider } from './context/TenantContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -38,11 +39,42 @@ import Facturas from './pages/paciente/Facturas';
 import DetalleFactura from './pages/paciente/DetalleFactura';
 import Odontograma from './pages/paciente/Odontograma';
 
+// Admin Pages
+import AdminLayout from './components/layout/AdminLayout';
+import AdminDashboard from './pages/admin/Dashboard';
+import AdminUsuarios from './pages/admin/Usuarios';
+
 function App() {
   return (
     <BrowserRouter>
       <TenantProvider>
         <AuthProvider>
+          {/* Toaster para notificaciones */}
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                duration: 5000,
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+          
           {/* Componente de debug de tenant (solo en desarrollo) */}
           {import.meta.env.DEV && <TenantDebugInfo />}
           
@@ -263,6 +295,21 @@ function App() {
             />
             
             {/* ============ FIN RUTAS PACIENTE ============ */}
+
+            {/* ============ RUTAS ADMIN ============ */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="usuarios" element={<AdminUsuarios />} />
+              <Route index element={<Navigate to="dashboard" replace />} />
+            </Route>
+            {/* ============ FIN RUTAS ADMIN ============ */}
 
             {/* Ruta raíz redirige al dashboard */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />            {/* 404 - Not Found */}
