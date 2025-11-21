@@ -43,6 +43,7 @@ import Odontograma from './pages/paciente/Odontograma';
 import AdminLayout from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsuarios from './pages/admin/Usuarios';
+import AdminPacientes from './pages/admin/Pacientes';
 
 function App() {
   return (
@@ -307,6 +308,7 @@ function App() {
             >
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="usuarios" element={<AdminUsuarios />} />
+              <Route path="pacientes" element={<AdminPacientes />} />
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
             {/* ============ FIN RUTAS ADMIN ============ */}
