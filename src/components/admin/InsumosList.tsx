@@ -60,7 +60,7 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
     );
   }
 
-  const insumos = data?.results || [];
+  const insumos = data || [];
 
   return (
     <div>
