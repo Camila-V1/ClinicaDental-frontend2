@@ -14,7 +14,7 @@ export const adminUsuariosService = {
   /**
    * Listar usuarios con filtros
    */
-  async getUsuarios(filtros: FiltrosUsuarios = {}): Promise<PaginatedResponse<Usuario>> {
+  async getUsuarios(filtros: FiltrosUsuarios = {}): Promise<Usuario[]> {
     const params = new URLSearchParams();
     
     if (filtros.tipo_usuario) params.append('tipo_usuario', filtros.tipo_usuario);

@@ -180,7 +180,7 @@ export default function Usuarios() {
       {/* Tabla */}
       <div className="bg-white rounded-lg shadow">
         <UserTable
-          users={data?.results || []}
+          users={data || []}
           isLoading={isLoading}
           onEdit={handleEdit}
           onToggleActive={handleToggleActive}
