@@ -2,7 +2,7 @@
  * 📊 Servicio de Reportes y Dashboard
  */
 
-import api from '@/lib/axios-core';
+import api from '../config/apiConfig';
 
 // ==================== INTERFACES ====================
 
