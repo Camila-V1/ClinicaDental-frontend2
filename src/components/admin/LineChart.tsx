@@ -42,6 +42,15 @@ export default function LineChart({
   color = '#3b82f6',
   label = 'Datos'
 }: LineChartProps) {
+  // Validación: No renderizar si no hay datos
+  if (!data || data.length === 0) {
+    return (
+      <div style={{ height: '256px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
+        No hay datos disponibles
+      </div>
+    );
+  }
+
   const chartData = {
     labels: data.map(item => item[xKey]),
     datasets: [

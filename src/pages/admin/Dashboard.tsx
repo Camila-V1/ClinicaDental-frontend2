@@ -211,37 +211,25 @@ export default function Dashboard() {
         {/* Tendencia de Citas */}
         <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '24px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#111827' }}>Tendencia de Citas (15 días)</h2>
-          {tendencia && tendencia.length > 0 ? (
-            <LineChart
-              data={tendencia}
-              xKey="fecha"
-              yKey="cantidad"
-              color="#3b82f6"
-              label="Citas"
-            />
-          ) : (
-            <div style={{ height: '256px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
-              No hay datos disponibles
-            </div>
-          )}
+          <LineChart
+            data={tendencia || []}
+            xKey="fecha"
+            yKey="cantidad"
+            color="#3b82f6"
+            label="Citas"
+          />
         </div>
 
         {/* Top Procedimientos */}
         <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '24px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#111827' }}>Top Procedimientos</h2>
-          {topProcedimientos && topProcedimientos.length > 0 ? (
-            <BarChart
-              data={topProcedimientos}
-              xKey="etiqueta"
-              yKey="valor"
-              color="#10b981"
-              label="Cantidad"
-            />
-          ) : (
-            <div style={{ height: '256px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
-              No hay datos disponibles
-            </div>
-          )}
+          <BarChart
+            data={topProcedimientos || []}
+            xKey="etiqueta"
+            yKey="valor"
+            color="#10b981"
+            label="Cantidad"
+          />
         </div>
       </div>
 

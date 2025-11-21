@@ -38,6 +38,15 @@ export default function BarChart({
   color = '#10b981',
   label = 'Cantidad'
 }: BarChartProps) {
+  // Validación: No renderizar si no hay datos
+  if (!data || data.length === 0) {
+    return (
+      <div style={{ height: '256px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
+        No hay datos disponibles
+      </div>
+    );
+  }
+
   const chartData = {
     labels: data.map(item => item[xKey]),
     datasets: [
