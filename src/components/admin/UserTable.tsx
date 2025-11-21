@@ -14,6 +14,27 @@ interface UserTableProps {
   onToggleActive: (user: Usuario) => void;
 }
 
+// ✅ Función segura para obtener iniciales (previene error de charAt en undefined)
+const getInitials = (fullName?: string): string => {
+  if (!fullName || typeof fullName !== 'string') {
+    console.warn('⚠️ [getInitials] fullName es undefined o inválido:', fullName);
+    return '??';
+  }
+  
+  const trimmed = fullName.trim();
+  if (!trimmed) return '??';
+  
+  const parts = trimmed.split(' ');
+  if (parts.length >= 2) {
+    const initial1 = parts[0].charAt(0).toUpperCase();
+    const initial2 = parts[1].charAt(0).toUpperCase();
+    return `${initial1}${initial2}`;
+  }
+  
+  // Si solo hay una palabra, tomar las primeras dos letras
+  return trimmed.substring(0, 2).toUpperCase();
+};
+
 export default function UserTable({ users, isLoading, onEdit, onToggleActive }: UserTableProps) {
   console.log('📊 [UserTable] Renderizando tabla con:', { 
     users, 
@@ -94,7 +115,7 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                     <span className="text-blue-600 font-medium">
-                      {user.full_name.charAt(0)}
+                      {getInitials(user.full_name)}
                     </span>
                   </div>
                   <div className="ml-3">
