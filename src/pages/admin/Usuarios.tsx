@@ -112,46 +112,50 @@ export default function Usuarios() {
     });
   };
 
+  console.log('🎨 [Usuarios] Renderizando página con:', { 
+    data, 
+    cantidad: data?.length,
+    isLoading,
+    filters 
+  });
+
   return (
-    <div className="p-6 space-y-6">
-      {console.log('🎨 [Usuarios] Renderizando página con:', { 
-        data, 
-        usuarios: data?.results,
-        cantidad: data?.results?.length,
-        isLoading,
-        filters 
-      })}
+    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Equipo de Trabajo</h1>
-          <p className="text-gray-600">Gestiona odontólogos, recepcionistas y administradores</p>
+          <h1 style={{ fontSize: '30px', fontWeight: 'bold', color: '#111827' }}>Equipo de Trabajo</h1>
+          <p style={{ color: '#6b7280' }}>Gestiona odontólogos, recepcionistas y administradores</p>
         </div>
         <Button onClick={handleCreate}>
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus style={{ width: '20px', height: '20px', marginRight: '8px' }} />
           Nuevo Usuario
         </Button>
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+      <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+          <div style={{ position: 'relative' }}>
+            <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', color: '#9ca3af' }} />
             <input
               type="text"
               placeholder="Buscar por nombre o email..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              style={{ width: '100%', paddingLeft: '40px', paddingRight: '16px', paddingTop: '8px', paddingBottom: '8px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
             />
           </div>
 
           <select
             value={filters.tipo_usuario}
             onChange={(e) => setFilters({ ...filters, tipo_usuario: e.target.value })}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', outline: 'none', backgroundColor: 'white', cursor: 'pointer' }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
           >
             <option value="ODONTOLOGO">Odontólogos</option>
             <option value="RECEPCIONISTA">Recepcionistas</option>
@@ -161,7 +165,9 @@ export default function Usuarios() {
           <select
             value={filters.is_active}
             onChange={(e) => setFilters({ ...filters, is_active: e.target.value })}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', outline: 'none', backgroundColor: 'white', cursor: 'pointer' }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
           >
             <option value="">Todos los estados</option>
             <option value="true">Activos</option>
@@ -169,8 +175,10 @@ export default function Usuarios() {
           </select>
 
           <button
-            onClick={() => setFilters({ tipo_usuario: '', is_active: 'true', search: '' })}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            onClick={() => setFilters({ tipo_usuario: 'ODONTOLOGO', is_active: 'true', search: '' })}
+            style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', backgroundColor: 'white', cursor: 'pointer', transition: 'background-color 150ms' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
           >
             Limpiar Filtros
           </button>
@@ -178,7 +186,7 @@ export default function Usuarios() {
       </div>
 
       {/* Tabla */}
-      <div className="bg-white rounded-lg shadow">
+      <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)' }}>
         <UserTable
           users={data || []}
           isLoading={isLoading}

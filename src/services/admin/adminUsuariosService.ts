@@ -15,6 +15,8 @@ export const adminUsuariosService = {
    * Listar usuarios con filtros
    */
   async getUsuarios(filtros: FiltrosUsuarios = {}): Promise<Usuario[]> {
+    console.log('🔍 [adminUsuariosService] getUsuarios llamado con filtros:', filtros);
+    
     const params = new URLSearchParams();
     
     if (filtros.tipo_usuario) params.append('tipo_usuario', filtros.tipo_usuario);
@@ -33,7 +35,13 @@ export const adminUsuariosService = {
       throw new Error('Debe especificar un tipo_usuario válido (ODONTOLOGO, PACIENTE, RECEPCIONISTA, ADMIN)');
     }
 
+    console.log(`📍 [adminUsuariosService] Llamando a endpoint: ${endpoint}?${params.toString()}`);
+    
     const { data } = await api.get(`${endpoint}?${params.toString()}`);
+    
+    console.log('📦 [adminUsuariosService] Datos recibidos del backend:', data);
+    console.log('📦 [adminUsuariosService] Primer usuario:', data[0]);
+    
     return data;
   },
 

@@ -15,11 +15,16 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Formatea una fecha ISO a formato legible
  */
-export function formatDate(dateString: string, includeTime = false): string {
+export function formatDate(dateString: string | null | undefined, includeTime = false): string {
+  if (!dateString) {
+    return '-';
+  }
+  
   const date = new Date(dateString);
   
   if (isNaN(date.getTime())) {
-    return 'Fecha inválida';
+    console.warn('⚠️ [formatDate] Fecha inválida:', dateString);
+    return '-';
   }
 
   const options: Intl.DateTimeFormatOptions = {

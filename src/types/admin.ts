@@ -42,6 +42,9 @@ export interface PerfilOdontologo {
 export interface Usuario {
   id: number;
   email: string;
+  nombre?: string;
+  apellido?: string;
+  nombre_completo: string;
   first_name: string;
   last_name: string;
   full_name: string;

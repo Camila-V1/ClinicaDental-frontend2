@@ -14,6 +14,49 @@ interface UserTableProps {
   onToggleActive: (user: Usuario) => void;
 }
 
+// ✅ Función segura para obtener nombre completo
+const getFullName = (user: Usuario): string => {
+  // Prioridad 1: nombre_completo del backend (nuevo campo)
+  if (user.nombre_completo && user.nombre_completo.trim()) {
+    console.log('✅ [getFullName] Usando nombre_completo:', user.nombre_completo);
+    return user.nombre_completo.trim();
+  }
+  
+  // Prioridad 2: full_name (campo antiguo, por compatibilidad)
+  if (user.full_name && user.full_name.trim()) {
+    console.log('⚠️ [getFullName] Usando full_name (campo antiguo):', user.full_name);
+    return user.full_name.trim();
+  }
+  
+  // Prioridad 3: Construir desde nombre + apellido (campos backend)
+  const nombre = user.nombre?.trim() || '';
+  const apellido = user.apellido?.trim() || '';
+  
+  if (nombre && apellido) {
+    console.log('🔧 [getFullName] Construido desde nombre+apellido:', `${nombre} ${apellido}`);
+    return `${nombre} ${apellido}`;
+  }
+  
+  if (nombre) return nombre;
+  if (apellido) return apellido;
+  
+  // Prioridad 4: Construir desde first_name + last_name (campos Django)
+  const firstName = user.first_name?.trim() || '';
+  const lastName = user.last_name?.trim() || '';
+  
+  if (firstName && lastName) {
+    console.log('🔧 [getFullName] Construido desde first_name+last_name:', `${firstName} ${lastName}`);
+    return `${firstName} ${lastName}`;
+  }
+  
+  if (firstName) return firstName;
+  if (lastName) return lastName;
+  
+  // Fallback final: email
+  console.warn('⚠️ [getFullName] No hay nombre disponible, usando email:', user.email);
+  return user.email || 'Sin nombre';
+};
+
 // ✅ Función segura para obtener iniciales (previene error de charAt en undefined)
 const getInitials = (fullName?: string): string => {
   if (!fullName || typeof fullName !== 'string') {
@@ -109,6 +152,7 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
         <tbody style={{ borderTop: '1px solid #e5e7eb' }}>
           {users.map((user, index) => {
             console.log(`👤 [UserTable] Renderizando usuario ${index}:`, user);
+            const fullName = getFullName(user);
             return (
               <tr 
                 key={user.id} 
@@ -120,11 +164,11 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <span style={{ color: '#2563eb', fontWeight: '500' }}>
-                      {getInitials(user.full_name)}
+                      {getInitials(fullName)}
                     </span>
                   </div>
                   <div style={{ marginLeft: '12px' }}>
-                    <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>{user.full_name}</p>
+                    <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>{fullName}</p>
                   </div>
                 </div>
               </td>

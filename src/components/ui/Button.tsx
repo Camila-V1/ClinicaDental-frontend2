@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import { cn } from '@/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'ghost';
@@ -17,46 +16,115 @@ export default function Button({
   size = 'md',
   isLoading = false,
   disabled,
-  className,
+  style,
   children,
   ...props 
 }: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-
-  const variantClasses = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-    secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
+  const baseStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: '500',
+    borderRadius: '8px',
+    transition: 'all 150ms',
+    outline: 'none',
+    border: 'none',
+    cursor: disabled || isLoading ? 'not-allowed' : 'pointer',
+    opacity: disabled || isLoading ? 0.5 : 1,
   };
 
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
+  const variantStyles: Record<string, React.CSSProperties> = {
+    primary: {
+      backgroundColor: '#2563eb',
+      color: 'white',
+    },
+    secondary: {
+      backgroundColor: '#e5e7eb',
+      color: '#111827',
+    },
+    danger: {
+      backgroundColor: '#dc2626',
+      color: 'white',
+    },
+    success: {
+      backgroundColor: '#16a34a',
+      color: 'white',
+    },
+    ghost: {
+      backgroundColor: 'transparent',
+      color: '#374151',
+    },
+  };
+
+  const sizeStyles: Record<string, React.CSSProperties> = {
+    sm: {
+      padding: '6px 12px',
+      fontSize: '14px',
+    },
+    md: {
+      padding: '8px 16px',
+      fontSize: '16px',
+    },
+    lg: {
+      padding: '12px 24px',
+      fontSize: '18px',
+    },
+  };
+
+  const hoverStyles: Record<string, string> = {
+    primary: '#1d4ed8',
+    secondary: '#d1d5db',
+    danger: '#b91c1c',
+    success: '#15803d',
+    ghost: '#f3f4f6',
+  };
+
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [rotation, setRotation] = React.useState(0);
+
+  // Animación del spinner
+  React.useEffect(() => {
+    if (!isLoading) return;
+    
+    const interval = setInterval(() => {
+      setRotation(prev => (prev + 30) % 360);
+    }, 50);
+    
+    return () => clearInterval(interval);
+  }, [isLoading]);
+
+  const combinedStyle: React.CSSProperties = {
+    ...baseStyle,
+    ...variantStyles[variant],
+    ...sizeStyles[size],
+    ...(isHovered && !disabled && !isLoading ? { backgroundColor: hoverStyles[variant] } : {}),
+    ...style,
   };
 
   return (
     <button
-      className={cn(
-        baseClasses,
-        variantClasses[variant],
-        sizeClasses[size],
-        className
-      )}
+      style={combinedStyle}
       disabled={disabled || isLoading}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       {...props}
     >
       {isLoading && (
         <svg 
-          className="animate-spin -ml-1 mr-2 h-4 w-4"
+          style={{ 
+            transform: `rotate(${rotation}deg)`, 
+            marginLeft: '-4px', 
+            marginRight: '8px', 
+            width: '16px', 
+            height: '16px',
+            transition: 'transform 50ms linear'
+          }}
           xmlns="http://www.w3.org/2000/svg" 
           fill="none" 
           viewBox="0 0 24 24"
         >
           <circle 
-            className="opacity-25" 
+            style={{ opacity: 0.25 }}
             cx="12" 
             cy="12" 
             r="10" 
@@ -64,7 +132,7 @@ export default function Button({
             strokeWidth="4"
           />
           <path 
-            className="opacity-75" 
+            style={{ opacity: 0.75 }}
             fill="currentColor" 
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           />

@@ -36,8 +36,9 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
     resolver: zodResolver(userSchema),
     defaultValues: user ? {
       email: user.email,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      // Priorizar campos backend (nombre/apellido) sobre Django (first_name/last_name)
+      first_name: user.nombre || user.first_name || '',
+      last_name: user.apellido || user.last_name || '',
       tipo_usuario: user.tipo_usuario as any,
       perfil_odontologo: user.perfil_odontologo,
     } : {
@@ -55,63 +56,73 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={user ? 'Editar Usuario' : 'Nuevo Usuario'}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {/* Información Básica */}
-        <div className="grid grid-cols-2 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Nombre</label>
             <input
               {...register('first_name')}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
             />
             {errors.first_name && (
-              <p className="text-red-500 text-sm mt-1">{errors.first_name.message}</p>
+              <p style={{ color: '#ef4444', fontSize: '14px', marginTop: '4px' }}>{errors.first_name.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Apellido</label>
             <input
               {...register('last_name')}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
             />
             {errors.last_name && (
-              <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>
+              <p style={{ color: '#ef4444', fontSize: '14px', marginTop: '4px' }}>{errors.last_name.message}</p>
             )}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Email</label>
           <input
             type="email"
             {...register('email')}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
           />
           {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+            <p style={{ color: '#ef4444', fontSize: '14px', marginTop: '4px' }}>{errors.email.message}</p>
           )}
         </div>
 
         {!user && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Contraseña</label>
             <input
               type="password"
               {...register('password')}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
             />
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              <p style={{ color: '#ef4444', fontSize: '14px', marginTop: '4px' }}>{errors.password.message}</p>
             )}
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Usuario</label>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Tipo de Usuario</label>
           <select
             {...register('tipo_usuario')}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', backgroundColor: 'white', cursor: 'pointer' }}
+            onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
           >
             <option value="ODONTOLOGO">Odontólogo</option>
             <option value="RECEPCIONISTA">Recepcionista</option>
@@ -122,35 +133,41 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
         {isOdontologo && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Especialidad</label>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Especialidad</label>
               <input
                 {...register('perfil_odontologo.especialidad')}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+                onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+                onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
                 placeholder="Ej: Ortodoncia, Endodoncia"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">N° Licencia</label>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>N° Licencia</label>
                 <input
                   {...register('perfil_odontologo.numero_licencia')}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Teléfono</label>
                 <input
                   {...register('perfil_odontologo.telefono')}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
                 />
               </div>
             </div>
           </>
         )}
 
-        <div className="flex justify-end gap-3 pt-4 border-t">
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
           <Button type="button" variant="ghost" onClick={handleClose}>
             Cancelar
           </Button>
