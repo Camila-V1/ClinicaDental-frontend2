@@ -46,8 +46,8 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
   if (isLoading) {
     console.log('⏳ [UserTable] Mostrando loading...');
     return (
-      <div className="p-12 flex items-center justify-center">
-        <Loader className="w-8 h-8 animate-spin text-blue-600" />
+      <div style={{ padding: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Loader style={{ width: '32px', height: '32px', animation: 'spin 1s linear infinite', color: '#2563eb' }} />
       </div>
     );
   }
@@ -55,7 +55,7 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
   if (users.length === 0) {
     console.log('📭 [UserTable] No hay usuarios para mostrar');
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div style={{ padding: '32px', textAlign: 'center', color: '#6b7280' }}>
         <p>No se encontraron usuarios</p>
       </div>
     );
@@ -65,100 +65,115 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
 
   const getRoleBadge = (tipo: string) => {
     const config = {
-      ODONTOLOGO: { label: 'Odontólogo', color: 'bg-blue-100 text-blue-800' },
-      RECEPCIONISTA: { label: 'Recepcionista', color: 'bg-green-100 text-green-800' },
-      ADMIN: { label: 'Administrador', color: 'bg-purple-100 text-purple-800' },
-      PACIENTE: { label: 'Paciente', color: 'bg-gray-100 text-gray-800' },
+      ODONTOLOGO: { label: 'Odontólogo', bg: '#dbeafe', color: '#1e40af' },
+      RECEPCIONISTA: { label: 'Recepcionista', bg: '#d1fae5', color: '#065f46' },
+      ADMIN: { label: 'Administrador', bg: '#e9d5ff', color: '#6b21a8' },
+      PACIENTE: { label: 'Paciente', bg: '#f3f4f6', color: '#1f2937' },
     };
-    const { label, color } = config[tipo] || config.PACIENTE;
+    const { label, bg, color } = config[tipo] || config.PACIENTE;
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${color}`}>
+      <span style={{ padding: '4px 8px', borderRadius: '9999px', fontSize: '12px', fontWeight: '500', backgroundColor: bg, color }}>
         {label}
       </span>
     );
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-gray-50 border-b">
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ width: '100%' }}>
+        <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
               Usuario
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
               Email
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
               Rol
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
               Especialidad
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
               Estado
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
               Registro
             </th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+            <th style={{ padding: '12px 24px', textAlign: 'right', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
               Acciones
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody style={{ borderTop: '1px solid #e5e7eb' }}>
           {users.map((user, index) => {
             console.log(`👤 [UserTable] Renderizando usuario ${index}:`, user);
             return (
-              <tr key={user.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 font-medium">
+              <tr 
+                key={user.id} 
+                style={{ borderBottom: '1px solid #e5e7eb' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <td style={{ padding: '16px 24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ color: '#2563eb', fontWeight: '500' }}>
                       {getInitials(user.full_name)}
                     </span>
                   </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
+                  <div style={{ marginLeft: '12px' }}>
+                    <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>{user.full_name}</p>
                   </div>
                 </div>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-              <td className="px-6 py-4">{getRoleBadge(user.tipo_usuario)}</td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td style={{ padding: '16px 24px', fontSize: '14px', color: '#4b5563' }}>{user.email}</td>
+              <td style={{ padding: '16px 24px' }}>{getRoleBadge(user.tipo_usuario)}</td>
+              <td style={{ padding: '16px 24px', fontSize: '14px', color: '#4b5563' }}>
                 {user.perfil_odontologo?.especialidad || '-'}
               </td>
-              <td className="px-6 py-4">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  user.is_active 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
+              <td style={{ padding: '16px 24px' }}>
+                <span style={{ 
+                  padding: '4px 8px', 
+                  borderRadius: '9999px', 
+                  fontSize: '12px', 
+                  fontWeight: '500',
+                  backgroundColor: user.is_active ? '#d1fae5' : '#fee2e2',
+                  color: user.is_active ? '#065f46' : '#991b1b'
+                }}>
                   {user.is_active ? 'Activo' : 'Inactivo'}
                 </span>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td style={{ padding: '16px 24px', fontSize: '14px', color: '#4b5563' }}>
                 {formatDate(user.date_joined)}
               </td>
-              <td className="px-6 py-4 text-right">
-                <div className="flex items-center justify-end gap-2">
+              <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
                   <button
                     onClick={() => onEdit(user)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                    style={{ padding: '8px', color: '#2563eb', borderRadius: '8px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#eff6ff'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     title="Editar"
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit style={{ width: '16px', height: '16px' }} />
                   </button>
                   <button
                     onClick={() => onToggleActive(user)}
-                    className={`p-2 rounded-lg ${
-                      user.is_active 
-                        ? 'text-red-600 hover:bg-red-50' 
-                        : 'text-green-600 hover:bg-green-50'
-                    }`}
+                    style={{ 
+                      padding: '8px', 
+                      borderRadius: '8px', 
+                      border: 'none', 
+                      cursor: 'pointer', 
+                      backgroundColor: 'transparent',
+                      color: user.is_active ? '#dc2626' : '#16a34a'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = user.is_active ? '#fef2f2' : '#f0fdf4'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     title={user.is_active ? 'Desactivar' : 'Activar'}
                   >
-                    <Power className="w-4 h-4" />
+                    <Power style={{ width: '16px', height: '16px' }} />
                   </button>
                 </div>
               </td>
