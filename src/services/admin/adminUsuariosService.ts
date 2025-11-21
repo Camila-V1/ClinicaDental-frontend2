@@ -24,11 +24,14 @@ export const adminUsuariosService = {
     if (filtros.page_size) params.append('page_size', filtros.page_size.toString());
     
     // Determinar endpoint basado en el tipo de usuario
-    let endpoint = '/api/usuarios/usuarios/';
+    let endpoint: string;
     if (filtros.tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
     else if (filtros.tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
     else if (filtros.tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
     else if (filtros.tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+    else {
+      throw new Error('Debe especificar un tipo_usuario válido (ODONTOLOGO, PACIENTE, RECEPCIONISTA, ADMIN)');
+    }
 
     const { data } = await api.get(`${endpoint}?${params.toString()}`);
     return data;
@@ -38,9 +41,18 @@ export const adminUsuariosService = {
    * Obtener un usuario por ID
    */
   async getUsuario(id: number, tipo_usuario?: string): Promise<Usuario> {
-    let endpoint = '/api/usuarios/usuarios/';
+    if (!tipo_usuario) {
+      throw new Error('Debe especificar el tipo_usuario para obtener un usuario específico');
+    }
+    
+    let endpoint: string;
     if (tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
     else if (tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
+    else if (tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
+    else if (tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+    else {
+      throw new Error(`Tipo de usuario no válido: ${tipo_usuario}`);
+    }
     
     const { data } = await api.get(`${endpoint}${id}/`);
     return data;
@@ -50,10 +62,13 @@ export const adminUsuariosService = {
    * Crear nuevo usuario
    */
   async createUsuario(userData: UsuarioFormData): Promise<Usuario> {
-    let endpoint = '/api/usuarios/usuarios/';
+    let endpoint: string;
     if (userData.tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
     else if (userData.tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
     else if (userData.tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+    else {
+      throw new Error(`Tipo de usuario no válido para crear: ${userData.tipo_usuario}`);
+    }
 
     const { data } = await api.post(endpoint, userData);
     return data;
@@ -63,14 +78,21 @@ export const adminUsuariosService = {
    * Actualizar usuario existente
    */
   async updateUsuario(id: number, userData: Partial<UsuarioFormData>, tipo_usuario?: string): Promise<Usuario> {
-    let endpoint = '/api/usuarios/usuarios/';
-    // Si no se pasa el tipo, intentamos deducirlo de userData si existe, o usamos el fallback
+    // Si no se pasa el tipo, intentamos deducirlo de userData
     const tipo = tipo_usuario || userData.tipo_usuario;
     
+    if (!tipo) {
+      throw new Error('Debe especificar el tipo_usuario para actualizar un usuario');
+    }
+    
+    let endpoint: string;
     if (tipo === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
     else if (tipo === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
     else if (tipo === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
     else if (tipo === 'ADMIN') endpoint = '/api/usuarios/admins/';
+    else {
+      throw new Error(`Tipo de usuario no válido: ${tipo}`);
+    }
 
     const { data } = await api.patch(`${endpoint}${id}/`, userData);
     return data;
@@ -80,11 +102,18 @@ export const adminUsuariosService = {
    * Desactivar usuario (soft delete)
    */
   async toggleActivo(id: number, is_active: boolean, tipo_usuario?: string): Promise<Usuario> {
-    let endpoint = '/api/usuarios/usuarios/';
+    if (!tipo_usuario) {
+      throw new Error('Debe especificar el tipo_usuario para cambiar el estado');
+    }
+    
+    let endpoint: string;
     if (tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
     else if (tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
     else if (tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
     else if (tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+    else {
+      throw new Error(`Tipo de usuario no válido: ${tipo_usuario}`);
+    }
 
     const { data } = await api.patch(`${endpoint}${id}/`, { is_active });
     return data;
@@ -94,9 +123,18 @@ export const adminUsuariosService = {
    * Eliminar usuario permanentemente
    */
   async deleteUsuario(id: number, tipo_usuario?: string): Promise<void> {
-    let endpoint = '/api/usuarios/usuarios/';
+    if (!tipo_usuario) {
+      throw new Error('Debe especificar el tipo_usuario para eliminar un usuario');
+    }
+    
+    let endpoint: string;
     if (tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
     else if (tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
+    else if (tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
+    else if (tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+    else {
+      throw new Error(`Tipo de usuario no válido: ${tipo_usuario}`);
+    }
     
     await api.delete(`${endpoint}${id}/`);
   },
