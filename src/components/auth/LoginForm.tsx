@@ -9,7 +9,19 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { Smile, Mail, Lock } from 'lucide-react';
 
+// Wrapper seguro para iconos de Lucide
+const SafeIcon = ({ Icon, size = 18, ...props }: any) => {
+  try {
+    return <Icon size={size} strokeWidth={1.5} {...props} />;
+  } catch (error) {
+    console.error('❌ [SafeIcon] Error renderizando icono:', error);
+    return null;
+  }
+};
+
 function LoginForm() {
+  console.log('🔑 [LoginForm] Componente montado');
+  
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,10 +37,12 @@ function LoginForm() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('🔑 [LoginForm] Iniciando login con:', { email: credentials.email });
     setIsLoading(true);
     setError('');
     try {
       const result: any = await login(credentials);
+      console.log('🔑 [LoginForm] Resultado del login:', result);
       if (result.success) {
         let dashboardUrl = '/dashboard';
         if (result.user?.tipo_usuario === 'PACIENTE') {
@@ -38,11 +52,14 @@ function LoginForm() {
         } else if (result.user?.tipo_usuario === 'ADMIN') {
           dashboardUrl = '/dashboard';
         }
+        console.log('🔑 [LoginForm] Navegando a:', dashboardUrl);
         navigate(dashboardUrl, { replace: true });
       } else {
+        console.error('❌ [LoginForm] Login fallido:', result.error);
         setError(result.error || 'Error al iniciar sesión');
       }
     } catch (err) {
+      console.error('❌ [LoginForm] Error en login:', err);
       setError('Error al iniciar sesión');
     }
     setIsLoading(false);
@@ -69,7 +86,7 @@ function LoginForm() {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <div style={{ marginBottom: '20px' }}>
-            <Smile size={56} strokeWidth={1.5} style={{ color: '#0d9488', margin: '0 auto' }} />
+            <SafeIcon Icon={Smile} size={56} style={{ color: '#0d9488', margin: '0 auto' }} />
           </div>
           <h1 style={{ margin: '0 0 8px 0', fontSize: '28px', color: '#0f172a', fontWeight: '600' }}>
             Clínica Dental
@@ -108,7 +125,7 @@ function LoginForm() {
               Correo Electrónico
             </label>
             <div style={{ position: 'relative' }}>
-              <Mail size={18} strokeWidth={1.5} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <SafeIcon Icon={Mail} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
               <input
                 type="email"
                 name="email"
@@ -148,7 +165,7 @@ function LoginForm() {
               Contraseña
             </label>
             <div style={{ position: 'relative' }}>
-              <Lock size={18} strokeWidth={1.5} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <SafeIcon Icon={Lock} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
               <input
                 type="password"
                 name="password"
