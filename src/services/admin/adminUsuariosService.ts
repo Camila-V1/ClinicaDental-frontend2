@@ -23,15 +23,26 @@ export const adminUsuariosService = {
     if (filtros.page) params.append('page', filtros.page.toString());
     if (filtros.page_size) params.append('page_size', filtros.page_size.toString());
     
-    const { data } = await api.get(`/api/usuarios/usuarios/?${params.toString()}`);
+    // Determinar endpoint basado en el tipo de usuario
+    let endpoint = '/api/usuarios/usuarios/';
+    if (filtros.tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
+    else if (filtros.tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
+    else if (filtros.tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
+    else if (filtros.tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+
+    const { data } = await api.get(`${endpoint}?${params.toString()}`);
     return data;
   },
 
   /**
    * Obtener un usuario por ID
    */
-  async getUsuario(id: number): Promise<Usuario> {
-    const { data } = await api.get(`/api/usuarios/usuarios/${id}/`);
+  async getUsuario(id: number, tipo_usuario?: string): Promise<Usuario> {
+    let endpoint = '/api/usuarios/usuarios/';
+    if (tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
+    else if (tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
+    
+    const { data } = await api.get(`${endpoint}${id}/`);
     return data;
   },
 
@@ -39,31 +50,55 @@ export const adminUsuariosService = {
    * Crear nuevo usuario
    */
   async createUsuario(userData: UsuarioFormData): Promise<Usuario> {
-    const { data } = await api.post('/api/usuarios/usuarios/', userData);
+    let endpoint = '/api/usuarios/usuarios/';
+    if (userData.tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
+    else if (userData.tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
+    else if (userData.tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+
+    const { data } = await api.post(endpoint, userData);
     return data;
   },
 
   /**
    * Actualizar usuario existente
    */
-  async updateUsuario(id: number, userData: Partial<UsuarioFormData>): Promise<Usuario> {
-    const { data } = await api.patch(`/api/usuarios/usuarios/${id}/`, userData);
+  async updateUsuario(id: number, userData: Partial<UsuarioFormData>, tipo_usuario?: string): Promise<Usuario> {
+    let endpoint = '/api/usuarios/usuarios/';
+    // Si no se pasa el tipo, intentamos deducirlo de userData si existe, o usamos el fallback
+    const tipo = tipo_usuario || userData.tipo_usuario;
+    
+    if (tipo === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
+    else if (tipo === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
+    else if (tipo === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
+    else if (tipo === 'ADMIN') endpoint = '/api/usuarios/admins/';
+
+    const { data } = await api.patch(`${endpoint}${id}/`, userData);
     return data;
   },
 
   /**
    * Desactivar usuario (soft delete)
    */
-  async toggleActivo(id: number, is_active: boolean): Promise<Usuario> {
-    const { data } = await api.patch(`/api/usuarios/usuarios/${id}/`, { is_active });
+  async toggleActivo(id: number, is_active: boolean, tipo_usuario?: string): Promise<Usuario> {
+    let endpoint = '/api/usuarios/usuarios/';
+    if (tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
+    else if (tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
+    else if (tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
+    else if (tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+
+    const { data } = await api.patch(`${endpoint}${id}/`, { is_active });
     return data;
   },
 
   /**
    * Eliminar usuario permanentemente
    */
-  async deleteUsuario(id: number): Promise<void> {
-    await api.delete(`/api/usuarios/usuarios/${id}/`);
+  async deleteUsuario(id: number, tipo_usuario?: string): Promise<void> {
+    let endpoint = '/api/usuarios/usuarios/';
+    if (tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
+    else if (tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
+    
+    await api.delete(`${endpoint}${id}/`);
   },
 
   /**

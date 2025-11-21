@@ -23,12 +23,18 @@ export const obtenerUsuarios = async (filtros?: {
   page?: number;
 }): Promise<Usuario[]> => {
   const params = new URLSearchParams();
-  if (filtros?.tipo_usuario) params.append('tipo_usuario', filtros.tipo_usuario);
   if (filtros?.search) params.append('search', filtros.search);
   if (filtros?.page) params.append('page', filtros.page.toString());
   
+  // Determinar endpoint basado en el tipo de usuario
+  let endpoint = '/api/usuarios/pacientes/'; // Default a pacientes si no se especifica
+  if (filtros?.tipo_usuario === 'ODONTOLOGO') endpoint = '/api/usuarios/odontologos/';
+  else if (filtros?.tipo_usuario === 'PACIENTE') endpoint = '/api/usuarios/pacientes/';
+  else if (filtros?.tipo_usuario === 'RECEPCIONISTA') endpoint = '/api/usuarios/recepcionistas/';
+  else if (filtros?.tipo_usuario === 'ADMIN') endpoint = '/api/usuarios/admins/';
+
   const response = await api.get<Usuario[]>(
-    `/api/usuarios/${params.toString() ? '?' + params.toString() : ''}`
+    `${endpoint}${params.toString() ? '?' + params.toString() : ''}`
   );
   return response.data;
 };

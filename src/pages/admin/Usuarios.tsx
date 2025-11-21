@@ -17,7 +17,7 @@ export default function Usuarios() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Usuario | null>(null);
   const [filters, setFilters] = useState({
-    tipo_usuario: '',
+    tipo_usuario: 'ODONTOLOGO',
     is_active: 'true',
     search: '',
   });
@@ -32,7 +32,7 @@ export default function Usuarios() {
   const mutation = useMutation({
     mutationFn: (userData: UsuarioFormData) => 
       selectedUser 
-        ? adminUsuariosService.updateUsuario(selectedUser.id, userData)
+        ? adminUsuariosService.updateUsuario(selectedUser.id, userData, selectedUser.tipo_usuario)
         : adminUsuariosService.createUsuario(userData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['usuarios-admin'] });
@@ -47,8 +47,8 @@ export default function Usuarios() {
 
   // Toggle activo/inactivo
   const toggleActiveMutation = useMutation({
-    mutationFn: ({ id, is_active }: { id: number; is_active: boolean }) =>
-      adminUsuariosService.toggleActivo(id, is_active),
+    mutationFn: ({ id, is_active, tipo_usuario }: { id: number; is_active: boolean; tipo_usuario?: string }) =>
+      adminUsuariosService.toggleActivo(id, is_active, tipo_usuario),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['usuarios-admin'] });
       toast.success('Estado actualizado');
@@ -69,6 +69,7 @@ export default function Usuarios() {
     toggleActiveMutation.mutate({
       id: user.id,
       is_active: !user.is_active,
+      tipo_usuario: user.tipo_usuario,
     });
   };
 
@@ -105,7 +106,6 @@ export default function Usuarios() {
             onChange={(e) => setFilters({ ...filters, tipo_usuario: e.target.value })}
             className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
-            <option value="">Todos los tipos</option>
             <option value="ODONTOLOGO">Odontólogos</option>
             <option value="RECEPCIONISTA">Recepcionistas</option>
             <option value="ADMIN">Administradores</option>
