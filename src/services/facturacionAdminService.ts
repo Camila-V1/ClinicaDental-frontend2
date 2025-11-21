@@ -85,7 +85,7 @@ class FacturacionAdminService {
     fecha_desde?: string;
     fecha_hasta?: string;
   }) {
-    const response = await api.get<{ results: Factura[]; count: number; next: string | null; previous: string | null }>(
+    const response = await api.get<Factura[]>(
       '/api/facturacion/facturas/',
       { params }
     );
@@ -123,7 +123,7 @@ class FacturacionAdminService {
 
   // PAGOS
   async getPagos(params?: { page?: number; factura_id?: number }) {
-    const response = await api.get<{ results: Pago[]; count: number; next: string | null; previous: string | null }>(
+    const response = await api.get<Pago[]>(
       '/api/facturacion/pagos/',
       { params }
     );

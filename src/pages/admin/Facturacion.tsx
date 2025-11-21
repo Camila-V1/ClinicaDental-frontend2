@@ -167,8 +167,8 @@ export default function Facturacion() {
     }
   };
 
-  const facturas = facturasData?.results || [];
-  const pagos = pagosData?.results || [];
+  const facturas = facturasData || [];
+  const pagos = pagosData || [];
 
   return (
     <div style={{ padding: '24px' }}>
