@@ -15,7 +15,15 @@ interface UserTableProps {
 }
 
 export default function UserTable({ users, isLoading, onEdit, onToggleActive }: UserTableProps) {
+  console.log('📊 [UserTable] Renderizando tabla con:', { 
+    users, 
+    cantidad: users?.length, 
+    isLoading,
+    primerUsuario: users?.[0]
+  });
+
   if (isLoading) {
+    console.log('⏳ [UserTable] Mostrando loading...');
     return (
       <div className="p-12 flex items-center justify-center">
         <Loader className="w-8 h-8 animate-spin text-blue-600" />
@@ -24,12 +32,15 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
   }
 
   if (users.length === 0) {
+    console.log('📭 [UserTable] No hay usuarios para mostrar');
     return (
       <div className="p-8 text-center text-gray-500">
         <p>No se encontraron usuarios</p>
       </div>
     );
   }
+
+  console.log(`✅ [UserTable] Renderizando ${users.length} usuarios en tabla`);
 
   const getRoleBadge = (tipo: string) => {
     const config = {
@@ -75,9 +86,11 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {users.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4">
+          {users.map((user, index) => {
+            console.log(`👤 [UserTable] Renderizando usuario ${index}:`, user);
+            return (
+              <tr key={user.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                     <span className="text-blue-600 font-medium">
@@ -129,7 +142,8 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                 </div>
               </td>
             </tr>
-          ))}
+          );
+          })}
         </tbody>
       </table>
     </div>
