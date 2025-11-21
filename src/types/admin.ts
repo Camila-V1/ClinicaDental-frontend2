@@ -51,6 +51,12 @@ export interface Usuario {
   tipo_usuario: 'ADMIN' | 'ODONTOLOGO' | 'RECEPCIONISTA' | 'PACIENTE';
   is_active: boolean;
   date_joined: string;
+  // Campos específicos del backend
+  cedula_profesional?: string;
+  experiencia?: string;
+  especialidad?: string;
+  telefono?: string;
+  // Objeto anidado (por compatibilidad)
   perfil_odontologo?: PerfilOdontologo;
 }
 

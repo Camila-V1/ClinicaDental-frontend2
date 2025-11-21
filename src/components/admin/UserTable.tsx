@@ -177,7 +177,7 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
-              Especialidad
+              Info Profesional
             </th>
             <th style={{ 
               padding: '14px 20px', 
@@ -217,6 +217,12 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
         <tbody>
           {users.map((user, index) => {
             console.log(`👤 [UserTable] Renderizando usuario ${index}:`, user);
+            console.log(`📋 [UserTable] Especialidad:`, {
+              directa: user.especialidad,
+              perfil: user.perfil_odontologo?.especialidad,
+              cedula: user.cedula_profesional,
+              telefono: user.telefono
+            });
             const fullName = getFullName(user);
             return (
               <tr 
@@ -281,11 +287,34 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                   {getRoleBadge(user.tipo_usuario)}
                 </td>
                 
-                {/* Especialidad */}
-                <td style={{ padding: '16px 20px', fontSize: '14px', color: '#475569' }}>
-                  {user.perfil_odontologo?.especialidad || (
-                    <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>-</span>
-                  )}
+                {/* Info Profesional */}
+                <td style={{ padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {/* Especialidad */}
+                    {(user.especialidad || user.perfil_odontologo?.especialidad) ? (
+                      <div style={{ fontSize: '14px', color: '#475569', fontWeight: '500' }}>
+                        {user.especialidad || user.perfil_odontologo?.especialidad}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '14px', color: '#94a3b8', fontStyle: 'italic' }}>
+                        Sin especialidad
+                      </div>
+                    )}
+                    
+                    {/* Cédula Profesional */}
+                    {user.cedula_profesional && (
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>
+                        Cédula: {user.cedula_profesional}
+                      </div>
+                    )}
+                    
+                    {/* Teléfono */}
+                    {(user.telefono || user.perfil_odontologo?.telefono) && (
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>
+                        📱 {user.telefono || user.perfil_odontologo?.telefono}
+                      </div>
+                    )}
+                  </div>
                 </td>
                 
                 {/* Estado */}
