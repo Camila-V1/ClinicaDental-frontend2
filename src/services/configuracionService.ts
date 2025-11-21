@@ -3,7 +3,7 @@
  * Configuración del sistema (limitado a lo disponible en backend)
  */
 
-import api from '@/lib/axios-core';
+import api from '../config/apiConfig';
 
 // ==================== INTERFACES ====================
 
