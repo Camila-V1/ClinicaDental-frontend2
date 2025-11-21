@@ -3,7 +3,7 @@
  * Logs de actividad del sistema
  */
 
-import api from '@/services/api';
+import api from '../config/apiConfig';
 
 // ==================== INTERFACES ====================
 

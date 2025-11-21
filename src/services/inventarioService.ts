@@ -3,7 +3,7 @@
  * Gestión de categorías e insumos
  */
 
-import api from '@/services/api';
+import api from '../config/apiConfig';
 
 // ==================== INTERFACES ====================
 
