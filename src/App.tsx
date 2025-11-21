@@ -44,6 +44,7 @@ import AdminLayout from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsuarios from './pages/admin/Usuarios';
 import AdminPacientes from './pages/admin/Pacientes';
+import AdminAgenda from './pages/admin/Agenda';
 
 function App() {
   return (
@@ -309,6 +310,7 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="usuarios" element={<AdminUsuarios />} />
               <Route path="pacientes" element={<AdminPacientes />} />
+              <Route path="agenda" element={<AdminAgenda />} />
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
             {/* ============ FIN RUTAS ADMIN ============ */}
