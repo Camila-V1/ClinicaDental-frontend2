@@ -171,7 +171,9 @@ export default function Usuarios() {
                   borderRadius: '8px', 
                   fontSize: '14px',
                   outline: 'none',
-                  transition: 'border-color 150ms'
+                  transition: 'border-color 150ms',
+                  color: '#111827', // Asegurar color de texto oscuro
+                  backgroundColor: 'white'
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = '#3b82f6';
@@ -201,6 +203,7 @@ export default function Usuarios() {
                 fontSize: '14px', 
                 outline: 'none', 
                 backgroundColor: 'white', 
+                color: '#111827', // Asegurar color de texto oscuro
                 cursor: 'pointer',
                 transition: 'border-color 150ms'
               }}
@@ -235,6 +238,7 @@ export default function Usuarios() {
                 fontSize: '14px', 
                 outline: 'none', 
                 backgroundColor: 'white', 
+                color: '#111827', // Asegurar color de texto oscuro
                 cursor: 'pointer',
                 transition: 'border-color 150ms'
               }}

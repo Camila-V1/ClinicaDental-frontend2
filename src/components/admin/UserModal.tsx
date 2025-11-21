@@ -63,7 +63,15 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Nombre</label>
             <input
               {...register('first_name')}
-              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+              style={{ 
+                width: '100%', 
+                padding: '8px 12px', 
+                border: '1px solid #d1d5db', 
+                borderRadius: '8px', 
+                outline: 'none',
+                color: '#111827',
+                backgroundColor: 'white'
+              }}
               onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
               onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
             />
@@ -76,7 +84,15 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Apellido</label>
             <input
               {...register('last_name')}
-              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+              style={{ 
+                width: '100%', 
+                padding: '8px 12px', 
+                border: '1px solid #d1d5db', 
+                borderRadius: '8px', 
+                outline: 'none',
+                color: '#111827',
+                backgroundColor: 'white'
+              }}
               onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
               onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
             />
@@ -91,7 +107,15 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
           <input
             type="email"
             {...register('email')}
-            style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+            style={{ 
+              width: '100%', 
+              padding: '8px 12px', 
+              border: '1px solid #d1d5db', 
+              borderRadius: '8px', 
+              outline: 'none',
+              color: '#111827',
+              backgroundColor: 'white'
+            }}
             onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
             onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
           />
@@ -106,7 +130,15 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
             <input
               type="password"
               {...register('password')}
-              style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+              style={{ 
+                width: '100%', 
+                padding: '8px 12px', 
+                border: '1px solid #d1d5db', 
+                borderRadius: '8px', 
+                outline: 'none',
+                color: '#111827',
+                backgroundColor: 'white'
+              }}
               onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
               onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
             />
@@ -120,7 +152,16 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
           <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Tipo de Usuario</label>
           <select
             {...register('tipo_usuario')}
-            style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none', backgroundColor: 'white', cursor: 'pointer' }}
+            style={{ 
+              width: '100%', 
+              padding: '8px 12px', 
+              border: '1px solid #d1d5db', 
+              borderRadius: '8px', 
+              outline: 'none', 
+              backgroundColor: 'white', 
+              color: '#111827',
+              cursor: 'pointer' 
+            }}
             onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
             onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
           >
@@ -136,7 +177,15 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
               <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Especialidad</label>
               <input
                 {...register('perfil_odontologo.especialidad')}
-                style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+                style={{ 
+                  width: '100%', 
+                  padding: '8px 12px', 
+                  border: '1px solid #d1d5db', 
+                  borderRadius: '8px', 
+                  outline: 'none',
+                  color: '#111827',
+                  backgroundColor: 'white'
+                }}
                 onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
                 onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
                 placeholder="Ej: Ortodoncia, Endodoncia"
@@ -148,7 +197,15 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>N° Licencia</label>
                 <input
                   {...register('perfil_odontologo.numero_licencia')}
-                  style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+                  style={{ 
+                    width: '100%', 
+                    padding: '8px 12px', 
+                    border: '1px solid #d1d5db', 
+                    borderRadius: '8px', 
+                    outline: 'none',
+                    color: '#111827',
+                    backgroundColor: 'white'
+                  }}
                   onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
                 />
@@ -158,7 +215,15 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Teléfono</label>
                 <input
                   {...register('perfil_odontologo.telefono')}
-                  style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '8px', outline: 'none' }}
+                  style={{ 
+                    width: '100%', 
+                    padding: '8px 12px', 
+                    border: '1px solid #d1d5db', 
+                    borderRadius: '8px', 
+                    outline: 'none',
+                    color: '#111827',
+                    backgroundColor: 'white'
+                  }}
                   onFocus={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
                 />

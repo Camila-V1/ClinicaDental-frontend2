@@ -205,17 +205,6 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
             </th>
             <th style={{ 
               padding: '14px 20px', 
-              textAlign: 'left', 
-              fontSize: '11px', 
-              fontWeight: '600', 
-              color: '#64748b', 
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              Registro
-            </th>
-            <th style={{ 
-              padding: '14px 20px', 
               textAlign: 'center', 
               fontSize: '11px', 
               fontWeight: '600', 
@@ -355,17 +344,6 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                     }} />
                     {user.is_active ? 'Activo' : 'Inactivo'}
                   </span>
-                </td>
-                
-                {/* Registro */}
-                <td style={{ 
-                  padding: '16px 20px', 
-                  verticalAlign: 'middle',
-                  fontSize: '14px', 
-                  color: '#64748b',
-                  whiteSpace: 'nowrap'
-                }}>
-                  {formatDate(user.date_joined)}
                 </td>
                 
                 {/* Acciones */}

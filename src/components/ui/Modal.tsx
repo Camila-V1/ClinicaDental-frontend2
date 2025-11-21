@@ -39,37 +39,79 @@ export default function Modal({
 
   if (!isOpen) return null;
 
-  const maxWidthClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-    '2xl': 'max-w-2xl',
+  const getMaxWidth = (size: string) => {
+    switch (size) {
+      case 'sm': return '384px';
+      case 'md': return '448px';
+      case 'lg': return '512px';
+      case 'xl': return '576px';
+      case '2xl': return '672px';
+      default: return '512px';
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div style={{ 
+      position: 'fixed', 
+      inset: 0, 
+      zIndex: 50, 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center' 
+    }}>
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
+        style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+          transition: 'opacity 0.3s' 
+        }}
         onClick={onClose}
       />
 
       {/* Modal Content */}
-      <div className={`relative bg-white rounded-lg shadow-xl w-full ${maxWidthClasses[maxWidth]} mx-4 max-h-[90vh] overflow-hidden flex flex-col`}>
+      <div style={{ 
+        position: 'relative', 
+        backgroundColor: 'white', 
+        borderRadius: '12px', 
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', 
+        width: '100%', 
+        maxWidth: getMaxWidth(maxWidth), 
+        margin: '0 16px', 
+        maxHeight: '90vh', 
+        overflow: 'hidden', 
+        display: 'flex', 
+        flexDirection: 'column' 
+      }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          padding: '16px 24px', 
+          borderBottom: '1px solid #e5e7eb' 
+        }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#111827', margin: 0 }}>{title}</h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            style={{ 
+              padding: '4px', 
+              borderRadius: '8px', 
+              border: 'none', 
+              backgroundColor: 'transparent', 
+              cursor: 'pointer', 
+              transition: 'background-color 150ms' 
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X style={{ width: '20px', height: '20px', color: '#6b7280' }} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-4 overflow-y-auto flex-1">
+        <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
           {children}
         </div>
       </div>
