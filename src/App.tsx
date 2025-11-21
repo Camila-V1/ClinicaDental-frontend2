@@ -46,6 +46,7 @@ import AdminUsuarios from './pages/admin/Usuarios';
 import AdminPacientes from './pages/admin/Pacientes';
 import AdminAgenda from './pages/admin/Agenda';
 import AdminTratamientos from './pages/admin/Tratamientos';
+import AdminHistorialClinico from './pages/admin/HistorialClinico';
 
 function App() {
   return (
@@ -313,6 +314,7 @@ function App() {
               <Route path="pacientes" element={<AdminPacientes />} />
               <Route path="agenda" element={<AdminAgenda />} />
               <Route path="tratamientos" element={<AdminTratamientos />} />
+              <Route path="historial-clinico" element={<AdminHistorialClinico />} />
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
             {/* ============ FIN RUTAS ADMIN ============ */}
