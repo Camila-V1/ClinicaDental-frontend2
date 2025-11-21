@@ -1,0 +1,238 @@
+/**
+ * 📊 Página de Reportes y Dashboard - Admin
+ */
+
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import reportesService from '@/services/reportesService';
+import DashboardKPIs from '@/components/admin/DashboardKPIs';
+import TendenciaCitasChart from '@/components/admin/TendenciaCitasChart';
+import TopProcedimientosChart from '@/components/admin/TopProcedimientosChart';
+import ReporteFinanciero from '@/components/admin/ReporteFinanciero';
+import OcupacionOdontologos from '@/components/admin/OcupacionOdontologos';
+
+export default function Reportes() {
+  const [diasTendencia, setDiasTendencia] = useState(15);
+  const [periodoFinanciero, setPeriodoFinanciero] = useState('mes_actual');
+
+  // ==================== QUERIES ====================
+  
+  const { data: kpis, isLoading: loadingKPIs } = useQuery({
+    queryKey: ['dashboard-kpis'],
+    queryFn: () => reportesService.getDashboardKpis(),
+    refetchInterval: 60000, // Refetch cada 60 segundos
+  });
+
+  const { data: estadisticas, isLoading: loadingStats } = useQuery({
+    queryKey: ['estadisticas-generales'],
+    queryFn: () => reportesService.getEstadisticasGenerales(),
+  });
+
+  const { data: tendenciaCitas, isLoading: loadingTendencia } = useQuery({
+    queryKey: ['tendencia-citas', diasTendencia],
+    queryFn: () => reportesService.getTendenciaCitas({ dias: diasTendencia }),
+  });
+
+  const { data: topProcedimientos, isLoading: loadingTop } = useQuery({
+    queryKey: ['top-procedimientos'],
+    queryFn: () => reportesService.getTopProcedimientos({ limite: 5 }),
+  });
+
+  const { data: reporteFinanciero, isLoading: loadingFinanciero } = useQuery({
+    queryKey: ['reporte-financiero', periodoFinanciero],
+    queryFn: () => reportesService.getReporteFinanciero({ periodo: periodoFinanciero }),
+  });
+
+  const { data: ocupacionOdontologos, isLoading: loadingOcupacion } = useQuery({
+    queryKey: ['ocupacion-odontologos'],
+    queryFn: () => reportesService.getOcupacionOdontologos(),
+  });
+
+  return (
+    <div style={{ padding: '24px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>
+          📊 Reportes y Análisis
+        </h1>
+        <p style={{ color: '#6b7280', fontSize: '14px' }}>
+          Dashboard ejecutivo con métricas y estadísticas del sistema
+        </p>
+      </div>
+
+      {/* KPIs Dashboard */}
+      <DashboardKPIs kpis={kpis} loading={loadingKPIs} />
+
+      {/* Gráficos y Reportes */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '24px', marginTop: '24px' }}>
+        {/* Tendencia de Citas */}
+        <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>
+              📈 Tendencia de Citas
+            </h2>
+            <select
+              value={diasTendencia}
+              onChange={(e) => setDiasTendencia(Number(e.target.value))}
+              style={{
+                padding: '6px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '13px',
+                color: '#111827',
+                backgroundColor: 'white',
+                outline: 'none',
+              }}
+            >
+              <option value={7}>Últimos 7 días</option>
+              <option value={15}>Últimos 15 días</option>
+              <option value={30}>Últimos 30 días</option>
+            </select>
+          </div>
+          <TendenciaCitasChart data={tendenciaCitas || []} loading={loadingTendencia} />
+        </div>
+
+        {/* Top Procedimientos */}
+        <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '20px' }}>
+            🏆 Procedimientos Más Realizados
+          </h2>
+          <TopProcedimientosChart data={topProcedimientos || []} loading={loadingTop} />
+        </div>
+      </div>
+
+      {/* Reporte Financiero */}
+      <div style={{ marginTop: '24px' }}>
+        <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>
+              💰 Reporte Financiero
+            </h2>
+            <select
+              value={periodoFinanciero}
+              onChange={(e) => setPeriodoFinanciero(e.target.value)}
+              style={{
+                padding: '8px 16px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '14px',
+                color: '#111827',
+                backgroundColor: 'white',
+                outline: 'none',
+              }}
+            >
+              <option value="mes_actual">Mes Actual</option>
+              <option value="mes_anterior">Mes Anterior</option>
+              <option value="trimestre">Trimestre Actual</option>
+              <option value="año">Año Actual</option>
+            </select>
+          </div>
+          <ReporteFinanciero reporte={reporteFinanciero} loading={loadingFinanciero} />
+        </div>
+      </div>
+
+      {/* Ocupación de Odontólogos */}
+      <div style={{ marginTop: '24px' }}>
+        <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '20px' }}>
+            👨‍⚕️ Ocupación de Odontólogos
+          </h2>
+          <OcupacionOdontologos ocupacion={ocupacionOdontologos || []} loading={loadingOcupacion} />
+        </div>
+      </div>
+
+      {/* Estadísticas Generales */}
+      {estadisticas && (
+        <div style={{ marginTop: '24px' }}>
+          <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '20px' }}>
+              📋 Estadísticas Generales
+            </h2>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+              {/* Pacientes */}
+              <div style={{ padding: '16px', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #86efac' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#065f46', marginBottom: '12px' }}>
+                  👥 Pacientes
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Total:</span>
+                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.pacientes.total}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Nuevos (mes):</span>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.pacientes.nuevos_mes}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Activos:</span>
+                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.pacientes.activos}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Citas */}
+              <div style={{ padding: '16px', background: '#eff6ff', borderRadius: '8px', border: '1px solid #93c5fd' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#1e40af', marginBottom: '12px' }}>
+                  📅 Citas (Mes)
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#1e40af' }}>Total:</span>
+                    <strong style={{ fontSize: '13px', color: '#1e40af' }}>{estadisticas.citas.total_mes}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#1e40af' }}>Completadas:</span>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.citas.completadas}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#1e40af' }}>Pendientes:</span>
+                    <strong style={{ fontSize: '13px', color: '#f59e0b' }}>{estadisticas.citas.pendientes}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Financiero */}
+              <div style={{ padding: '16px', background: '#fef3c7', borderRadius: '8px', border: '1px solid #fbbf24' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#92400e', marginBottom: '12px' }}>
+                  💰 Financiero
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#92400e' }}>Ingresos (mes):</span>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {estadisticas.financiero.ingresos_mes}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#92400e' }}>Pendiente:</span>
+                    <strong style={{ fontSize: '13px', color: '#ef4444' }}>Bs. {estadisticas.financiero.facturas_pendientes}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#92400e' }}>Vencidas:</span>
+                    <strong style={{ fontSize: '13px', color: '#92400e' }}>{estadisticas.financiero.facturas_vencidas}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tratamientos */}
+              <div style={{ padding: '16px', background: '#fce7f3', borderRadius: '8px', border: '1px solid #f9a8d4' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#831843', marginBottom: '12px' }}>
+                  🦷 Tratamientos
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#831843' }}>Planes activos:</span>
+                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos.planes_activos}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#831843' }}>Procedimientos:</span>
+                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos.procedimientos_realizados}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
