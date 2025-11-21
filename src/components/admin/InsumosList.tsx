@@ -246,8 +246,8 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
         </div>
       )}
 
-      {/* Paginación */}
-      {data && data.count > 10 && (
+      {/* Paginación - Simplificada para array directo */}
+      {insumos.length > 0 && (
         <div style={{
           background: 'white',
           borderRadius: '12px',
@@ -259,35 +259,44 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
           border: '1px solid #e5e7eb',
         }}>
           <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
-            Total: {data.count} insumos
+            Mostrando {insumos.length} insumo{insumos.length !== 1 ? 's' : ''}
           </p>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
-              disabled={!data.previous}
+              disabled={page === 1}
               onClick={() => setPage(page - 1)}
               style={{
                 padding: '8px 16px',
-                background: data.previous ? 'white' : '#f9fafb',
-                color: data.previous ? '#111827' : '#9ca3af',
+                background: page === 1 ? '#f9fafb' : 'white',
+                color: page === 1 ? '#9ca3af' : '#111827',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
                 fontSize: '14px',
-                cursor: data.previous ? 'pointer' : 'not-allowed',
+                cursor: page === 1 ? 'not-allowed' : 'pointer',
               }}
             >
               ← Anterior
             </button>
+            <span style={{
+              padding: '8px 16px',
+              fontSize: '14px',
+              color: '#6b7280',
+              display: 'flex',
+              alignItems: 'center',
+            }}>
+              Página {page}
+            </span>
             <button
-              disabled={!data.next}
+              disabled={insumos.length < 10}
               onClick={() => setPage(page + 1)}
               style={{
                 padding: '8px 16px',
-                background: data.next ? 'white' : '#f9fafb',
-                color: data.next ? '#111827' : '#9ca3af',
+                background: insumos.length < 10 ? '#f9fafb' : 'white',
+                color: insumos.length < 10 ? '#9ca3af' : '#111827',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
                 fontSize: '14px',
-                cursor: data.next ? 'pointer' : 'not-allowed',
+                cursor: insumos.length < 10 ? 'not-allowed' : 'pointer',
               }}
             >
               Siguiente →
