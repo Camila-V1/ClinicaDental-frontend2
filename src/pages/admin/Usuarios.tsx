@@ -13,6 +13,8 @@ import Button from '@/components/ui/Button';
 import type { Usuario, UsuarioFormData } from '@/types/admin';
 
 export default function Usuarios() {
+  console.log('👥 [Usuarios] Componente montado');
+  
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Usuario | null>(null);
@@ -22,50 +24,87 @@ export default function Usuarios() {
     search: '',
   });
 
+  // Log de cambios en filtros
+  React.useEffect(() => {
+    console.log('🔍 [Usuarios] Filtros actualizados:', filters);
+  }, [filters]);
+
   // Fetch usuarios
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['usuarios-admin', filters],
-    queryFn: () => adminUsuariosService.getUsuarios(filters),
+    queryFn: async () => {
+      console.log('📡 [Usuarios] Fetching usuarios con filtros:', filters);
+      try {
+        const result = await adminUsuariosService.getUsuarios(filters);
+        console.log('✅ [Usuarios] Usuarios obtenidos:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ [Usuarios] Error obteniendo usuarios:', error);
+        throw error;
+      }
+    },
   });
+
+  // Log de errores
+  React.useEffect(() => {
+    if (error) {
+      console.error('🔴 [Usuarios] Error en query:', error);
+    }
+  }, [error]);
 
   // Crear/Editar usuario
   const mutation = useMutation({
-    mutationFn: (userData: UsuarioFormData) => 
-      selectedUser 
+    mutationFn: (userData: UsuarioFormData) => {
+      console.log('💾 [Usuarios] Guardando usuario:', { selectedUser: selectedUser?.id, userData });
+      return selectedUser 
         ? adminUsuariosService.updateUsuario(selectedUser.id, userData, selectedUser.tipo_usuario)
-        : adminUsuariosService.createUsuario(userData),
-    onSuccess: () => {
+        : adminUsuariosService.createUsuario(userData);
+    },
+    onSuccess: (data) => {
+      console.log('✅ [Usuarios] Usuario guardado exitosamente:', data);
       queryClient.invalidateQueries({ queryKey: ['usuarios-admin'] });
       setIsModalOpen(false);
       setSelectedUser(null);
       toast.success(selectedUser ? 'Usuario actualizado' : 'Usuario creado');
     },
     onError: (error: any) => {
+      console.error('❌ [Usuarios] Error guardando usuario:', error);
+      console.error('❌ [Usuarios] Error details:', error.response?.data);
       toast.error(error.response?.data?.message || 'Error al guardar usuario');
     },
   });
 
   // Toggle activo/inactivo
   const toggleActiveMutation = useMutation({
-    mutationFn: ({ id, is_active, tipo_usuario }: { id: number; is_active: boolean; tipo_usuario?: string }) =>
-      adminUsuariosService.toggleActivo(id, is_active, tipo_usuario),
-    onSuccess: () => {
+    mutationFn: ({ id, is_active, tipo_usuario }: { id: number; is_active: boolean; tipo_usuario?: string }) => {
+      console.log('🔄 [Usuarios] Toggle activo:', { id, is_active, tipo_usuario });
+      return adminUsuariosService.toggleActivo(id, is_active, tipo_usuario);
+    },
+    onSuccess: (data) => {
+      console.log('✅ [Usuarios] Estado actualizado:', data);
       queryClient.invalidateQueries({ queryKey: ['usuarios-admin'] });
       toast.success('Estado actualizado');
+    },
+    onError: (error: any) => {
+      console.error('❌ [Usuarios] Error en toggle activo:', error);
+      toast.error('Error al cambiar estado');
     },
   });
 
   const handleEdit = (user: Usuario) => {
+    console.log('✏️ [Usuarios] Editando usuario:', user);
     setSelectedUser(user);
     setIsModalOpen(true);
   };
 
   const handleCreate = () => {
+    console.log('➕ [Usuarios] Creando nuevo usuario');
     setSelectedUser(null);
     setIsModalOpen(true);
   };
 
   const handleToggleActive = (user: Usuario) => {
+    console.log('🔄 [Usuarios] Iniciando toggle para usuario:', user);
     toggleActiveMutation.mutate({
       id: user.id,
       is_active: !user.is_active,
