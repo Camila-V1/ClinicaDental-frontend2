@@ -50,6 +50,8 @@ import AdminHistorialClinico from './pages/admin/HistorialClinico';
 import AdminFacturacion from './pages/admin/Facturacion';
 import AdminReportes from './pages/admin/Reportes';
 import AdminConfiguracion from './pages/admin/Configuracion';
+import AdminInventario from './pages/admin/Inventario';
+import AdminBitacora from './pages/admin/Bitacora';
 
 function App() {
   return (
@@ -321,6 +323,8 @@ function App() {
               <Route path="facturacion" element={<AdminFacturacion />} />
               <Route path="reportes" element={<AdminReportes />} />
               <Route path="configuracion" element={<AdminConfiguracion />} />
+              <Route path="inventario" element={<AdminInventario />} />
+              <Route path="bitacora" element={<AdminBitacora />} />
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
             {/* ============ FIN RUTAS ADMIN ============ */}
