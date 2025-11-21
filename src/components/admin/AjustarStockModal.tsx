@@ -44,7 +44,7 @@ export default function AjustarStockModal({ insumo, onClose }: AjustarStockModal
     });
   };
 
-  const nuevoStock = insumo.stock_actual + parseFloat(formData.cantidad || '0');
+  const nuevoStock = parseFloat(String(insumo.stock_actual)) + parseFloat(formData.cantidad || '0');
 
   return (
     <div

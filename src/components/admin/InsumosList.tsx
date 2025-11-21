@@ -131,7 +131,10 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
           {insumos.map((insumo) => {
-            const status = getStockStatus(insumo.stock_actual, insumo.stock_minimo);
+            const status = getStockStatus(
+              parseFloat(String(insumo.stock_actual)),
+              parseFloat(String(insumo.stock_minimo))
+            );
             return (
               <div
                 key={insumo.id}
