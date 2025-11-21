@@ -85,6 +85,19 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
     isLoading,
     primerUsuario: users?.[0]
   });
+  
+  console.log('🔍 [UserTable] Detalles completos del primer usuario:', {
+    id: users?.[0]?.id,
+    nombre_completo: users?.[0]?.nombre_completo,
+    email: users?.[0]?.email,
+    tipo_usuario: users?.[0]?.tipo_usuario,
+    especialidad: users?.[0]?.especialidad,
+    cedula_profesional: users?.[0]?.cedula_profesional,
+    telefono: users?.[0]?.telefono,
+    is_active: users?.[0]?.is_active,
+    date_joined: users?.[0]?.date_joined,
+    perfil_odontologo: users?.[0]?.perfil_odontologo
+  });
 
   if (isLoading) {
     console.log('⏳ [UserTable] Mostrando loading...');
@@ -239,7 +252,7 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                 }}
               >
                 {/* Usuario */}
-                <td style={{ padding: '16px 20px' }}>
+                <td style={{ padding: '16px 20px', verticalAlign: 'middle' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ 
                       width: '44px', 
@@ -249,7 +262,8 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
-                      boxShadow: '0 2px 8px rgba(102, 126, 234, 0.25)'
+                      boxShadow: '0 2px 8px rgba(102, 126, 234, 0.25)',
+                      flexShrink: 0
                     }}>
                       <span style={{ 
                         color: 'white', 
@@ -259,12 +273,13 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                         {getInitials(fullName)}
                       </span>
                     </div>
-                    <div>
+                    <div style={{ minWidth: 0 }}>
                       <p style={{ 
                         fontSize: '14px', 
                         fontWeight: '600', 
                         color: '#0f172a',
-                        marginBottom: '2px'
+                        margin: 0,
+                        lineHeight: '1.4'
                       }}>
                         {fullName}
                       </p>
@@ -274,43 +289,43 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                 
                 {/* Email */}
                 <td style={{ 
-                  padding: '16px 20px', 
+                  padding: '16px 20px',
+                  verticalAlign: 'middle',
                   fontSize: '14px', 
-                  color: '#64748b',
-                  fontFamily: 'monospace'
+                  color: '#64748b'
                 }}>
                   {user.email}
                 </td>
                 
                 {/* Rol */}
-                <td style={{ padding: '16px 20px' }}>
+                <td style={{ padding: '16px 20px', verticalAlign: 'middle' }}>
                   {getRoleBadge(user.tipo_usuario)}
                 </td>
                 
                 {/* Info Profesional */}
-                <td style={{ padding: '16px 20px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <td style={{ padding: '16px 20px', verticalAlign: 'middle' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     {/* Especialidad */}
                     {(user.especialidad || user.perfil_odontologo?.especialidad) ? (
-                      <div style={{ fontSize: '14px', color: '#475569', fontWeight: '500' }}>
+                      <div style={{ fontSize: '14px', color: '#0f172a', fontWeight: '500', lineHeight: '1.4' }}>
                         {user.especialidad || user.perfil_odontologo?.especialidad}
                       </div>
                     ) : (
-                      <div style={{ fontSize: '14px', color: '#94a3b8', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic' }}>
                         Sin especialidad
                       </div>
                     )}
                     
                     {/* Cédula Profesional */}
                     {user.cedula_profesional && (
-                      <div style={{ fontSize: '12px', color: '#64748b' }}>
-                        Cédula: {user.cedula_profesional}
+                      <div style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.4' }}>
+                        <span style={{ fontWeight: '500' }}>Cédula:</span> {user.cedula_profesional}
                       </div>
                     )}
                     
                     {/* Teléfono */}
                     {(user.telefono || user.perfil_odontologo?.telefono) && (
-                      <div style={{ fontSize: '12px', color: '#64748b' }}>
+                      <div style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.4' }}>
                         📱 {user.telefono || user.perfil_odontologo?.telefono}
                       </div>
                     )}
@@ -318,7 +333,7 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                 </td>
                 
                 {/* Estado */}
-                <td style={{ padding: '16px 20px' }}>
+                <td style={{ padding: '16px 20px', verticalAlign: 'middle' }}>
                   <span style={{ 
                     padding: '6px 12px', 
                     borderRadius: '6px', 
@@ -329,7 +344,8 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                     border: `1px solid ${user.is_active ? '#a7f3d0' : '#fecaca'}`,
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '6px'
+                    gap: '6px',
+                    whiteSpace: 'nowrap'
                   }}>
                     <span style={{ 
                       width: '6px', 
@@ -342,7 +358,13 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
                 </td>
                 
                 {/* Registro */}
-                <td style={{ padding: '16px 20px', fontSize: '14px', color: '#64748b' }}>
+                <td style={{ 
+                  padding: '16px 20px', 
+                  verticalAlign: 'middle',
+                  fontSize: '14px', 
+                  color: '#64748b',
+                  whiteSpace: 'nowrap'
+                }}>
                   {formatDate(user.date_joined)}
                 </td>
                 
