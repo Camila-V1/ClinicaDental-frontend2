@@ -108,14 +108,23 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
 
   const getRoleBadge = (tipo: string) => {
     const config = {
-      ODONTOLOGO: { label: 'Odontólogo', bg: '#dbeafe', color: '#1e40af' },
-      RECEPCIONISTA: { label: 'Recepcionista', bg: '#d1fae5', color: '#065f46' },
-      ADMIN: { label: 'Administrador', bg: '#e9d5ff', color: '#6b21a8' },
-      PACIENTE: { label: 'Paciente', bg: '#f3f4f6', color: '#1f2937' },
+      ODONTOLOGO: { label: 'Odontólogo', bg: '#eff6ff', color: '#1e40af', border: '#bfdbfe' },
+      RECEPCIONISTA: { label: 'Recepcionista', bg: '#ecfdf5', color: '#065f46', border: '#a7f3d0' },
+      ADMIN: { label: 'Administrador', bg: '#faf5ff', color: '#6b21a8', border: '#e9d5ff' },
+      PACIENTE: { label: 'Paciente', bg: '#f9fafb', color: '#374151', border: '#e5e7eb' },
     };
-    const { label, bg, color } = config[tipo] || config.PACIENTE;
+    const { label, bg, color, border } = config[tipo] || config.PACIENTE;
     return (
-      <span style={{ padding: '4px 8px', borderRadius: '9999px', fontSize: '12px', fontWeight: '500', backgroundColor: bg, color }}>
+      <span style={{ 
+        padding: '6px 12px', 
+        borderRadius: '6px', 
+        fontSize: '13px', 
+        fontWeight: '500', 
+        backgroundColor: bg, 
+        color,
+        border: `1px solid ${border}`,
+        display: 'inline-block'
+      }}>
         {label}
       </span>
     );
@@ -123,106 +132,240 @@ export default function UserTable({ users, isLoading, onEdit, onToggleActive }: 
 
   return (
     <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%' }}>
-        <thead style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-          <tr>
-            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+            <th style={{ 
+              padding: '14px 20px', 
+              textAlign: 'left', 
+              fontSize: '11px', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
               Usuario
             </th>
-            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+            <th style={{ 
+              padding: '14px 20px', 
+              textAlign: 'left', 
+              fontSize: '11px', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
               Email
             </th>
-            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+            <th style={{ 
+              padding: '14px 20px', 
+              textAlign: 'left', 
+              fontSize: '11px', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
               Rol
             </th>
-            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+            <th style={{ 
+              padding: '14px 20px', 
+              textAlign: 'left', 
+              fontSize: '11px', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
               Especialidad
             </th>
-            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+            <th style={{ 
+              padding: '14px 20px', 
+              textAlign: 'left', 
+              fontSize: '11px', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
               Estado
             </th>
-            <th style={{ padding: '12px 24px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+            <th style={{ 
+              padding: '14px 20px', 
+              textAlign: 'left', 
+              fontSize: '11px', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
               Registro
             </th>
-            <th style={{ padding: '12px 24px', textAlign: 'right', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+            <th style={{ 
+              padding: '14px 20px', 
+              textAlign: 'center', 
+              fontSize: '11px', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
               Acciones
             </th>
           </tr>
         </thead>
-        <tbody style={{ borderTop: '1px solid #e5e7eb' }}>
+        <tbody>
           {users.map((user, index) => {
             console.log(`👤 [UserTable] Renderizando usuario ${index}:`, user);
             const fullName = getFullName(user);
             return (
               <tr 
                 key={user.id} 
-                style={{ borderBottom: '1px solid #e5e7eb' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                style={{ 
+                  borderBottom: '1px solid #f1f5f9',
+                  transition: 'background-color 150ms'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
-                <td style={{ padding: '16px 24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ color: '#2563eb', fontWeight: '500' }}>
-                      {getInitials(fullName)}
-                    </span>
+                {/* Usuario */}
+                <td style={{ padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ 
+                      width: '44px', 
+                      height: '44px', 
+                      borderRadius: '10px', 
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 8px rgba(102, 126, 234, 0.25)'
+                    }}>
+                      <span style={{ 
+                        color: 'white', 
+                        fontWeight: '600',
+                        fontSize: '14px'
+                      }}>
+                        {getInitials(fullName)}
+                      </span>
+                    </div>
+                    <div>
+                      <p style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '600', 
+                        color: '#0f172a',
+                        marginBottom: '2px'
+                      }}>
+                        {fullName}
+                      </p>
+                    </div>
                   </div>
-                  <div style={{ marginLeft: '12px' }}>
-                    <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>{fullName}</p>
-                  </div>
-                </div>
-              </td>
-              <td style={{ padding: '16px 24px', fontSize: '14px', color: '#4b5563' }}>{user.email}</td>
-              <td style={{ padding: '16px 24px' }}>{getRoleBadge(user.tipo_usuario)}</td>
-              <td style={{ padding: '16px 24px', fontSize: '14px', color: '#4b5563' }}>
-                {user.perfil_odontologo?.especialidad || '-'}
-              </td>
-              <td style={{ padding: '16px 24px' }}>
-                <span style={{ 
-                  padding: '4px 8px', 
-                  borderRadius: '9999px', 
-                  fontSize: '12px', 
-                  fontWeight: '500',
-                  backgroundColor: user.is_active ? '#d1fae5' : '#fee2e2',
-                  color: user.is_active ? '#065f46' : '#991b1b'
+                </td>
+                
+                {/* Email */}
+                <td style={{ 
+                  padding: '16px 20px', 
+                  fontSize: '14px', 
+                  color: '#64748b',
+                  fontFamily: 'monospace'
                 }}>
-                  {user.is_active ? 'Activo' : 'Inactivo'}
-                </span>
-              </td>
-              <td style={{ padding: '16px 24px', fontSize: '14px', color: '#4b5563' }}>
-                {formatDate(user.date_joined)}
-              </td>
-              <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-                  <button
-                    onClick={() => onEdit(user)}
-                    style={{ padding: '8px', color: '#2563eb', borderRadius: '8px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#eff6ff'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    title="Editar"
-                  >
-                    <Edit style={{ width: '16px', height: '16px' }} />
-                  </button>
-                  <button
-                    onClick={() => onToggleActive(user)}
-                    style={{ 
-                      padding: '8px', 
-                      borderRadius: '8px', 
-                      border: 'none', 
-                      cursor: 'pointer', 
-                      backgroundColor: 'transparent',
-                      color: user.is_active ? '#dc2626' : '#16a34a'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = user.is_active ? '#fef2f2' : '#f0fdf4'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    title={user.is_active ? 'Desactivar' : 'Activar'}
-                  >
-                    <Power style={{ width: '16px', height: '16px' }} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          );
+                  {user.email}
+                </td>
+                
+                {/* Rol */}
+                <td style={{ padding: '16px 20px' }}>
+                  {getRoleBadge(user.tipo_usuario)}
+                </td>
+                
+                {/* Especialidad */}
+                <td style={{ padding: '16px 20px', fontSize: '14px', color: '#475569' }}>
+                  {user.perfil_odontologo?.especialidad || (
+                    <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>-</span>
+                  )}
+                </td>
+                
+                {/* Estado */}
+                <td style={{ padding: '16px 20px' }}>
+                  <span style={{ 
+                    padding: '6px 12px', 
+                    borderRadius: '6px', 
+                    fontSize: '13px', 
+                    fontWeight: '500',
+                    backgroundColor: user.is_active ? '#ecfdf5' : '#fef2f2',
+                    color: user.is_active ? '#059669' : '#dc2626',
+                    border: `1px solid ${user.is_active ? '#a7f3d0' : '#fecaca'}`,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <span style={{ 
+                      width: '6px', 
+                      height: '6px', 
+                      borderRadius: '50%', 
+                      backgroundColor: user.is_active ? '#059669' : '#dc2626'
+                    }} />
+                    {user.is_active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
+                
+                {/* Registro */}
+                <td style={{ padding: '16px 20px', fontSize: '14px', color: '#64748b' }}>
+                  {formatDate(user.date_joined)}
+                </td>
+                
+                {/* Acciones */}
+                <td style={{ padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                    <button
+                      onClick={() => onEdit(user)}
+                      style={{ 
+                        padding: '8px', 
+                        color: '#3b82f6', 
+                        borderRadius: '8px', 
+                        border: 'none', 
+                        cursor: 'pointer', 
+                        backgroundColor: 'transparent',
+                        transition: 'background-color 150ms'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#eff6ff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                      title="Editar usuario"
+                    >
+                      <Edit style={{ width: '18px', height: '18px' }} />
+                    </button>
+                    <button
+                      onClick={() => onToggleActive(user)}
+                      style={{ 
+                        padding: '8px', 
+                        borderRadius: '8px', 
+                        border: 'none', 
+                        cursor: 'pointer', 
+                        backgroundColor: 'transparent',
+                        color: user.is_active ? '#ef4444' : '#10b981',
+                        transition: 'background-color 150ms'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = user.is_active ? '#fef2f2' : '#f0fdf4';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                      title={user.is_active ? 'Desactivar usuario' : 'Activar usuario'}
+                    >
+                      <Power style={{ width: '18px', height: '18px' }} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
           })}
         </tbody>
       </table>
