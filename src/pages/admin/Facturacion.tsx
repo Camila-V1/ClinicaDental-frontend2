@@ -1,9 +1,10 @@
 /**
  * 💰 Página de Facturación - Admin
+ * Corregido: Manejo de errores y persistencia de datos
  */
 
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import facturacionService, { type Factura, type Pago, type FacturaCreateData, type PagoCreateData } from '@/services/facturacionAdminService';
 import FacturasList from '@/components/admin/FacturasList';
@@ -28,20 +29,46 @@ export default function Facturacion() {
 
   // ==================== QUERIES ====================
   
-  const { data: facturasData, isLoading: loadingFacturas } = useQuery({
+  const { 
+    data: facturasData, 
+    isLoading: loadingFacturas,
+    isError: isErrorFacturas,
+    error: errorFacturas
+  } = useQuery({
     queryKey: ['admin-facturas', searchTerm, estadoFilter, fechaDesde, fechaHasta],
-    queryFn: () => facturacionService.getFacturas({
-      search: searchTerm || undefined,
-      estado: estadoFilter || undefined,
-      fecha_desde: fechaDesde || undefined,
-      fecha_hasta: fechaHasta || undefined,
-    }),
+    queryFn: async () => {
+      console.log("📡 Fetching facturas con filtros:", { searchTerm, estadoFilter });
+      const res = await facturacionService.getFacturas({
+        search: searchTerm || undefined,
+        estado: estadoFilter || undefined,
+        fecha_desde: fechaDesde || undefined,
+        fecha_hasta: fechaHasta || undefined,
+      });
+      return res;
+    },
+    placeholderData: keepPreviousData, // Mantiene los datos anteriores mientras carga los nuevos
+    retry: 1,
   });
 
-  const { data: pagosData, isLoading: loadingPagos } = useQuery({
+  const { 
+    data: pagosData, 
+    isLoading: loadingPagos,
+    isError: isErrorPagos
+  } = useQuery({
     queryKey: ['admin-pagos'],
     queryFn: () => facturacionService.getPagos(),
   });
+
+  // Debugging: Ver qué llega realmente
+  useEffect(() => {
+    if (facturasData) {
+      console.log("✅ Facturas Data en Componente:", facturasData);
+      console.log("📏 Cantidad:", Array.isArray(facturasData) ? facturasData.length : 'No es array');
+    }
+    if (isErrorFacturas) {
+      console.error("❌ Error cargando facturas:", errorFacturas);
+    }
+  }, [facturasData, isErrorFacturas, errorFacturas]);
 
   // ==================== MUTATIONS ====================
 
@@ -167,8 +194,9 @@ export default function Facturacion() {
     }
   };
 
-  const facturas = facturasData || [];
-  const pagos = pagosData || [];
+  // Safe default
+  const facturas = Array.isArray(facturasData) ? facturasData : [];
+  const pagos = Array.isArray(pagosData) ? pagosData : [];
 
   return (
     <div style={{ padding: '24px' }}>
@@ -309,14 +337,21 @@ export default function Facturacion() {
             </button>
           </div>
 
-          <FacturasList
-            facturas={facturas}
-            loading={loadingFacturas}
-            onEdit={handleEditFactura}
-            onDelete={handleDeleteFactura}
-            onMarcarPagada={handleMarcarPagada}
-            onCancelar={handleCancelarFactura}
-          />
+          {/* ERROR HANDLING DISPLAY */}
+          {isErrorFacturas ? (
+            <div style={{ padding: '20px', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '8px', textAlign: 'center' }}>
+              ❌ Error cargando facturas. Intente recargar la página.
+            </div>
+          ) : (
+            <FacturasList
+              facturas={facturas}
+              loading={loadingFacturas}
+              onEdit={handleEditFactura}
+              onDelete={handleDeleteFactura}
+              onMarcarPagada={handleMarcarPagada}
+              onCancelar={handleCancelarFactura}
+            />
+          )}
         </>
       )}
 
@@ -344,13 +379,19 @@ export default function Facturacion() {
             </button>
           </div>
 
-          <PagosList
-            pagos={pagos}
-            loading={loadingPagos}
-            onEdit={handleEditPago}
-            onDelete={handleDeletePago}
-            onAnular={handleAnularPago}
-          />
+          {isErrorPagos ? (
+             <div style={{ padding: '20px', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '8px', textAlign: 'center' }}>
+               ❌ Error cargando pagos.
+             </div>
+          ) : (
+            <PagosList
+              pagos={pagos}
+              loading={loadingPagos}
+              onEdit={handleEditPago}
+              onDelete={handleDeletePago}
+              onAnular={handleAnularPago}
+            />
+          )}
         </>
       )}
 
