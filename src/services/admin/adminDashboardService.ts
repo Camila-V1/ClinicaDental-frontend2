@@ -172,7 +172,7 @@ export const adminDashboardService = {
   async getStockBajo() {
     try {
       const { data } = await api.get('/api/inventario/insumos/bajo_stock/', { params: { page_size: 10 } });
-      return data;
+      return Array.isArray(data) ? data : [];
     } catch (error: any) {
       console.error('🔴 Error Stock:', error);
       return [];
@@ -180,12 +180,15 @@ export const adminDashboardService = {
   },
 
   /**
-   * Obtener actividad reciente
+   * Obtener actividad reciente (bitácora)
    */
   async getActividadReciente() {
     try {
       const { data } = await api.get('/api/reportes/bitacora/', { params: { page: 1, page_size: 10 } });
-      return data;
+      // La respuesta de bitácora a veces viene paginada (results) o directa (array)
+      if (data && Array.isArray(data.results)) return data.results;
+      if (Array.isArray(data)) return data;
+      return [];
     } catch (error: any) {
       console.error('🔴 Error Bitácora:', error);
       return [];
