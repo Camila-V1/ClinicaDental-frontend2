@@ -773,24 +773,115 @@ ingresos_mes: "0"
 
 ---
 
-### 3. Ocupación en 0% (NO ES ERROR ✅)
+### 3. Ocupación en 0% - Troubleshooting
 
 **Síntoma:**
 \`\`\`json
 {
+  "usuario_id": 381,
+  "nombre_completo": "Dr. Juan Pérez",
   "citas_completadas": 0,
   "horas_ocupadas": 0,
   "tasa_ocupacion": "0.00"
 }
 \`\`\`
 
-**Causa:**
+**Posibles Causas:**
+
+#### A) No hay citas completadas (NORMAL)
 - NO hay citas con estado "COMPLETADA" en la base de datos
 - \`tasa_ocupacion = citas_completadas / total_citas = 0 / 7 = 0%\`
+- **Solución:** Cambiar el estado de algunas citas a "COMPLETADA" en la agenda
 
-**Solución:**
-- Cambiar el estado de algunas citas a "COMPLETADA" en la agenda
-- NO es un bug del frontend o backend
+#### B) Cache del navegador (COMÚN)
+- El frontend tiene datos antiguos en memoria
+- React Query no refrescó después de cambiar estados de citas
+- **Solución:** 
+  1. Presionar \`Ctrl + Shift + R\` (Windows) o \`Cmd + Shift + R\` (Mac)
+  2. O hacer clic en el botón "🔄 Refrescar" del dashboard
+  3. Verificar en la consola del navegador qué \`usuario_id\` está recibiendo
+
+#### C) IDs de usuario diferentes entre tenants
+- Base de datos tiene \`usuario_id: 103\`
+- Frontend muestra \`usuario_id: 381\`
+- **Causa:** Estás viendo datos de otro tenant o sesión
+- **Solución:** Verificar que estés en el tenant correcto (\`clinica_demo\`)
+
+**Script de Verificación (Backend):**
+\`\`\`python
+# verificar_ocupacion_odontologo.py
+from datetime import datetime
+from django.db.models import Q
+from usuarios.models import Usuario
+from citas.models import Cita
+
+# Buscar odontólogo
+odontologo = Usuario.objects.filter(
+    tipo_usuario='ODONTOLOGO',
+    is_active=True
+).first()
+
+if odontologo:
+    print(f"🩺 {odontologo.full_name} (ID: {odontologo.id})")
+    
+    # Contar citas
+    now = datetime.now()
+    citas = Cita.objects.filter(
+        odontologo__usuario=odontologo,
+        fecha_hora__year=now.year,
+        fecha_hora__month=now.month
+    )
+    
+    total = citas.count()
+    completadas = citas.filter(estado='COMPLETADA').count()
+    canceladas = citas.filter(estado='CANCELADA').count()
+    pendientes = citas.filter(
+        Q(estado='PENDIENTE') | Q(estado='CONFIRMADA')
+    ).count()
+    
+    tasa = (completadas / total * 100) if total > 0 else 0
+    horas = completadas * 2
+    pacientes = citas.filter(
+        estado='COMPLETADA'
+    ).values('paciente').distinct().count()
+    
+    print(f"├── Total Citas: {total}")
+    print(f"├── ✅ Completadas: {completadas} ({tasa:.2f}%)")
+    print(f"├── ❌ Canceladas: {canceladas}")
+    print(f"├── ⏳ Pendientes: {pendientes}")
+    print(f"├── Horas Ocupadas: {horas}h")
+    print(f"└── Pacientes Atendidos: {pacientes}")
+\`\`\`
+
+**Verificación en Consola del Navegador:**
+\`\`\`javascript
+// Logs que deberías ver:
+👨‍⚕️ [ReportesService] Solicitando ocupacion-odontologos
+✅ [ReportesService] Ocupación recibida del backend: [{usuario_id: 103, ...}]
+📋 Odontólogo 1: {
+  usuario_id: 103,
+  nombre_completo: 'Dr. Juan Pérez',
+  total_citas: 11,
+  citas_completadas: 5,
+  tasa_ocupacion: "45.45",
+  horas_ocupadas: 10,
+  pacientes_atendidos: 4
+}
+\`\`\`
+
+**Datos Correctos Esperados:**
+\`\`\`json
+{
+  "usuario_id": 103,
+  "nombre_completo": "Dr. Juan Pérez",
+  "total_citas": 11,
+  "citas_completadas": 5,
+  "citas_canceladas": 2,
+  "horas_ocupadas": 10,
+  "tasa_ocupacion": "45.45",
+  "pacientes_atendidos": 4
+}
+\`\`\`
 
 ---
 
