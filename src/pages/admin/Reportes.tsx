@@ -5,12 +5,14 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { FileText } from 'lucide-react';
 import reportesService from '@/services/reportesService';
 import DashboardKPIs from '@/components/admin/DashboardKPIs';
 import TendenciaCitasChart from '@/components/admin/TendenciaCitasChart';
 import TopProcedimientosChart from '@/components/admin/TopProcedimientosChart';
 import ReporteFinanciero from '@/components/admin/ReporteFinanciero';
 import OcupacionOdontologos from '@/components/admin/OcupacionOdontologos';
+import { generateReportesDocumentation, downloadMarkdownFile } from '@/utils/generateReportesDocumentation';
 
 export default function Reportes() {
   const [diasTendencia, setDiasTendencia] = useState(15);
@@ -87,16 +89,55 @@ export default function Reportes() {
 
   const loadingGlobalKPIs = loadingKPIs || loadingStats || loadingFinanciero;
 
+  // Función para generar y descargar documentación
+  const handleGenerarDocumentacion = () => {
+    const markdown = generateReportesDocumentation();
+    downloadMarkdownFile(markdown, 'DOCUMENTACION_SISTEMA_REPORTES.md');
+  };
+
   return (
     <div style={{ padding: '24px' }}>
       {/* Header */}
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>
-          📊 Reportes y Análisis
-        </h1>
-        <p style={{ color: '#6b7280', fontSize: '14px' }}>
-          Dashboard ejecutivo con métricas y estadísticas del sistema
-        </p>
+      <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>
+            📊 Reportes y Análisis
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: '14px' }}>
+            Dashboard ejecutivo con métricas y estadísticas del sistema
+          </p>
+        </div>
+        <button
+          onClick={handleGenerarDocumentacion}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 20px',
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#2563eb';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 4px 8px rgba(59, 130, 246, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#3b82f6';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.3)';
+          }}
+        >
+          <FileText size={18} />
+          📄 Imprimir Documentación
+        </button>
       </div>
 
       {/* KPIs Dashboard FUSIONADOS */}
