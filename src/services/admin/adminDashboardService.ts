@@ -196,18 +196,41 @@ export const adminDashboardService = {
   },
 
   /**
-   * Obtener actividad reciente (bitácora)
+   * ✅ Actividad reciente - Bitácora del sistema
    */
   async getActividadReciente() {
     try {
       const { data } = await api.get('/api/reportes/bitacora/', { params: { page: 1, page_size: 10 } });
+      
+      console.log('📋 [adminDashboardService] Bitácora data cruda:', data);
+      
       // La respuesta de bitácora a veces viene paginada (results) o directa (array)
-      if (data && Array.isArray(data.results)) return data.results;
-      if (Array.isArray(data)) return data;
-      return [];
+      let logs = [];
+      if (data && Array.isArray(data.results)) {
+        logs = data.results;
+      } else if (Array.isArray(data)) {
+        logs = data;
+      }
+      
+      console.log('📋 [adminDashboardService] Logs encontrados:', logs.length);
+      
+      // Transformar el formato del backend al formato que espera el frontend
+      const transformedLogs = logs.map((log: any) => ({
+        id: log.id,
+        usuario_nombre: log.usuario?.nombre_completo || log.usuario || 'Usuario desconocido',
+        accion_display: log.accion_display || log.accion || 'Acción',
+        descripcion: log.descripcion || '',
+        fecha_hora: log.fecha_hora || log.timestamp || new Date().toISOString(),
+        tabla_afectada: log.modelo || undefined
+      }));
+      
+      console.log('✅ [adminDashboardService] Logs transformados:', transformedLogs);
+      console.log('📊 [adminDashboardService] Primer log:', transformedLogs[0]);
+      
+      return { results: transformedLogs, count: transformedLogs.length };
     } catch (error: any) {
       console.error('🔴 Error Bitácora:', error);
-      return [];
+      return { results: [], count: 0 };
     }
   },
 };
