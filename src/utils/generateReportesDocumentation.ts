@@ -578,20 +578,78 @@ interface Props {
 \`\`\`
 
 **Renderiza:**
-- Gráfico de líneas con Chart.js
-- **Problema Actual:** Solo muestra 1 línea (\`cantidad\`) porque backend NO envía \`completadas\` ni \`canceladas\`
+- ✅ Gráfico de barras agrupadas (NO líneas)
+- ✅ **3 barras por fecha:** Total (azul), Completadas (verde), Canceladas (rojo)
+- ✅ Leyenda superior con indicadores de color
+- ✅ Etiquetas de fecha formateadas (mes corto + día)
+- ✅ Tooltips con valores al hacer hover
 
-**Configuración del Gráfico:**
+**Estado Actual:**
+- ✅ **Componente CORRECTO:** Ya renderiza las 3 barras
+- ⚠️ **Backend INCOMPLETO:** Solo envía \`cantidad\` (falta \`completadas\` y \`canceladas\`)
+- 🔄 **Resultado Visual:** Solo la barra "Total" tiene altura, las otras están en 0
+
+**Código Actual del Componente (Líneas 70-108):**
+\`\`\`tsx
+{data.map((item, index) => {
+  const totalHeight = (item.total / maxValue) * chartHeight;
+  const completadasHeight = (item.completadas / maxValue) * chartHeight;  // ✅
+  const canceladasHeight = (item.canceladas / maxValue) * chartHeight;    // ✅
+
+  return (
+    <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '100%', display: 'flex', gap: '2px' }}>
+        {/* Total Bar (Azul) */}
+        <div style={{ width: '30%', height: totalHeight, background: '#3b82f6' }}>
+          {item.total > 0 && <span>{item.total}</span>}
+        </div>
+        
+        {/* Completadas Bar (Verde) ✅ */}
+        <div style={{ width: '30%', height: completadasHeight, background: '#10b981' }} />
+        
+        {/* Canceladas Bar (Rojo) ✅ */}
+        <div style={{ width: '30%', height: canceladasHeight, background: '#ef4444' }} />
+      </div>
+      
+      <div style={{ fontSize: '10px' }}>
+        {formatFecha(item.fecha)}
+      </div>
+    </div>
+  );
+})}
+\`\`\`
+
+**Conclusión:**
+- ✅ Frontend **NO necesita cambios**
+- ❌ Backend debe actualizar endpoint \`tendencia-citas\` para incluir campos faltantes
+- 📋 Ver sección "Corrección Backend Requerida" más abajo
+
+**Datos que el componente espera recibir:**
 \`\`\`typescript
-datasets: [
-  {
-    label: 'Total Citas',
-    data: data.map(d => d.cantidad),
-    borderColor: 'rgb(59, 130, 246)',
-  },
-  // ❌ Falta: completadas
-  // ❌ Falta: canceladas
-]
+interface TendenciaCitas {
+  fecha: string;        // "2025-11-22"
+  total: number;        // Todas las citas del día
+  completadas: number;  // ❌ Backend NO envía (siempre 0)
+  canceladas: number;   // ❌ Backend NO envía (siempre 0)
+}
+\`\`\`
+
+**Datos que el backend actualmente envía:**
+\`\`\`json
+{
+  "fecha": "2025-11-22",
+  "cantidad": 1  // Solo este campo
+}
+\`\`\`
+
+**Mapeo en reportesService.ts (Línea 175-179):**
+\`\`\`typescript
+const resultado = data.map((item: any) => ({
+  fecha: item.fecha,
+  total: Number(item.cantidad || item.total || 0),  // ✅ Mapea cantidad → total
+  completadas: Number(item.completadas || 0),        // ⚠️ Siempre 0 (backend no envía)
+  canceladas: Number(item.canceladas || 0)           // ⚠️ Siempre 0 (backend no envía)
+}));
 \`\`\`
 
 ---
