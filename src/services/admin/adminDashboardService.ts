@@ -146,19 +146,25 @@ export const adminDashboardService = {
   async getOcupacionOdontologos(): Promise<OcupacionOdontologoUI[]> {
     try {
       const { data } = await api.get('/api/reportes/reportes/ocupacion-odontologos/');
+      console.log('👨‍⚕️ [adminDashboardService] Ocupación recibida:', data);
+      
       if (!Array.isArray(data)) return [];
 
-      const mappedData = data.map((item: any) => ({
-        odontologo_id: item.odontologo_id || item.id || 0,
-        odontologo_nombre: item.odontologo_nombre || item.nombre_completo || item.nombre || 'Desconocido',
-        tasa_ocupacion: String(item.tasa_ocupacion || item.ocupacion || "0"),
-        total_citas: Number(item.total_citas || item.citas_totales || 0),
-        citas_completadas: Number(item.citas_completadas || 0),
-        citas_canceladas: Number(item.citas_canceladas || 0),
-        horas_ocupadas: Number(item.horas_ocupadas || 0),
-        pacientes_atendidos: Number(item.pacientes_atendidos || item.pacientes_unicos || 0)
-      }));
+      const mappedData = data.map((item: any) => {
+        console.log('🔄 Mapeo ocupación:', item);
+        return {
+          odontologo_id: Number(item.usuario_id || 0),  // ✅ CORRECTO: usuario_id del backend
+          odontologo_nombre: item.nombre_completo || 'Desconocido',  // ✅ CORRECTO: nombre_completo
+          tasa_ocupacion: String(item.tasa_ocupacion || "0"),
+          total_citas: Number(item.total_citas || 0),
+          citas_completadas: Number(item.citas_completadas || 0),
+          citas_canceladas: Number(item.citas_canceladas || 0),
+          horas_ocupadas: Number(item.horas_ocupadas || 0),
+          pacientes_atendidos: Number(item.pacientes_atendidos || 0)
+        };
+      });
 
+      console.log('✅ [adminDashboardService] Ocupación mapeada:', mappedData);
       return mappedData;
     } catch (error: any) {
       console.error('🔴 Error Ocupación:', error);
