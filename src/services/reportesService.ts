@@ -96,37 +96,37 @@ export interface OcupacionOdontologo {
 class ReportesService {
   // Dashboard KPIs principales
   async getDashboardKpis() {
-    const response = await api.get<DashboardKPIs>('/api/reportes/dashboard-kpis/');
+    const response = await api.get<DashboardKPIs>('/api/reportes/reportes/dashboard-kpis/');
     return response.data;
   }
 
   // Estadísticas generales del sistema
   async getEstadisticasGenerales() {
-    const response = await api.get<EstadisticasGenerales>('/api/reportes/estadisticas-generales/');
+    const response = await api.get<EstadisticasGenerales>('/api/reportes/reportes/estadisticas-generales/');
     return response.data;
   }
 
   // Tendencia de citas (gráfico)
   async getTendenciaCitas(params?: { dias?: number }) {
-    const response = await api.get<TendenciaCitas[]>('/api/reportes/tendencia-citas/', { params });
+    const response = await api.get<TendenciaCitas[]>('/api/reportes/reportes/tendencia-citas/', { params });
     return response.data;
   }
 
   // Top procedimientos más realizados
   async getTopProcedimientos(params?: { limite?: number }) {
-    const response = await api.get<TopProcedimiento[]>('/api/reportes/top-procedimientos/', { params });
+    const response = await api.get<TopProcedimiento[]>('/api/reportes/reportes/top-procedimientos/', { params });
     return response.data;
   }
 
   // Reporte financiero por período
   async getReporteFinanciero(params?: { periodo?: string; fecha_inicio?: string; fecha_fin?: string }) {
-    const response = await api.get<ReporteFinanciero>('/api/reportes/reporte-financiero/', { params });
+    const response = await api.get<ReporteFinanciero>('/api/reportes/reportes/reporte-financiero/', { params });
     return response.data;
   }
 
   // Ocupación por odontólogo
   async getOcupacionOdontologos(params?: { mes?: string }) {
-    const response = await api.get<OcupacionOdontologo[]>('/api/reportes/ocupacion-odontologos/', { params });
+    const response = await api.get<OcupacionOdontologo[]>('/api/reportes/reportes/ocupacion-odontologos/', { params });
     return response.data;
   }
 }
