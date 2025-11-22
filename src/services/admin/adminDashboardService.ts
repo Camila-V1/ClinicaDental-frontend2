@@ -1,6 +1,6 @@
 /**
  * 📊 Servicio para Dashboard del Administrador
- * (Corregido con adaptadores de datos)
+ * (Corregido: Error 'includes' of undefined)
  */
 
 import api from '@/config/apiConfig';
@@ -49,8 +49,10 @@ export const adminDashboardService = {
       if (Array.isArray(data)) {
         // Si es un array, intentamos mapear buscando por claves o labels comunes
         data.forEach((item: any) => {
-          // Normalizamos la clave para buscar coincidencias (ej: "total_pacientes" o "Total Pacientes")
-          const key = item.key || item.label?.toLowerCase().replace(/ /g, '_');
+          // CORRECCIÓN: Asegurar que key siempre sea string
+          // Usamos (item.key O item.label O texto vacío)
+          const rawKey = item.key || item.label || ''; 
+          const key = String(rawKey).toLowerCase().replace(/ /g, '_');
           const value = item.value;
 
           if (key.includes('pacientes') && key.includes('total')) kpisFormatted.total_pacientes = value;
@@ -62,8 +64,8 @@ export const adminDashboardService = {
           else if (key.includes('citas') && key.includes('pendientes')) kpisFormatted.citas_pendientes = value;
           else if (key.includes('facturas')) kpisFormatted.facturas_pendientes = value;
         });
-      } else if (typeof data === 'object') {
-        // Si ya es objeto, lo mezclamos con los defaults para evitar undefined
+      } else if (typeof data === 'object' && data !== null) {
+        // Si ya es objeto, lo mezclamos con los defaults
         kpisFormatted = { ...kpisFormatted, ...data };
       }
 
@@ -72,7 +74,17 @@ export const adminDashboardService = {
 
     } catch (error: any) {
       console.error('🔴 [adminDashboardService.getKPIs] Error:', error);
-      throw error;
+      // Retornamos estructura vacía para no romper la UI
+      return {
+        total_pacientes: 0,
+        citas_hoy: 0,
+        ingresos_mes: "0",
+        tratamientos_activos: 0,
+        pacientes_nuevos_mes: 0,
+        tasa_ocupacion: 0,
+        citas_pendientes: 0,
+        facturas_pendientes: 0
+      };
     }
   },
 
@@ -80,7 +92,6 @@ export const adminDashboardService = {
    * Obtener tendencia de citas
    */
   async getTendenciaCitas(dias: number = 15): Promise<TendenciaCita[]> {
-    console.log('🔵 [adminDashboardService.getTendenciaCitas] Días:', dias);
     try {
       const { data } = await api.get('/api/reportes/reportes/tendencia-citas/', { params: { dias } });
       return data || [];
@@ -96,7 +107,6 @@ export const adminDashboardService = {
   async getTopProcedimientos(limite: number = 5): Promise<TopProcedimiento[]> {
     try {
       const { data } = await api.get('/api/reportes/reportes/top-procedimientos/', { params: { limite } });
-      // Asegurar que data sea un array
       return Array.isArray(data) ? data : [];
     } catch (error: any) {
       console.error('🔴 Error Top Procedimientos:', error);
@@ -132,17 +142,12 @@ export const adminDashboardService = {
 
   /**
    * Obtener ocupación de odontólogos
-   * Se aplica transformación de claves (snake_case mapping)
    */
   async getOcupacionOdontologos(): Promise<OcupacionOdontologoUI[]> {
-    console.log('🔵 [adminDashboardService.getOcupacion] Iniciando...');
     try {
       const { data } = await api.get('/api/reportes/reportes/ocupacion-odontologos/');
-      console.log('🟢 [adminDashboardService.getOcupacion] RAW:', data);
-
       if (!Array.isArray(data)) return [];
 
-      // 🛠️ ADAPTADOR: Mapear claves del backend a lo que espera el componente
       const mappedData = data.map((item: any) => ({
         odontologo_id: item.odontologo_id || item.id || 0,
         odontologo_nombre: item.odontologo_nombre || item.nombre_completo || item.nombre || 'Desconocido',
@@ -154,7 +159,6 @@ export const adminDashboardService = {
         pacientes_atendidos: Number(item.pacientes_atendidos || item.pacientes_unicos || 0)
       }));
 
-      console.log('✅ [adminDashboardService.getOcupacion] Mapped:', mappedData);
       return mappedData;
     } catch (error: any) {
       console.error('🔴 Error Ocupación:', error);
