@@ -11,7 +11,13 @@ interface TopProcedimientosChartProps {
 }
 
 export default function TopProcedimientosChart({ data, loading }: TopProcedimientosChartProps) {
+  console.log('🏆 [TopProcedimientosChart] Renderizando componente');
+  console.log('   - loading:', loading);
+  console.log('   - data length:', data?.length);
+  console.log('   - data:', data);
+
   if (loading) {
+    console.log('🏆 [TopProcedimientosChart] Mostrando mensaje de carga');
     return (
       <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
         Cargando procedimientos...
@@ -20,12 +26,15 @@ export default function TopProcedimientosChart({ data, loading }: TopProcedimien
   }
 
   if (!data || data.length === 0) {
+    console.warn('⚠️ [TopProcedimientosChart] No hay datos disponibles');
     return (
       <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
         No hay datos de procedimientos disponibles
       </div>
     );
   }
+
+  console.log('✅ [TopProcedimientosChart] Datos disponibles, renderizando lista');
 
   const colors = [
     '#3b82f6', // blue

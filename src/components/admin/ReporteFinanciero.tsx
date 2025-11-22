@@ -11,7 +11,12 @@ interface ReporteFinancieroProps {
 }
 
 export default function ReporteFinanciero({ reporte, loading }: ReporteFinancieroProps) {
+  console.log('💰 [ReporteFinanciero] Renderizando componente');
+  console.log('   - loading:', loading);
+  console.log('   - reporte:', reporte);
+
   if (loading) {
+    console.log('💰 [ReporteFinanciero] Mostrando mensaje de carga');
     return (
       <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>
         Cargando reporte financiero...
@@ -20,12 +25,20 @@ export default function ReporteFinanciero({ reporte, loading }: ReporteFinancier
   }
 
   if (!reporte) {
+    console.warn('⚠️ [ReporteFinanciero] No hay datos de reporte financiero');
     return (
       <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>
         No hay datos financieros disponibles
       </div>
     );
   }
+
+  console.log('✅ [ReporteFinanciero] Datos disponibles:');
+  console.log('   - periodo:', reporte.periodo);
+  console.log('   - total_facturado:', reporte.total_facturado);
+  console.log('   - total_cobrado:', reporte.total_cobrado);
+  console.log('   - total_pendiente:', reporte.total_pendiente);
+  console.log('   - ingresos_por_metodo:', reporte.ingresos_por_metodo);
 
   const formatCurrency = (amount: string | number) => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;

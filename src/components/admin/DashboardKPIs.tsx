@@ -11,7 +11,12 @@ interface DashboardKPIsProps {
 }
 
 export default function DashboardKPIs({ kpis, loading }: DashboardKPIsProps) {
+  console.log('📊 [DashboardKPIs] Renderizando componente');
+  console.log('   - loading:', loading);
+  console.log('   - kpis:', kpis);
+
   if (loading) {
+    console.log('📊 [DashboardKPIs] Mostrando skeleton loader');
     return (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
         {[...Array(4)].map((_, i) => (
@@ -21,7 +26,10 @@ export default function DashboardKPIs({ kpis, loading }: DashboardKPIsProps) {
     );
   }
 
-  if (!kpis) return null;
+  if (!kpis) {
+    console.warn('⚠️ [DashboardKPIs] No hay datos de KPIs');
+    return null;
+  }
 
   const kpiCards = [
     {

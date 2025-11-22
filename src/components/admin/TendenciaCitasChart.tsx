@@ -11,7 +11,13 @@ interface TendenciaCitasChartProps {
 }
 
 export default function TendenciaCitasChart({ data, loading }: TendenciaCitasChartProps) {
+  console.log('📈 [TendenciaCitasChart] Renderizando componente');
+  console.log('   - loading:', loading);
+  console.log('   - data length:', data?.length);
+  console.log('   - data:', data);
+
   if (loading) {
+    console.log('📈 [TendenciaCitasChart] Mostrando mensaje de carga');
     return (
       <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
         Cargando tendencia...
@@ -20,12 +26,17 @@ export default function TendenciaCitasChart({ data, loading }: TendenciaCitasCha
   }
 
   if (!data || data.length === 0) {
+    console.warn('⚠️ [TendenciaCitasChart] No hay datos disponibles');
     return (
       <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
         No hay datos de tendencia disponibles
       </div>
     );
   }
+
+  console.log('✅ [TendenciaCitasChart] Datos disponibles, renderizando gráfico');
+  console.log('   - Primer registro:', data[0]);
+  console.log('   - Último registro:', data[data.length - 1]);
 
   const maxValue = Math.max(...data.map(d => d.total), 10);
   const chartHeight = 200;

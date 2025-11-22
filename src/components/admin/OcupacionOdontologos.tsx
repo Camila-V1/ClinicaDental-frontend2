@@ -11,7 +11,13 @@ interface OcupacionOdontologosProps {
 }
 
 export default function OcupacionOdontologos({ ocupacion, loading }: OcupacionOdontologosProps) {
+  console.log('👨‍⚕️ [OcupacionOdontologos] Renderizando componente');
+  console.log('   - loading:', loading);
+  console.log('   - ocupacion length:', ocupacion?.length);
+  console.log('   - ocupacion:', ocupacion);
+
   if (loading) {
+    console.log('👨‍⚕️ [OcupacionOdontologos] Mostrando mensaje de carga');
     return (
       <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>
         Cargando ocupación...
@@ -20,12 +26,15 @@ export default function OcupacionOdontologos({ ocupacion, loading }: OcupacionOd
   }
 
   if (!ocupacion || ocupacion.length === 0) {
+    console.warn('⚠️ [OcupacionOdontologos] No hay datos disponibles');
     return (
       <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9ca3af' }}>
         No hay datos de ocupación disponibles
       </div>
     );
   }
+
+  console.log('✅ [OcupacionOdontologos] Datos disponibles, renderizando tabla');
 
   const getOcupacionColor = (tasa: string) => {
     const porcentaje = parseFloat(tasa);

@@ -15,6 +15,10 @@ export default function Reportes() {
   const [diasTendencia, setDiasTendencia] = useState(15);
   const [periodoFinanciero, setPeriodoFinanciero] = useState('mes_actual');
 
+  console.log('📊 [Reportes] Componente renderizado');
+  console.log('   - diasTendencia:', diasTendencia);
+  console.log('   - periodoFinanciero:', periodoFinanciero);
+
   // Función para convertir "mes_actual" al formato YYYY-MM
   const getPeriodoFormateado = () => {
     if (periodoFinanciero === 'mes_actual') {
@@ -24,38 +28,71 @@ export default function Reportes() {
     return periodoFinanciero;
   };
 
+  const periodoFormateado = getPeriodoFormateado();
+  console.log('   - periodoFormateado:', periodoFormateado);
+
   // ==================== QUERIES ====================
   
-  const { data: kpis, isLoading: loadingKPIs } = useQuery({
+  const { data: kpis, isLoading: loadingKPIs, error: errorKPIs } = useQuery({
     queryKey: ['dashboard-kpis'],
     queryFn: () => reportesService.getDashboardKpis(),
     refetchInterval: 60000, // Refetch cada 60 segundos
   });
 
-  const { data: estadisticas, isLoading: loadingStats } = useQuery({
+  console.log('📊 [Reportes] KPIs Query Estado:');
+  console.log('   - isLoading:', loadingKPIs);
+  console.log('   - error:', errorKPIs);
+  console.log('   - data:', kpis);
+
+  const { data: estadisticas, isLoading: loadingStats, error: errorStats } = useQuery({
     queryKey: ['estadisticas-generales'],
     queryFn: () => reportesService.getEstadisticasGenerales(),
   });
 
-  const { data: tendenciaCitas, isLoading: loadingTendencia } = useQuery({
+  console.log('📊 [Reportes] Estadísticas Query Estado:');
+  console.log('   - isLoading:', loadingStats);
+  console.log('   - error:', errorStats);
+  console.log('   - data:', estadisticas);
+
+  const { data: tendenciaCitas, isLoading: loadingTendencia, error: errorTendencia } = useQuery({
     queryKey: ['tendencia-citas', diasTendencia],
     queryFn: () => reportesService.getTendenciaCitas({ dias: diasTendencia }),
   });
 
-  const { data: topProcedimientos, isLoading: loadingTop } = useQuery({
+  console.log('📊 [Reportes] Tendencia Citas Query Estado:');
+  console.log('   - isLoading:', loadingTendencia);
+  console.log('   - error:', errorTendencia);
+  console.log('   - data:', tendenciaCitas);
+
+  const { data: topProcedimientos, isLoading: loadingTop, error: errorTop } = useQuery({
     queryKey: ['top-procedimientos'],
     queryFn: () => reportesService.getTopProcedimientos({ limite: 5 }),
   });
 
-  const { data: reporteFinanciero, isLoading: loadingFinanciero } = useQuery({
+  console.log('📊 [Reportes] Top Procedimientos Query Estado:');
+  console.log('   - isLoading:', loadingTop);
+  console.log('   - error:', errorTop);
+  console.log('   - data:', topProcedimientos);
+
+  const { data: reporteFinanciero, isLoading: loadingFinanciero, error: errorFinanciero } = useQuery({
     queryKey: ['reporte-financiero', periodoFinanciero],
-    queryFn: () => reportesService.getReporteFinanciero({ periodo: getPeriodoFormateado() }),
+    queryFn: () => reportesService.getReporteFinanciero({ periodo: periodoFormateado }),
   });
 
-  const { data: ocupacionOdontologos, isLoading: loadingOcupacion } = useQuery({
+  console.log('📊 [Reportes] Reporte Financiero Query Estado:');
+  console.log('   - isLoading:', loadingFinanciero);
+  console.log('   - error:', errorFinanciero);
+  console.log('   - data:', reporteFinanciero);
+
+  const { data: ocupacionOdontologos, isLoading: loadingOcupacion, error: errorOcupacion } = useQuery({
     queryKey: ['ocupacion-odontologos'],
     queryFn: () => reportesService.getOcupacionOdontologos(),
   });
+
+  console.log('📊 [Reportes] Ocupación Odontólogos Query Estado:');
+  console.log('   - isLoading:', loadingOcupacion);
+  console.log('   - error:', errorOcupacion);
+  console.log('   - data:', ocupacionOdontologos);
 
   return (
     <div style={{ padding: '24px' }}>
