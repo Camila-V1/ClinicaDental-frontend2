@@ -15,6 +15,15 @@ export default function Reportes() {
   const [diasTendencia, setDiasTendencia] = useState(15);
   const [periodoFinanciero, setPeriodoFinanciero] = useState('mes_actual');
 
+  // Función para convertir "mes_actual" al formato YYYY-MM
+  const getPeriodoFormateado = () => {
+    if (periodoFinanciero === 'mes_actual') {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }
+    return periodoFinanciero;
+  };
+
   // ==================== QUERIES ====================
   
   const { data: kpis, isLoading: loadingKPIs } = useQuery({
@@ -40,7 +49,7 @@ export default function Reportes() {
 
   const { data: reporteFinanciero, isLoading: loadingFinanciero } = useQuery({
     queryKey: ['reporte-financiero', periodoFinanciero],
-    queryFn: () => reportesService.getReporteFinanciero({ periodo: periodoFinanciero }),
+    queryFn: () => reportesService.getReporteFinanciero({ periodo: getPeriodoFormateado() }),
   });
 
   const { data: ocupacionOdontologos, isLoading: loadingOcupacion } = useQuery({
