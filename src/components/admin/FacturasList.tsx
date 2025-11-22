@@ -61,6 +61,13 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
   return (
     <div style={{ display: 'grid', gap: '16px' }}>
       {facturas.map((factura) => {
+        // 🔧 FIX: Usar campos con fallbacks para compatibilidad con backend
+        const numeroFactura = factura.numero_factura || `#${factura.id}`;
+        const total = factura.total || factura.monto_total || '0.00';
+        const saldo = factura.saldo || '0.00';
+        const fechaEmision = factura.fecha_emision || new Date().toISOString();
+        const fechaVencimiento = factura.fecha_vencimiento || new Date().toISOString();
+        
         const estadoColor = getEstadoColor(factura.estado);
         
         return (
@@ -95,7 +102,7 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
                   </div>
                   <div>
                     <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', margin: 0 }}>
-                      {factura.numero_factura}
+                      {numeroFactura}
                     </h3>
                     <p style={{ fontSize: '14px', color: '#6b7280', margin: '2px 0 0 0' }}>
                       {factura.paciente_nombre}
@@ -115,7 +122,7 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
                   border: `1px solid ${estadoColor.border}`,
                 }}
               >
-                {factura.estado}
+                {factura.estado_display || factura.estado}
               </span>
             </div>
 
@@ -124,25 +131,25 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
               <div>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Fecha Emisión</p>
                 <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827', margin: 0 }}>
-                  📅 {formatDate(factura.fecha_emision)}
+                  📅 {formatDate(fechaEmision)}
                 </p>
               </div>
               <div>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Vencimiento</p>
                 <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827', margin: 0 }}>
-                  ⏰ {formatDate(factura.fecha_vencimiento)}
+                  ⏰ {formatDate(fechaVencimiento)}
                 </p>
               </div>
               <div>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Total</p>
                 <p style={{ fontSize: '16px', fontWeight: '700', color: '#10b981', margin: 0 }}>
-                  {formatCurrency(factura.total)}
+                  {formatCurrency(total)}
                 </p>
               </div>
               <div>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Saldo</p>
-                <p style={{ fontSize: '16px', fontWeight: '700', color: factura.saldo === '0.00' ? '#10b981' : '#ef4444', margin: 0 }}>
-                  {formatCurrency(factura.saldo)}
+                <p style={{ fontSize: '16px', fontWeight: '700', color: saldo === '0.00' ? '#10b981' : '#ef4444', margin: 0 }}>
+                  {formatCurrency(saldo)}
                 </p>
               </div>
             </div>

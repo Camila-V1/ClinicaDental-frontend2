@@ -8,22 +8,24 @@ import api from '../config/apiConfig';
 
 export interface Factura {
   id: number;
-  numero_factura: string;
+  numero_factura?: string; // Puede no venir en algunos casos
   paciente: number;
   paciente_nombre: string;
   plan_tratamiento?: number;
   plan_nombre?: string;
   fecha_emision: string;
   fecha_vencimiento: string;
-  subtotal: string;
-  descuento: string;
-  total: string;
-  saldo: string;
+  subtotal?: string;
+  descuento?: string;
+  total?: string; // Nombre esperado
+  monto_total?: string; // Nombre alternativo que envía backend
+  saldo?: string;
   estado: 'PENDIENTE' | 'PAGADA' | 'VENCIDA' | 'ANULADA';
+  estado_display?: string; // Backend puede enviar este campo
   notas?: string;
   items?: ItemFactura[];
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ItemFactura {
@@ -85,10 +87,15 @@ class FacturacionAdminService {
     fecha_desde?: string;
     fecha_hasta?: string;
   }) {
+    console.log('💰 [Facturación] Obteniendo facturas con params:', params);
     const response = await api.get<{ results: Factura[]; count: number; next: string | null; previous: string | null }>(
       '/api/facturacion/facturas/',
       { params }
     );
+    console.log('✅ [Facturación] Respuesta recibida:', response.data);
+    if (response.data.results && response.data.results.length > 0) {
+      console.log('📋 [Facturación] Primera factura (estructura):', response.data.results[0]);
+    }
     return response.data;
   }
 

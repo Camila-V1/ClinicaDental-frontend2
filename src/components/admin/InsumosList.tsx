@@ -131,9 +131,16 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
           {insumos.map((insumo) => {
+            // 🔧 FIX: Usar campos que el backend realmente envía
+            const stockActual = insumo.stock_actual ?? insumo.cantidad_disponible ?? 0;
+            const stockMinimo = insumo.stock_minimo ?? 0;
+            const unidadMedida = insumo.unidad_medida ?? 'unid';
+            const categoriaNombre = insumo.categoria_nombre ?? insumo.categoria?.nombre ?? 'Sin categoría';
+            const precioVenta = insumo.precio_venta ?? insumo.precio_unitario?.toString() ?? '0.00';
+            
             const status = getStockStatus(
-              parseFloat(String(insumo.stock_actual)),
-              parseFloat(String(insumo.stock_minimo))
+              parseFloat(String(stockActual)),
+              parseFloat(String(stockMinimo))
             );
             return (
               <div
@@ -172,24 +179,22 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
                   <div>
-                    <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 4px 0' }}>Stock Actual</p>
-                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#111827', margin: 0 }}>
-                      {insumo.stock_actual} {insumo.unidad_medida}
+                    <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 4px 0' }}>Código</p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: '#111827', margin: 0 }}>
+                      {insumo.codigo}
                     </p>
                   </div>
                   <div>
-                    <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 4px 0' }}>Stock Mínimo</p>
-                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#111827', margin: 0 }}>
-                      {insumo.stock_minimo} {insumo.unidad_medida}
+                    <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 4px 0' }}>Precio</p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: '#10b981', margin: 0 }}>
+                      Bs. {parseFloat(precioVenta).toFixed(2)}
                     </p>
                   </div>
                 </div>
 
-                {insumo.categoria && (
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '16px' }}>
-                    🏷️ {insumo.categoria.nombre}
-                  </div>
-                )}
+                <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '16px' }}>
+                  🏷️ {categoriaNombre}
+                </div>
 
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button

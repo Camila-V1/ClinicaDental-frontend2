@@ -20,12 +20,15 @@ export interface Insumo {
   codigo: string;
   nombre: string;
   descripcion?: string;
-  categoria: Categoria | null;
+  categoria_nombre?: string; // Backend envía este campo directamente
+  categoria?: Categoria | null; // Puede venir como objeto en algunos casos
   categoria_id?: number;
-  stock_actual: number;
-  stock_minimo: number;
-  unidad_medida: string;
-  precio_unitario: number;
+  stock_actual?: number; // Opcional - puede no venir del backend
+  cantidad_disponible?: number; // Alternativa que puede enviar backend
+  stock_minimo?: number; // Opcional
+  unidad_medida?: string; // Opcional
+  precio_unitario?: number; // Nombre original
+  precio_venta?: string; // Nombre que envía el backend
   fecha_vencimiento?: string;
   proveedor?: string;
   activo: boolean;
@@ -66,7 +69,12 @@ const deleteCategoria = async (id: number): Promise<void> => {
 // ==================== INSUMOS ====================
 
 const getInsumos = async (params?: { page?: number; search?: string; categoria?: number }): Promise<{ results: Insumo[]; count: number; next: string | null; previous: string | null }> => {
+  console.log('📦 [Inventario] Obteniendo insumos con params:', params);
   const response = await api.get<{ results: Insumo[]; count: number; next: string | null; previous: string | null }>('/api/inventario/insumos/', { params });
+  console.log('✅ [Inventario] Respuesta recibida:', response.data);
+  if (response.data.results && response.data.results.length > 0) {
+    console.log('📋 [Inventario] Primer insumo (estructura):', response.data.results[0]);
+  }
   return response.data;
 };
 
