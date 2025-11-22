@@ -13,14 +13,32 @@ export interface KPI {
 }
 
 export interface EstadisticasGenerales {
+  // Pacientes
   total_pacientes_activos: number;
+  pacientes_nuevos_mes: number;
+  
+  // Odontólogos
   total_odontologos: number;
+  
+  // Citas
   citas_mes_actual: number;
+  citas_completadas: number;
+  citas_pendientes: number;
+  citas_canceladas: number;
+  
+  // Tratamientos
   tratamientos_completados: number;
-  ingresos_mes_actual: string;  // ✅ Backend envía como string "280.00"
-  // Propiedades opcionales que el backend puede no enviar aún:
-  promedio_factura?: number;
-  tasa_ocupacion?: number;
+  planes_activos: number;
+  total_procedimientos: number;
+  
+  // Financiero
+  ingresos_mes_actual: number;
+  monto_pendiente: number;
+  facturas_vencidas: number;
+  promedio_factura: number;
+  
+  // Ocupación
+  tasa_ocupacion: number;
 }
 
 export interface TendenciaCita {

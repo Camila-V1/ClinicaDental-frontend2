@@ -19,13 +19,32 @@ export interface DashboardKPIs {
 
 // ✅ Usar la interfaz correcta que coincide con el backend
 export interface EstadisticasGenerales {
+  // Pacientes
   total_pacientes_activos: number;
+  pacientes_nuevos_mes: number;
+  
+  // Odontólogos
   total_odontologos: number;
+  
+  // Citas
   citas_mes_actual: number;
+  citas_completadas: number;
+  citas_pendientes: number;
+  citas_canceladas: number;
+  
+  // Tratamientos
   tratamientos_completados: number;
-  ingresos_mes_actual: string;
-  promedio_factura?: number;
-  tasa_ocupacion?: number;
+  planes_activos: number;
+  total_procedimientos: number;
+  
+  // Financiero
+  ingresos_mes_actual: number;
+  monto_pendiente: number;
+  facturas_vencidas: number;
+  promedio_factura: number;
+  
+  // Ocupación
+  tasa_ocupacion: number;
 }
 
 export interface TendenciaCitas {
@@ -91,11 +110,27 @@ class ReportesService {
     console.log('📊 [ReportesService] Solicitando estadisticas-generales...');
     const response = await api.get<EstadisticasGenerales>('/api/reportes/reportes/estadisticas-generales/');
     console.log('📊 [ReportesService] Estadísticas generales recibidas:', response.data);
-    console.log('   - total_pacientes_activos:', response.data?.total_pacientes_activos);
-    console.log('   - total_odontologos:', response.data?.total_odontologos);
-    console.log('   - citas_mes_actual:', response.data?.citas_mes_actual);
-    console.log('   - tratamientos_completados:', response.data?.tratamientos_completados);
-    console.log('   - ingresos_mes_actual:', response.data?.ingresos_mes_actual);
+    console.log('   📋 PACIENTES:');
+    console.log('      - total_pacientes_activos:', response.data?.total_pacientes_activos);
+    console.log('      - pacientes_nuevos_mes:', response.data?.pacientes_nuevos_mes);
+    console.log('   📋 ODONTÓLOGOS:');
+    console.log('      - total_odontologos:', response.data?.total_odontologos);
+    console.log('   📋 CITAS:');
+    console.log('      - citas_mes_actual:', response.data?.citas_mes_actual);
+    console.log('      - citas_completadas:', response.data?.citas_completadas);
+    console.log('      - citas_pendientes:', response.data?.citas_pendientes);
+    console.log('      - citas_canceladas:', response.data?.citas_canceladas);
+    console.log('   📋 TRATAMIENTOS:');
+    console.log('      - tratamientos_completados:', response.data?.tratamientos_completados);
+    console.log('      - planes_activos:', response.data?.planes_activos);
+    console.log('      - total_procedimientos:', response.data?.total_procedimientos);
+    console.log('   📋 FINANCIERO:');
+    console.log('      - ingresos_mes_actual:', response.data?.ingresos_mes_actual);
+    console.log('      - monto_pendiente:', response.data?.monto_pendiente);
+    console.log('      - facturas_vencidas:', response.data?.facturas_vencidas);
+    console.log('      - promedio_factura:', response.data?.promedio_factura);
+    console.log('   📋 OCUPACIÓN:');
+    console.log('      - tasa_ocupacion:', response.data?.tasa_ocupacion);
     return response.data;
   }
 

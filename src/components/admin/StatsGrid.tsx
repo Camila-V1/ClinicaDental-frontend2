@@ -13,16 +13,16 @@ interface StatsGridProps {
 export default function StatsGrid({ stats }: StatsGridProps) {
   console.log('📊 [StatsGrid] Renderizando con stats:', stats);
 
-  // ✅ Parsear ingresos_mes_actual de string a number
-  const ingresosMes = typeof stats.ingresos_mes_actual === 'string' 
-    ? parseFloat(stats.ingresos_mes_actual) 
-    : stats.ingresos_mes_actual || 0;
-
   const items = [
     {
       label: 'Pacientes Activos',
       value: formatNumber(stats.total_pacientes_activos || 0),
       color: '#2563eb', // blue-600
+    },
+    {
+      label: 'Pacientes Nuevos (Mes)',
+      value: formatNumber(stats.pacientes_nuevos_mes || 0),
+      color: '#06b6d4', // cyan-600
     },
     {
       label: 'Odontólogos',
@@ -35,33 +35,61 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       color: '#16a34a', // green-600
     },
     {
+      label: 'Citas Completadas',
+      value: formatNumber(stats.citas_completadas || 0),
+      color: '#10b981', // emerald-600
+    },
+    {
+      label: 'Citas Pendientes',
+      value: formatNumber(stats.citas_pendientes || 0),
+      color: '#f59e0b', // amber-600
+    },
+    {
+      label: 'Citas Canceladas',
+      value: formatNumber(stats.citas_canceladas || 0),
+      color: '#ef4444', // red-600
+    },
+    {
+      label: 'Planes Activos',
+      value: formatNumber(stats.planes_activos || 0),
+      color: '#8b5cf6', // violet-600
+    },
+    {
       label: 'Tratamientos Completados',
       value: formatNumber(stats.tratamientos_completados || 0),
       color: '#ea580c', // orange-600
     },
     {
+      label: 'Total Procedimientos',
+      value: formatNumber(stats.total_procedimientos || 0),
+      color: '#ec4899', // pink-600
+    },
+    {
       label: 'Ingresos del Mes',
-      value: formatCurrency(ingresosMes),
+      value: formatCurrency(stats.ingresos_mes_actual || 0),
       color: '#059669', // emerald-600
     },
-  ];
-
-  // ✅ Solo agregar promedio_factura y tasa_ocupación si existen
-  if (stats.promedio_factura !== undefined) {
-    items.push({
+    {
+      label: 'Monto Pendiente',
+      value: formatCurrency(stats.monto_pendiente || 0),
+      color: '#f97316', // orange-600
+    },
+    {
+      label: 'Facturas Vencidas',
+      value: formatNumber(stats.facturas_vencidas || 0),
+      color: '#dc2626', // red-600
+    },
+    {
       label: 'Promedio por Factura',
-      value: formatCurrency(stats.promedio_factura),
+      value: formatCurrency(stats.promedio_factura || 0),
       color: '#0891b2', // cyan-600
-    });
-  }
-
-  if (stats.tasa_ocupacion !== undefined) {
-    items.push({
+    },
+    {
       label: 'Tasa de Ocupación',
       value: `${typeof stats.tasa_ocupacion === 'number' ? stats.tasa_ocupacion.toFixed(1) : '0.0'}%`,
       color: '#4f46e5', // indigo-600
-    });
-  }
+    },
+  ];
 
   console.log('📊 [StatsGrid] Items a renderizar:', items.length);
 

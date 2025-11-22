@@ -206,6 +206,10 @@ export default function Reportes() {
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Activos:</span>
                     <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.total_pacientes_activos ?? 0}</strong>
                   </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Nuevos (mes):</span>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.pacientes_nuevos_mes ?? 0}</strong>
+                  </div>
                 </div>
               </div>
 
@@ -232,6 +236,18 @@ export default function Reportes() {
                     <span style={{ fontSize: '13px', color: '#92400e' }}>Total:</span>
                     <strong style={{ fontSize: '13px', color: '#92400e' }}>{estadisticas.citas_mes_actual ?? 0}</strong>
                   </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#92400e' }}>Completadas:</span>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.citas_completadas ?? 0}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#92400e' }}>Pendientes:</span>
+                    <strong style={{ fontSize: '13px', color: '#f59e0b' }}>{estadisticas.citas_pendientes ?? 0}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#92400e' }}>Canceladas:</span>
+                    <strong style={{ fontSize: '13px', color: '#ef4444' }}>{estadisticas.citas_canceladas ?? 0}</strong>
+                  </div>
                 </div>
               </div>
 
@@ -242,21 +258,56 @@ export default function Reportes() {
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#831843' }}>Planes activos:</span>
+                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.planes_activos ?? 0}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#831843' }}>Completados:</span>
-                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos_completados ?? 0}</strong>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.tratamientos_completados ?? 0}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#831843' }}>Procedimientos:</span>
+                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.total_procedimientos ?? 0}</strong>
                   </div>
                 </div>
               </div>
 
-              {/* Ingresos */}
+              {/* Financiero */}
               <div style={{ padding: '16px', background: '#d1fae5', borderRadius: '8px', border: '1px solid #86efac' }}>
                 <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#065f46', marginBottom: '12px' }}>
-                  💰 Ingresos
+                  💰 Financiero
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#065f46' }}>Mes Actual:</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {estadisticas.ingresos_mes_actual ?? '0.00'}</strong>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Ingresos (mes):</span>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {(estadisticas.ingresos_mes_actual ?? 0).toFixed(2)}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Pendiente:</span>
+                    <strong style={{ fontSize: '13px', color: '#f59e0b' }}>Bs. {(estadisticas.monto_pendiente ?? 0).toFixed(2)}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Vencidas:</span>
+                    <strong style={{ fontSize: '13px', color: '#ef4444' }}>{estadisticas.facturas_vencidas ?? 0}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Promedio factura:</span>
+                    <strong style={{ fontSize: '13px', color: '#065f46' }}>Bs. {(estadisticas.promedio_factura ?? 0).toFixed(2)}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ocupación */}
+              <div style={{ padding: '16px', background: '#e0e7ff', borderRadius: '8px', border: '1px solid #a5b4fc' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#3730a3', marginBottom: '12px' }}>
+                  📊 Ocupación
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#3730a3' }}>Tasa de ocupación:</span>
+                    <strong style={{ fontSize: '13px', color: estadisticas.tasa_ocupacion > 70 ? '#10b981' : '#f59e0b' }}>
+                      {(estadisticas.tasa_ocupacion ?? 0).toFixed(1)}%
+                    </strong>
                   </div>
                 </div>
               </div>
