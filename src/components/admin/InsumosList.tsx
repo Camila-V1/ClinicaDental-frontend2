@@ -60,7 +60,7 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
     );
   }
 
-  const insumos = data || [];
+  const insumos = data?.results || [];
 
   return (
     <div>
@@ -246,8 +246,8 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
         </div>
       )}
 
-      {/* Paginación - Simplificada para array directo */}
-      {insumos.length > 0 && (
+      {/* Paginación */}
+      {data && data.count > 0 && (
         <div style={{
           background: 'white',
           borderRadius: '12px',
@@ -259,44 +259,35 @@ export default function InsumosList({ onEdit, onAjustarStock }: InsumosListProps
           border: '1px solid #e5e7eb',
         }}>
           <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
-            Mostrando {insumos.length} insumo{insumos.length !== 1 ? 's' : ''}
+            Total: {data.count} insumos - Página {page}
           </p>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
-              disabled={page === 1}
+              disabled={!data.previous}
               onClick={() => setPage(page - 1)}
               style={{
                 padding: '8px 16px',
-                background: page === 1 ? '#f9fafb' : 'white',
-                color: page === 1 ? '#9ca3af' : '#111827',
+                background: data.previous ? 'white' : '#f9fafb',
+                color: data.previous ? '#111827' : '#9ca3af',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
                 fontSize: '14px',
-                cursor: page === 1 ? 'not-allowed' : 'pointer',
+                cursor: data.previous ? 'pointer' : 'not-allowed',
               }}
             >
               ← Anterior
             </button>
-            <span style={{
-              padding: '8px 16px',
-              fontSize: '14px',
-              color: '#6b7280',
-              display: 'flex',
-              alignItems: 'center',
-            }}>
-              Página {page}
-            </span>
             <button
-              disabled={insumos.length < 10}
+              disabled={!data.next}
               onClick={() => setPage(page + 1)}
               style={{
                 padding: '8px 16px',
-                background: insumos.length < 10 ? '#f9fafb' : 'white',
-                color: insumos.length < 10 ? '#9ca3af' : '#111827',
+                background: data.next ? 'white' : '#f9fafb',
+                color: data.next ? '#111827' : '#9ca3af',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
                 fontSize: '14px',
-                cursor: insumos.length < 10 ? 'not-allowed' : 'pointer',
+                cursor: data.next ? 'pointer' : 'not-allowed',
               }}
             >
               Siguiente →

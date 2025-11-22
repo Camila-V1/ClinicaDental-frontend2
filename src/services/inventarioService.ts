@@ -65,8 +65,8 @@ const deleteCategoria = async (id: number): Promise<void> => {
 
 // ==================== INSUMOS ====================
 
-const getInsumos = async (params?: { page?: number; search?: string; categoria?: number }): Promise<Insumo[]> => {
-  const response = await api.get<Insumo[]>('/api/inventario/insumos/', { params });
+const getInsumos = async (params?: { page?: number; search?: string; categoria?: number }): Promise<{ results: Insumo[]; count: number; next: string | null; previous: string | null }> => {
+  const response = await api.get<{ results: Insumo[]; count: number; next: string | null; previous: string | null }>('/api/inventario/insumos/', { params });
   return response.data;
 };
 
