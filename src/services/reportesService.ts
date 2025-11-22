@@ -85,14 +85,14 @@ export interface ReporteFinanciero {
 }
 
 export interface OcupacionOdontologo {
-  odontologo_id: number;
-  odontologo_nombre: string;
+  usuario_id: number;          // ✅ Campo correcto del backend (no odontologo_id)
+  nombre_completo: string;     // ✅ Campo correcto del backend
   total_citas: number;
   citas_completadas: number;
   citas_canceladas: number;
-  horas_ocupadas: number;
-  tasa_ocupacion: string;
-  pacientes_atendidos: number;
+  horas_ocupadas: number;      // ✅ Calculado por backend
+  tasa_ocupacion: string;      // ✅ String "43.48"
+  pacientes_atendidos: number; // ✅ Calculado por backend
 }
 
 // ==================== SERVICIO ====================
@@ -237,11 +237,12 @@ class ReportesService {
     return response.data;
   }
 
-  // 6. Ocupación de Odontólogos (Usando datos completos del backend)
-  async getOcupacionOdontologos(params?: { mes?: string }) {
+  // 6. Ocupación de Odontólogos (Usando endpoint correcto: ocupacion-odontologos)
+  async getOcupacionOdontologos(params?: { mes?: string; anio?: string }) {
     try {
-      console.log('👨‍⚕️ [ReportesService] Solicitando reporte-citas-odontologo con params:', params);
-      const response = await api.get('/api/reportes/reportes/reporte-citas-odontologo/', { params });
+      console.log('👨‍⚕️ [ReportesService] Solicitando ocupacion-odontologos (ENDPOINT CORRECTO) con params:', params);
+      // ✅ CAMBIO CRÍTICO: Usar endpoint correcto que tiene estructura completa
+      const response = await api.get<OcupacionOdontologo[]>('/api/reportes/reportes/ocupacion-odontologos/', { params });
       const data = response.data;
       console.log('✅ [ReportesService] Ocupación recibida del backend:', data);
       console.log('   - Tipo:', Array.isArray(data) ? 'Array' : typeof data);
@@ -252,32 +253,13 @@ class ReportesService {
         return [];
       }
 
-      console.log('🔄 [ReportesService] Mapeando datos de ocupación:');
-      return data.map((item: any, index: number) => {
-        console.log(`\n   📋 Odontólogo ${index + 1}:`);
-        console.log('      - Raw data:', item);
-        console.log('      - usuario_id:', item.usuario_id);
-        console.log('      - nombre_completo:', item.nombre_completo);
-        console.log('      - total_citas:', item.total_citas);
-        console.log('      - citas_completadas:', item.citas_completadas);
-        console.log('      - horas_ocupadas:', item.horas_ocupadas);
-        console.log('      - tasa_ocupacion:', item.tasa_ocupacion);
-        console.log('      - pacientes_atendidos:', item.pacientes_atendidos);
-
-        const resultado = {
-          odontologo_id: Number(item.usuario_id || item.odontologo_id || 0),
-          odontologo_nombre: item.nombre_completo || item.odontologo || 'Dr. Desconocido',
-          total_citas: Number(item.total_citas || 0),
-          citas_completadas: Number(item.citas_completadas || item.completadas || 0),
-          citas_canceladas: Number(item.citas_canceladas || item.canceladas || 0),
-          horas_ocupadas: Number(item.horas_ocupadas || 0),
-          tasa_ocupacion: String(item.tasa_ocupacion || "0"),
-          pacientes_atendidos: Number(item.pacientes_atendidos || 0)
-        };
-
-        console.log('      ✅ Mapeado:', resultado);
-        return resultado;
+      // ✅ Backend ya envía estructura correcta, NO necesitamos mapear
+      console.log('📦 [ReportesService] Retornando datos directos del backend (sin mapeo)');
+      data.forEach((item, index) => {
+        console.log(`\n   📋 Odontólogo ${index + 1}:`, item);
       });
+
+      return data;
     } catch (error) {
       console.error('🔴 Error getOcupacionOdontologos:', error);
       return [];

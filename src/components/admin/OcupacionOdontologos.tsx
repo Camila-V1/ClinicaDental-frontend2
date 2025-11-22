@@ -50,7 +50,7 @@ export default function OcupacionOdontologos({ ocupacion, loading }: OcupacionOd
         
         return (
           <div
-            key={odontologo.odontologo_id}
+            key={odontologo.usuario_id}
             style={{
               background: 'white',
               borderRadius: '12px',
@@ -77,10 +77,10 @@ export default function OcupacionOdontologos({ ocupacion, loading }: OcupacionOd
                 </div>
                 <div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', margin: 0 }}>
-                    {odontologo.odontologo_nombre}
+                    {odontologo.nombre_completo}
                   </h3>
                   <p style={{ fontSize: '13px', color: '#6b7280', margin: '2px 0 0 0' }}>
-                    ID: {odontologo.odontologo_id}
+                    ID: {odontologo.usuario_id}
                   </p>
                 </div>
               </div>
