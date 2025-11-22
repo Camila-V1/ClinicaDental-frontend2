@@ -17,9 +17,10 @@ export interface EstadisticasGenerales {
   total_odontologos: number;
   citas_mes_actual: number;
   tratamientos_completados: number;
-  ingresos_mes_actual: number;
-  promedio_factura: number;
-  tasa_ocupacion: number;
+  ingresos_mes_actual: string;  // ✅ Backend envía como string "280.00"
+  // Propiedades opcionales que el backend puede no enviar aún:
+  promedio_factura?: number;
+  tasa_ocupacion?: number;
 }
 
 export interface TendenciaCita {

@@ -17,32 +17,15 @@ export interface DashboardKPIs {
   facturas_pendientes: number;
 }
 
+// ✅ Usar la interfaz correcta que coincide con el backend
 export interface EstadisticasGenerales {
-  pacientes: {
-    total: number;
-    nuevos_mes: number;
-    activos: number;
-  };
-  citas: {
-    total_mes: number;
-    completadas: number;
-    canceladas: number;
-    pendientes: number;
-  };
-  financiero: {
-    ingresos_mes: string;
-    ingresos_año: string;
-    facturas_pendientes: string;
-    facturas_vencidas: number;
-  };
-  tratamientos: {
-    planes_activos: number;
-    procedimientos_realizados: number;
-    servicios_mas_solicitados: Array<{
-      nombre: string;
-      cantidad: number;
-    }>;
-  };
+  total_pacientes_activos: number;
+  total_odontologos: number;
+  citas_mes_actual: number;
+  tratamientos_completados: number;
+  ingresos_mes_actual: string;
+  promedio_factura?: number;
+  tasa_ocupacion?: number;
 }
 
 export interface TendenciaCitas {
@@ -108,10 +91,11 @@ class ReportesService {
     console.log('📊 [ReportesService] Solicitando estadisticas-generales...');
     const response = await api.get<EstadisticasGenerales>('/api/reportes/reportes/estadisticas-generales/');
     console.log('📊 [ReportesService] Estadísticas generales recibidas:', response.data);
-    console.log('   - Pacientes:', response.data?.pacientes);
-    console.log('   - Citas:', response.data?.citas);
-    console.log('   - Financiero:', response.data?.financiero);
-    console.log('   - Tratamientos:', response.data?.tratamientos);
+    console.log('   - total_pacientes_activos:', response.data?.total_pacientes_activos);
+    console.log('   - total_odontologos:', response.data?.total_odontologos);
+    console.log('   - citas_mes_actual:', response.data?.citas_mes_actual);
+    console.log('   - tratamientos_completados:', response.data?.tratamientos_completados);
+    console.log('   - ingresos_mes_actual:', response.data?.ingresos_mes_actual);
     return response.data;
   }
 

@@ -203,58 +203,34 @@ export default function Reportes() {
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#065f46' }}>Total:</span>
-                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.pacientes?.total ?? 0}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#065f46' }}>Nuevos (mes):</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.pacientes?.nuevos_mes ?? 0}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Activos:</span>
-                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.pacientes?.activos ?? 0}</strong>
+                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.total_pacientes_activos ?? 0}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Odontólogos */}
+              <div style={{ padding: '16px', background: '#eff6ff', borderRadius: '8px', border: '1px solid #93c5fd' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#1e40af', marginBottom: '12px' }}>
+                  👨‍⚕️ Odontólogos
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '13px', color: '#1e40af' }}>Total:</span>
+                    <strong style={{ fontSize: '13px', color: '#1e40af' }}>{estadisticas.total_odontologos ?? 0}</strong>
                   </div>
                 </div>
               </div>
 
               {/* Citas */}
-              <div style={{ padding: '16px', background: '#eff6ff', borderRadius: '8px', border: '1px solid #93c5fd' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#1e40af', marginBottom: '12px' }}>
+              <div style={{ padding: '16px', background: '#fef3c7', borderRadius: '8px', border: '1px solid #fbbf24' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#92400e', marginBottom: '12px' }}>
                   📅 Citas (Mes)
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#1e40af' }}>Total:</span>
-                    <strong style={{ fontSize: '13px', color: '#1e40af' }}>{estadisticas.citas?.total_mes ?? 0}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#1e40af' }}>Completadas:</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.citas?.completadas ?? 0}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#1e40af' }}>Pendientes:</span>
-                    <strong style={{ fontSize: '13px', color: '#f59e0b' }}>{estadisticas.citas?.pendientes ?? 0}</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* Financiero */}
-              <div style={{ padding: '16px', background: '#fef3c7', borderRadius: '8px', border: '1px solid #fbbf24' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#92400e', marginBottom: '12px' }}>
-                  💰 Financiero
-                </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#92400e' }}>Ingresos (mes):</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {estadisticas.financiero?.ingresos_mes ?? '0.00'}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#92400e' }}>Pendiente:</span>
-                    <strong style={{ fontSize: '13px', color: '#ef4444' }}>Bs. {estadisticas.financiero?.facturas_pendientes ?? '0.00'}</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#92400e' }}>Vencidas:</span>
-                    <strong style={{ fontSize: '13px', color: '#92400e' }}>{estadisticas.financiero?.facturas_vencidas ?? 0}</strong>
+                    <span style={{ fontSize: '13px', color: '#92400e' }}>Total:</span>
+                    <strong style={{ fontSize: '13px', color: '#92400e' }}>{estadisticas.citas_mes_actual ?? 0}</strong>
                   </div>
                 </div>
               </div>
@@ -266,12 +242,21 @@ export default function Reportes() {
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#831843' }}>Planes activos:</span>
-                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos?.planes_activos ?? 0}</strong>
+                    <span style={{ fontSize: '13px', color: '#831843' }}>Completados:</span>
+                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos_completados ?? 0}</strong>
                   </div>
+                </div>
+              </div>
+
+              {/* Ingresos */}
+              <div style={{ padding: '16px', background: '#d1fae5', borderRadius: '8px', border: '1px solid #86efac' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#065f46', marginBottom: '12px' }}>
+                  💰 Ingresos
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '13px', color: '#831843' }}>Procedimientos:</span>
-                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos?.procedimientos_realizados ?? 0}</strong>
+                    <span style={{ fontSize: '13px', color: '#065f46' }}>Mes Actual:</span>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {estadisticas.ingresos_mes_actual ?? '0.00'}</strong>
                   </div>
                 </div>
               </div>
