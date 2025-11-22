@@ -15,24 +15,29 @@ export interface Categoria {
   fecha_creacion?: string;
 }
 
+// Interfaz para LISTADO (serializer simplificado)
 export interface Insumo {
   id: number;
   codigo: string;
   nombre: string;
-  descripcion?: string;
-  categoria_nombre?: string; // Backend envía este campo directamente
-  categoria?: Categoria | null; // Puede venir como objeto en algunos casos
-  categoria_id?: number;
-  stock_actual?: number; // Opcional - puede no venir del backend
-  cantidad_disponible?: number; // Alternativa que puede enviar backend
-  stock_minimo?: number; // Opcional
-  unidad_medida?: string; // Opcional
-  precio_unitario?: number; // Nombre original
-  precio_venta?: string; // Nombre que envía el backend
-  fecha_vencimiento?: string;
-  proveedor?: string;
+  categoria_nombre: string; // ✅ Backend envía esto en listado
+  precio_venta: string; // ✅ Decimal como string
+  stock_actual: string; // ✅ Decimal como string
+  unidad_medida: string; // ✅ Siempre presente
+  requiere_reposicion: boolean; // ✅ Indica si stock_actual <= stock_minimo
   activo: boolean;
-  fecha_creacion?: string;
+}
+
+// Interfaz para DETALLE (serializer completo)
+export interface InsumoDetalle extends Insumo {
+  categoria: number; // ID de la categoría
+  descripcion?: string;
+  precio_costo: string;
+  margen_ganancia: string; // Calculado por backend
+  stock_minimo: string;
+  proveedor?: string;
+  creado: string;
+  actualizado: string;
 }
 
 export interface AjusteStock {
@@ -68,28 +73,28 @@ const deleteCategoria = async (id: number): Promise<void> => {
 
 // ==================== INSUMOS ====================
 
-const getInsumos = async (params?: { page?: number; search?: string; categoria?: number }): Promise<{ results: Insumo[]; count: number; next: string | null; previous: string | null }> => {
+const getInsumos = async (params?: { search?: string; categoria?: number; activo?: boolean; ordering?: string }): Promise<Insumo[]> => {
   console.log('📦 [Inventario] Obteniendo insumos con params:', params);
-  const response = await api.get<{ results: Insumo[]; count: number; next: string | null; previous: string | null }>('/api/inventario/insumos/', { params });
-  console.log('✅ [Inventario] Respuesta recibida:', response.data);
-  if (response.data.results && response.data.results.length > 0) {
-    console.log('📋 [Inventario] Primer insumo (estructura):', response.data.results[0]);
+  const response = await api.get<Insumo[]>('/api/inventario/insumos/', { params });
+  console.log('✅ [Inventario] Respuesta recibida (array directo):', response.data);
+  if (response.data && response.data.length > 0) {
+    console.log('📋 [Inventario] Primer insumo (estructura):', response.data[0]);
   }
   return response.data;
 };
 
-const getInsumo = async (id: number): Promise<Insumo> => {
-  const response = await api.get<Insumo>(`/api/inventario/insumos/${id}/`);
+const getInsumo = async (id: number): Promise<InsumoDetalle> => {
+  const response = await api.get<InsumoDetalle>(`/api/inventario/insumos/${id}/`);
   return response.data;
 };
 
-const createInsumo = async (data: Partial<Insumo>): Promise<Insumo> => {
-  const response = await api.post<Insumo>('/api/inventario/insumos/', data);
+const createInsumo = async (data: Partial<InsumoDetalle>): Promise<InsumoDetalle> => {
+  const response = await api.post<InsumoDetalle>('/api/inventario/insumos/', data);
   return response.data;
 };
 
-const updateInsumo = async (id: number, data: Partial<Insumo>): Promise<Insumo> => {
-  const response = await api.put<Insumo>(`/api/inventario/insumos/${id}/`, data);
+const updateInsumo = async (id: number, data: Partial<InsumoDetalle>): Promise<InsumoDetalle> => {
+  const response = await api.put<InsumoDetalle>(`/api/inventario/insumos/${id}/`, data);
   return response.data;
 };
 
@@ -97,8 +102,17 @@ const deleteInsumo = async (id: number): Promise<void> => {
   await api.delete(`/api/inventario/insumos/${id}/`);
 };
 
-const ajustarStock = async (id: number, data: AjusteStock): Promise<Insumo> => {
-  const response = await api.post<Insumo>(`/api/inventario/insumos/${id}/ajustar_stock/`, data);
+interface AjusteStockResponse {
+  mensaje: string;
+  insumo: string;
+  stock_anterior: number;
+  ajuste: number;
+  stock_actual: number;
+  motivo: string;
+}
+
+const ajustarStock = async (id: number, data: AjusteStock): Promise<AjusteStockResponse> => {
+  const response = await api.post<AjusteStockResponse>(`/api/inventario/insumos/${id}/ajustar_stock/`, data);
   return response.data;
 };
 
