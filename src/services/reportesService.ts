@@ -195,42 +195,32 @@ class ReportesService {
     return response.data;
   }
 
-  // 6. Ocupación de Odontólogos (REPARADO: Cálculo real de ocupación)
+  // 6. Ocupación de Odontólogos (Usando datos completos del backend)
   async getOcupacionOdontologos(params?: { mes?: string }) {
     try {
-      // Usamos el endpoint detallado del backend
+      // Backend ahora envía estructura completa con todos los campos
       const response = await api.get('/api/reportes/reportes/reporte-citas-odontologo/', { params });
       const data = response.data;
 
       if (!Array.isArray(data)) return [];
 
+      console.log('📋 Datos ocupación odontólogos desde backend:', data);
+
       return data.map((item: any) => {
-        const total = Number(item.total_citas || 0);
-        const confirmadas = Number(item.confirmadas || 0);
-        const completadas = Number(item.completadas || 0);
-        const canceladas = Number(item.canceladas || 0);
-
-        // CÁLCULO PROPIO: Consideramos ocupado si está confirmada o completada
-        // El backend solo contaba completadas, por eso daba 0%
-        let tasaCalculada = 0;
-        if (total > 0) {
-          tasaCalculada = ((confirmadas + completadas) / total) * 100;
-        }
-
-        return {
-          odontologo_id: 0,
-          odontologo_nombre: item.odontologo || 'Dr. Desconocido',
-          total_citas: total,
-          citas_completadas: completadas,
-          citas_canceladas: canceladas,
-          
-          // Corregimos el porcentaje
-          tasa_ocupacion: tasaCalculada.toFixed(1),
-          
-          // Estimaciones para rellenar datos que el backend no envía aún
-          horas_ocupadas: total * 1, // Asumimos 1 hora promedio por cita
-          pacientes_atendidos: total // Asumimos 1 paciente por cita
+        // Backend ahora envía todo correctamente, solo mapeamos los nombres
+        const resultado = {
+          odontologo_id: Number(item.usuario_id || item.odontologo_id || 0),
+          odontologo_nombre: item.nombre_completo || item.odontologo || 'Dr. Desconocido',
+          total_citas: Number(item.total_citas || 0),
+          citas_completadas: Number(item.citas_completadas || item.completadas || 0),
+          citas_canceladas: Number(item.citas_canceladas || item.canceladas || 0),
+          horas_ocupadas: Number(item.horas_ocupadas || 0),
+          tasa_ocupacion: String(item.tasa_ocupacion || "0"),
+          pacientes_atendidos: Number(item.pacientes_atendidos || 0)
         };
+
+        console.log('🔄 Ocupación mapeada:', resultado);
+        return resultado;
       });
     } catch (error) {
       console.error('🔴 Error getOcupacionOdontologos:', error);
