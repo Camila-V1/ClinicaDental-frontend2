@@ -365,11 +365,138 @@ interface ReporteFinanciero {
 
 **URL:** \`GET /api/reportes/bitacora/?page=1&page_size=10\`
 
-**Descripción:** Últimas acciones registradas en el sistema.
+**Descripción:** Últimas acciones registradas en el sistema (auditoría).
 
 **Respuesta Real del Backend:**
 \`\`\`json
-[]  // Sin actividad registrada actualmente
+[
+  {
+    "id": 13,
+    "usuario": {
+      "id": 436,
+      "nombre_completo": "Administrador Principal",
+      "email": "admin@clinica-demo.com",
+      "tipo_usuario": "ADMIN"
+    },
+    "accion": "LOGIN",
+    "accion_display": "Inicio de sesión",
+    "descripcion": "Inicio de sesión exitoso - Administrador Principal",
+    "detalles": {},
+    "fecha_hora": "2025-11-22T23:27:35.259677Z",
+    "ip_address": "189.28.77.175",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)...",
+    "modelo": null,
+    "object_id": null
+  }
+]
+\`\`\`
+
+**Estructura Frontend:**
+\`\`\`typescript
+interface BitacoraLog {
+  id: number;
+  usuario: string;              // Nombre completo del usuario
+  accion: string;               // LOGIN, CREAR, EDITAR, ELIMINAR
+  modelo: string | null;        // Modelo afectado (Cita, Factura, etc.)
+  objeto_id: string | null;     // ID del objeto afectado
+  detalles: string | null;      // Descripción adicional
+  timestamp: string;            // Fecha y hora ISO
+  ip_address: string | null;    // IP del usuario
+}
+\`\`\`
+
+**⚠️ PROBLEMA COMÚN - Bitácora no se muestra:**
+
+**Síntoma:**
+- Backend envía 13 registros correctamente
+- Frontend muestra: "📋 No hay registros"
+
+**Causas posibles:**
+
+1. **Formato de respuesta diferente:**
+   \`\`\`typescript
+   // Backend puede enviar:
+   {
+     "count": 13,
+     "results": [...]  // ← Array dentro de results
+   }
+   
+   // O directamente:
+   [...]  // ← Array directo
+   
+   // Frontend debe manejar ambos casos:
+   const bitacoras = response.data.results || response.data;
+   \`\`\`
+
+2. **Filtro incorrecto en componente:**
+   \`\`\`typescript
+   // ❌ INCORRECTO - Filtra todos si antes había registros sin usuario
+   const registrosValidos = bitacoras.filter(b => b.usuario?.id);
+   
+   // ✅ CORRECTO
+   const registrosValidos = bitacoras;
+   \`\`\`
+
+3. **Mapeo de datos:**
+   \`\`\`typescript
+   // El componente espera:
+   {
+     usuario: "Nombre Completo",  // String
+     timestamp: "2025-11-22T23:27:35Z"
+   }
+   
+   // Pero backend envía:
+   {
+     usuario: {                    // Object
+       nombre_completo: "...",
+       email: "..."
+     },
+     fecha_hora: "2025-11-22T23:27:35Z"  // No timestamp
+   }
+   
+   // Solución: Transformar en el servicio
+   const logs = response.data.map(item => ({
+     ...item,
+     usuario: item.usuario.nombre_completo,
+     timestamp: item.fecha_hora
+   }));
+   \`\`\`
+
+**Componentes Frontend:**
+- \`ActivityTimeline.tsx\` - Timeline visual en Dashboard
+- \`BitacoraLogsList.tsx\` - Lista completa con paginación
+
+**Verificación en Consola:**
+\`\`\`javascript
+// Buscar estos logs:
+console.log('📊 Bitácora recibida:', bitacoras);
+console.log('📊 Cantidad:', bitacoras.length);
+
+// Si ves:
+// ✅ "Cantidad: 13" pero UI muestra "No hay registros"
+// → Problema de mapeo o validación en componente
+
+// Si ves:
+// ❌ "Cantidad: 0"
+// → Problema en el servicio (no accede correctamente a los datos)
+\`\`\`
+
+**✅ CORRECTO (Código de adminDashboardService.ts línea 206-211):**
+\`\`\`typescript
+async getActividadReciente() {
+  try {
+    const { data } = await api.get('/api/reportes/bitacora/', { 
+      params: { page: 1, page_size: 10 } 
+    });
+    // Manejar ambos formatos de respuesta
+    if (data && Array.isArray(data.results)) return data.results;
+    if (Array.isArray(data)) return data;
+    return [];
+  } catch (error: any) {
+    console.error('🔴 Error Bitácora:', error);
+    return [];
+  }
+}
 \`\`\`
 
 ---
