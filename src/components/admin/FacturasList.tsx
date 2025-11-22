@@ -61,12 +61,12 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
   return (
     <div style={{ display: 'grid', gap: '16px' }}>
       {facturas.map((factura) => {
-        // 🔧 FIX: Usar campos con fallbacks para compatibilidad con backend
-        const numeroFactura = factura.numero_factura || `#${factura.id}`;
-        const total = factura.total || factura.monto_total || '0.00';
-        const saldo = factura.saldo || '0.00';
-        const fechaEmision = factura.fecha_emision || new Date().toISOString();
-        const fechaVencimiento = factura.fecha_vencimiento || new Date().toISOString();
+        // ✅ Usar campos exactos del backend según documentación
+        const numeroFactura = factura.numero || factura.id;
+        const montoTotal = parseFloat(factura.monto_total || factura.total || factura.monto || '0');
+        const montoPagado = parseFloat(factura.monto_pagado || '0');
+        const saldoPendiente = parseFloat(factura.saldo_pendiente || factura.saldo || '0');
+        const fechaEmision = factura.fecha_emision || factura.fecha;
         
         const estadoColor = getEstadoColor(factura.estado);
         
@@ -102,7 +102,7 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
                   </div>
                   <div>
                     <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', margin: 0 }}>
-                      {numeroFactura}
+                      Factura #{numeroFactura}
                     </h3>
                     <p style={{ fontSize: '14px', color: '#6b7280', margin: '2px 0 0 0' }}>
                       {factura.paciente_nombre}
@@ -122,7 +122,7 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
                   border: `1px solid ${estadoColor.border}`,
                 }}
               >
-                {factura.estado_display || factura.estado}
+                {factura.estado_display}
               </span>
             </div>
 
@@ -135,41 +135,38 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Vencimiento</p>
-                <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827', margin: 0 }}>
-                  ⏰ {formatDate(fechaVencimiento)}
-                </p>
-              </div>
-              <div>
-                <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Total</p>
+                <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Monto Total</p>
                 <p style={{ fontSize: '16px', fontWeight: '700', color: '#10b981', margin: 0 }}>
-                  {formatCurrency(total)}
+                  {formatCurrency(montoTotal)}
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Saldo</p>
-                <p style={{ fontSize: '16px', fontWeight: '700', color: saldo === '0.00' ? '#10b981' : '#ef4444', margin: 0 }}>
-                  {formatCurrency(saldo)}
+                <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Pagado</p>
+                <p style={{ fontSize: '16px', fontWeight: '700', color: '#059669', margin: 0 }}>
+                  {formatCurrency(montoPagado)}
+                </p>
+              </div>
+              <div>
+                <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Saldo Pendiente</p>
+                <p style={{ fontSize: '16px', fontWeight: '700', color: saldoPendiente === 0 ? '#10b981' : '#ef4444', margin: 0 }}>
+                  {formatCurrency(saldoPendiente)}
                 </p>
               </div>
             </div>
 
-            {/* Items Preview */}
-            {factura.items && factura.items.length > 0 && (
-              <div style={{ marginBottom: '16px', padding: '12px', background: '#f9fafb', borderRadius: '8px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', margin: '0 0 8px 0' }}>
-                  Items ({factura.items.length})
+            {/* Descripción */}
+            {factura.descripcion && (
+              <div style={{ marginBottom: '16px', padding: '10px', background: '#f9fafb', borderRadius: '8px' }}>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
+                  📝 {factura.descripcion}
                 </p>
-                {factura.items.slice(0, 2).map((item, idx) => (
-                  <div key={idx} style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px' }}>
-                    • {item.descripcion} x{item.cantidad} = {formatCurrency(item.subtotal)}
-                  </div>
-                ))}
-                {factura.items.length > 2 && (
-                  <p style={{ fontSize: '12px', color: '#9ca3af', margin: '4px 0 0 0' }}>
-                    + {factura.items.length - 2} más...
-                  </p>
-                )}
+              </div>
+            )}
+
+            {/* Total de pagos */}
+            {factura.total_pagos > 0 && (
+              <div style={{ marginBottom: '16px', fontSize: '13px', color: '#059669' }}>
+                💳 {factura.total_pagos} pago{factura.total_pagos !== 1 ? 's' : ''} registrado{factura.total_pagos !== 1 ? 's' : ''}
               </div>
             )}
 
@@ -244,14 +241,6 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
                 </button>
               )}
             </div>
-
-            {factura.notas && (
-              <div style={{ marginTop: '12px', padding: '10px', background: '#fffbeb', borderLeft: '3px solid #f59e0b', borderRadius: '4px' }}>
-                <p style={{ fontSize: '12px', color: '#92400e', margin: 0 }}>
-                  📝 {factura.notas}
-                </p>
-              </div>
-            )}
           </div>
         );
       })}

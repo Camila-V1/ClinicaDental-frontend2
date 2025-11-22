@@ -6,73 +6,71 @@ import api from '../config/apiConfig';
 
 // ==================== INTERFACES ====================
 
+// Interfaz para LISTADO de facturas
 export interface Factura {
   id: number;
-  numero_factura?: string; // Puede no venir en algunos casos
-  paciente: number;
+  numero: number; // Alias de id
   paciente_nombre: string;
-  plan_tratamiento?: number;
-  plan_nombre?: string;
+  estado: 'PENDIENTE' | 'PAGADA' | 'ANULADA';
+  estado_display: string;
+  monto_total: string;
+  monto: string; // Alias de monto_total
+  total: string; // Alias de monto_total
+  monto_pagado: string;
+  saldo_pendiente: string;
+  saldo: string; // Alias de saldo_pendiente
   fecha_emision: string;
-  fecha_vencimiento: string;
-  subtotal?: string;
-  descuento?: string;
-  total?: string; // Nombre esperado
-  monto_total?: string; // Nombre alternativo que envía backend
-  saldo?: string;
-  estado: 'PENDIENTE' | 'PAGADA' | 'VENCIDA' | 'ANULADA';
-  estado_display?: string; // Backend puede enviar este campo
-  notas?: string;
-  items?: ItemFactura[];
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface ItemFactura {
-  id: number;
-  factura: number;
+  fecha: string; // Alias de fecha_emision
+  total_pagos: number;
   descripcion: string;
-  cantidad: number;
-  precio_unitario: string;
-  subtotal: string;
 }
 
+// Interfaz para DETALLE de factura
+export interface FacturaDetalle extends Factura {
+  fecha_anulacion: string | null;
+  paciente: number;
+  paciente_email: string;
+  paciente_ci: string;
+  paciente_telefono: string;
+  presupuesto: number;
+  presupuesto_numero: number;
+  presupuesto_token: string;
+  nit_ci: string;
+  razon_social: string;
+  porcentaje_pagado: number;
+  pagos: Pago[];
+}
+
+// Interfaz para Pago// Interfaz para Pago
 export interface Pago {
   id: number;
   factura: number;
-  factura_numero: string;
+  factura_numero: number;
+  factura_total: string;
+  paciente: number;
   paciente_nombre: string;
+  paciente_email: string;
+  monto_pagado: string;
+  metodo_pago: 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA' | 'QR';
+  estado_pago: 'COMPLETADO' | 'PENDIENTE' | 'CANCELADO';
   fecha_pago: string;
-  monto: string;
-  metodo_pago: 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA' | 'CHEQUE';
-  numero_transaccion?: string;
-  notas?: string;
-  estado: 'COMPLETADO' | 'ANULADO';
-  created_by?: number;
-  created_by_nombre?: string;
-  created_at: string;
+  referencia_transaccion: string;
+  notas: string;
 }
 
 export interface FacturaCreateData {
   paciente: number;
-  plan_tratamiento?: number;
-  fecha_emision: string;
-  fecha_vencimiento: string;
-  descuento?: string;
-  notas?: string;
-  items: {
-    descripcion: string;
-    cantidad: number;
-    precio_unitario: string;
-  }[];
+  presupuesto: number;
+  monto_total?: string;
+  nit_ci?: string;
+  razon_social?: string;
 }
 
 export interface PagoCreateData {
   factura: number;
-  fecha_pago: string;
-  monto: string;
-  metodo_pago: 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA' | 'CHEQUE';
-  numero_transaccion?: string;
+  monto_pagado: string;
+  metodo_pago: 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA' | 'QR';
+  referencia_transaccion?: string;
   notas?: string;
 }
 
@@ -81,26 +79,25 @@ export interface PagoCreateData {
 class FacturacionAdminService {
   // FACTURAS
   async getFacturas(params?: {
-    page?: number;
     search?: string;
     estado?: string;
     fecha_desde?: string;
     fecha_hasta?: string;
   }) {
     console.log('💰 [Facturación] Obteniendo facturas con params:', params);
-    const response = await api.get<{ results: Factura[]; count: number; next: string | null; previous: string | null }>(
+    const response = await api.get<Factura[]>(
       '/api/facturacion/facturas/',
       { params }
     );
-    console.log('✅ [Facturación] Respuesta recibida:', response.data);
-    if (response.data.results && response.data.results.length > 0) {
-      console.log('📋 [Facturación] Primera factura (estructura):', response.data.results[0]);
+    console.log('✅ [Facturación] Respuesta recibida (array directo):', response.data);
+    if (response.data && response.data.length > 0) {
+      console.log('📋 [Facturación] Primera factura (estructura):', response.data[0]);
     }
     return response.data;
   }
 
   async getFactura(id: number) {
-    const response = await api.get<Factura>(`/api/facturacion/facturas/${id}/`);
+    const response = await api.get<FacturaDetalle>(`/api/facturacion/facturas/${id}/`);
     return response.data;
   }
 
@@ -119,7 +116,7 @@ class FacturacionAdminService {
   }
 
   async marcarPagada(id: number) {
-    const response = await api.post<Factura>(`/api/facturacion/facturas/${id}/marcar-pagada/`);
+    const response = await api.post<Factura>(`/api/facturacion/facturas/${id}/marcar_pagada/`);
     return response.data;
   }
 
@@ -129,8 +126,8 @@ class FacturacionAdminService {
   }
 
   // PAGOS
-  async getPagos(params?: { page?: number; factura_id?: number }) {
-    const response = await api.get<{ results: Pago[]; count: number; next: string | null; previous: string | null }>(
+  async getPagos(params?: { factura_id?: number }) {
+    const response = await api.get<Pago[]>(
       '/api/facturacion/pagos/',
       { params }
     );
@@ -162,7 +159,7 @@ class FacturacionAdminService {
   }
 
   async getPagosPorFactura(facturaId: number) {
-    const response = await api.get<Pago[]>('/api/facturacion/pagos/por-factura/', {
+    const response = await api.get<Pago[]>('/api/facturacion/pagos/por_factura/', {
       params: { factura_id: facturaId }
     });
     return response.data;
