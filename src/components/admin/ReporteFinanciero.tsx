@@ -91,45 +91,47 @@ export default function ReporteFinanciero({ reporte, loading }: ReporteFinancier
       </div>
 
       {/* Ingresos por Método de Pago */}
-      <div>
-        <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
-          Ingresos por Método de Pago
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#f0fdf4', borderRadius: '6px', border: '1px solid #86efac' }}>
-            <span style={{ fontSize: '13px', color: '#065f46', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              💵 Efectivo
-            </span>
-            <strong style={{ fontSize: '13px', color: '#10b981' }}>
-              {formatCurrency(reporte.ingresos_por_metodo.EFECTIVO)}
-            </strong>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#eff6ff', borderRadius: '6px', border: '1px solid #93c5fd' }}>
-            <span style={{ fontSize: '13px', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              💳 Tarjeta
-            </span>
-            <strong style={{ fontSize: '13px', color: '#3b82f6' }}>
-              {formatCurrency(reporte.ingresos_por_metodo.TARJETA)}
-            </strong>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#f5f3ff', borderRadius: '6px', border: '1px solid #c4b5fd' }}>
-            <span style={{ fontSize: '13px', color: '#5b21b6', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              🏦 Transferencia
-            </span>
-            <strong style={{ fontSize: '13px', color: '#8b5cf6' }}>
-              {formatCurrency(reporte.ingresos_por_metodo.TRANSFERENCIA)}
-            </strong>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#fef3c7', borderRadius: '6px', border: '1px solid #fbbf24' }}>
-            <span style={{ fontSize: '13px', color: '#92400e', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              📝 Cheque
-            </span>
-            <strong style={{ fontSize: '13px', color: '#f59e0b' }}>
-              {formatCurrency(reporte.ingresos_por_metodo.CHEQUE)}
-            </strong>
+      {reporte.ingresos_por_metodo && (
+        <div>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
+            Ingresos por Método de Pago
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#f0fdf4', borderRadius: '6px', border: '1px solid #86efac' }}>
+              <span style={{ fontSize: '13px', color: '#065f46', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                💵 Efectivo
+              </span>
+              <strong style={{ fontSize: '13px', color: '#10b981' }}>
+                {formatCurrency(reporte.ingresos_por_metodo.EFECTIVO ?? '0.00')}
+              </strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#eff6ff', borderRadius: '6px', border: '1px solid #93c5fd' }}>
+              <span style={{ fontSize: '13px', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                💳 Tarjeta
+              </span>
+              <strong style={{ fontSize: '13px', color: '#3b82f6' }}>
+                {formatCurrency(reporte.ingresos_por_metodo.TARJETA ?? '0.00')}
+              </strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#f5f3ff', borderRadius: '6px', border: '1px solid #c4b5fd' }}>
+              <span style={{ fontSize: '13px', color: '#5b21b6', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                🏦 Transferencia
+              </span>
+              <strong style={{ fontSize: '13px', color: '#8b5cf6' }}>
+                {formatCurrency(reporte.ingresos_por_metodo.TRANSFERENCIA ?? '0.00')}
+              </strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: '#fef3c7', borderRadius: '6px', border: '1px solid #fbbf24' }}>
+              <span style={{ fontSize: '13px', color: '#92400e', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                📝 Cheque
+              </span>
+              <strong style={{ fontSize: '13px', color: '#f59e0b' }}>
+                {formatCurrency(reporte.ingresos_por_metodo.CHEQUE ?? '0.00')}
+              </strong>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

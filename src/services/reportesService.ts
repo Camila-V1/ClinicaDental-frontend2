@@ -66,7 +66,7 @@ export interface ReporteFinanciero {
   facturas_emitidas: number;
   facturas_pagadas: number;
   facturas_pendientes: number;
-  ingresos_por_metodo: {
+  ingresos_por_metodo?: {
     EFECTIVO: string;
     TARJETA: string;
     TRANSFERENCIA: string;
