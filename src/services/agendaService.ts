@@ -77,12 +77,15 @@ export const obtenerCitas = async (filtros?: FiltrosCitas): Promise<Cita[]> => {
   console.log('📅 Obteniendo citas con filtros:', filtros);
   console.log('🔗 URL completa:', `/api/agenda/citas/?${params}`);
   
-  const response = await api.get<Cita[]>(`/api/agenda/citas/?${params}`);
+  const response = await api.get<any>(`/api/agenda/citas/?${params}`);
   
-  console.log('✅ Citas recibidas:', response.data.length, 'citas');
-  console.log('📊 Datos:', response.data);
+  // 🔧 FIX TEMPORAL: Manejar formato paginado ({count, results}) o array directo
+  const citas = response.data?.results ? response.data.results : response.data;
   
-  return response.data;
+  console.log('✅ Citas recibidas:', Array.isArray(citas) ? citas.length : 0, 'citas');
+  console.log('📊 Datos:', citas);
+  
+  return citas;
 };
 
 /**
@@ -181,10 +184,13 @@ export const obtenerMisCitas = async (filtros?: FiltrosCitas): Promise<Cita[]> =
   console.log('📅 Obteniendo mis citas como paciente...');
   
   // Usar el mismo endpoint que obtenerCitas, el backend filtra automáticamente por paciente
-  const response = await api.get<Cita[]>(`/api/agenda/citas/?${params}`);
+  const response = await api.get<any>(`/api/agenda/citas/?${params}`);
   
-  console.log('✅ Mis citas recibidas:', response.data.length);
-  return response.data;
+  // 🔧 FIX TEMPORAL: Manejar formato paginado ({count, results}) o array directo
+  const citas = response.data?.results ? response.data.results : response.data;
+  
+  console.log('✅ Mis citas recibidas:', Array.isArray(citas) ? citas.length : 0);
+  return citas;
 };
 
 /**
@@ -252,12 +258,15 @@ export const obtenerProximasCitas = async (limite: number = 3): Promise<Cita[]> 
   
   // Filtrar por citas futuras y límite
   const hoy = new Date().toISOString().split('T')[0];
-  const response = await api.get<Cita[]>(
+  const response = await api.get<any>(
     `/api/agenda/citas/?fecha_inicio=${hoy}&ordering=fecha_hora&limit=${limite}`
   );
   
-  console.log('✅ Próximas citas:', response.data.length);
-  return response.data;
+  // 🔧 FIX TEMPORAL: Manejar formato paginado ({count, results}) o array directo
+  const citas = response.data?.results ? response.data.results : response.data;
+  
+  console.log('✅ Próximas citas:', Array.isArray(citas) ? citas.length : 0);
+  return citas;
 };
 
 /**
