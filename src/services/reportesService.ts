@@ -1,6 +1,6 @@
 /**
  * 📊 Servicio de Reportes y Dashboard
- * (Corregido con Mapeo Inteligente de Campos)
+ * (Corregido: Endpoints correctos y mapeo exacto con views.py)
  */
 
 import api from '../config/apiConfig';
@@ -64,13 +64,13 @@ export interface TopProcedimiento {
 export interface ReporteFinanciero {
   periodo: string;
   total_facturado: string;
-  total_pagado: string;        // ✅ Nombre correcto del backend
-  saldo_pendiente: string;     // ✅ Nombre correcto del backend
-  numero_facturas: number;     // ✅ Nombre correcto del backend
-  facturas_emitidas?: number;  // Opcional - puede no venir
-  facturas_pagadas?: number;   // Opcional - puede no venir
-  facturas_pendientes?: number; // Opcional - puede no venir
-  ingresos_por_metodo?: {      // Opcional - no viene del backend actualmente
+  total_pagado: string;
+  saldo_pendiente: string;
+  numero_facturas: number;
+  facturas_emitidas?: number;
+  facturas_pagadas?: number;
+  facturas_pendientes?: number;
+  ingresos_por_metodo?: {
     EFECTIVO: string;
     TARJETA: string;
     TRANSFERENCIA: string;
@@ -98,7 +98,7 @@ export interface OcupacionOdontologo {
 // ==================== SERVICIO ====================
 
 class ReportesService {
-  // Dashboard KPIs principales (Con Adaptador Array -> Object)
+  // 1. Dashboard KPIs (Mapeo etiqueta/valor -> Objeto)
   async getDashboardKpis() {
     try {
       const response = await api.get('/api/reportes/reportes/dashboard-kpis/');
@@ -117,21 +117,15 @@ class ReportesService {
 
       if (Array.isArray(data)) {
         data.forEach((item: any) => {
-          const rawKey = item.key || item.label || '';
-          const key = String(rawKey).toLowerCase().replace(/ /g, '_');
-          const value = item.value;
+          // El backend envía "etiqueta" y "valor"
+          const label = (item.etiqueta || item.label || '').toLowerCase();
+          const value = item.valor || item.value || 0;
 
-          if (key.includes('pacientes') && key.includes('total')) kpisFormatted.total_pacientes = value;
-          else if (key.includes('citas') && key.includes('hoy')) kpisFormatted.citas_hoy = value;
-          else if (key.includes('ingresos')) kpisFormatted.ingresos_mes = String(value);
-          else if (key.includes('tratamientos')) kpisFormatted.tratamientos_activos = value;
-          else if (key.includes('nuevos')) kpisFormatted.pacientes_nuevos_mes = value;
-          else if (key.includes('ocupacion') || key.includes('ocupación')) kpisFormatted.tasa_ocupacion = String(value);
-          else if (key.includes('citas') && key.includes('pendientes')) kpisFormatted.citas_pendientes = value;
-          else if (key.includes('facturas')) kpisFormatted.facturas_pendientes = value;
+          if (label.includes('pacientes')) kpisFormatted.total_pacientes = Number(value);
+          else if (label.includes('citas')) kpisFormatted.citas_hoy = Number(value);
+          else if (label.includes('ingresos')) kpisFormatted.ingresos_mes = String(value);
+          else if (label.includes('saldo')) kpisFormatted.facturas_pendientes = Number(value);
         });
-      } else if (typeof data === 'object' && data !== null) {
-        kpisFormatted = { ...kpisFormatted, ...data };
       }
       return kpisFormatted;
     } catch (error) {
@@ -140,13 +134,13 @@ class ReportesService {
     }
   }
 
-  // Estadísticas generales del sistema
+  // 2. Estadísticas Generales (Directo)
   async getEstadisticasGenerales() {
     const response = await api.get<EstadisticasGenerales>('/api/reportes/reportes/estadisticas-generales/');
     return response.data;
   }
 
-  // Tendencia de citas (TRADUCTOR ACTIVADO: cantidad -> total)
+  // 3. Tendencia de Citas (Mapeo cantidad -> total)
   async getTendenciaCitas(params?: { dias?: number }) {
     try {
       const response = await api.get('/api/reportes/reportes/tendencia-citas/', { params });
@@ -154,13 +148,12 @@ class ReportesService {
       
       if (!Array.isArray(data)) return [];
 
-      // Mapeo para corregir nombres de campos
+      // El backend envía "fecha" y "cantidad"
       return data.map((item: any) => ({
-        fecha: item.fecha || item.date || '',
-        // Si viene 'cantidad', lo usamos como 'total'
-        total: Number(item.total || item.cantidad || item.count || 0),
-        completadas: Number(item.completadas || item.citas_completadas || 0),
-        canceladas: Number(item.canceladas || item.citas_canceladas || 0)
+        fecha: item.fecha,
+        total: Number(item.cantidad || 0), // Mapeo crítico
+        completadas: 0, // El backend actual no desglosa por estado en este endpoint
+        canceladas: 0   // El backend actual no desglosa por estado en este endpoint
       }));
     } catch (error) {
       console.error('🔴 Error Tendencia:', error);
@@ -168,7 +161,7 @@ class ReportesService {
     }
   }
 
-  // Top procedimientos (TRADUCTOR ACTIVADO)
+  // 4. Top Procedimientos (Mapeo etiqueta -> nombre, valor -> cantidad)
   async getTopProcedimientos(params?: { limite?: number }) {
     try {
       const response = await api.get('/api/reportes/reportes/top-procedimientos/', { params });
@@ -176,11 +169,11 @@ class ReportesService {
 
       if (!Array.isArray(data)) return [];
 
+      // El backend envía "etiqueta" (nombre servicio) y "valor" (cantidad)
       return data.map((item: any) => ({
-        // Buscamos nombre en varias propiedades posibles
-        nombre: item.nombre || item.procedimiento || item.servicio_nombre || 'Procedimiento',
-        cantidad: Number(item.cantidad || item.count || item.total || 0),
-        porcentaje: String(item.porcentaje || item.percentage || "0")
+        nombre: item.etiqueta || 'Desconocido',
+        cantidad: Number(item.valor || 0),
+        porcentaje: "0" // Cálculo opcional en frontend si se requiere
       }));
     } catch (error) {
       console.error('🔴 Error Top Procedimientos:', error);
@@ -188,30 +181,31 @@ class ReportesService {
     }
   }
 
-  // Reporte financiero por período
+  // 5. Reporte Financiero
   async getReporteFinanciero(params?: { periodo?: string; fecha_inicio?: string; fecha_fin?: string }) {
     const response = await api.get<ReporteFinanciero>('/api/reportes/reportes/reporte-financiero/', { params });
     return response.data;
   }
 
-  // Ocupación por odontólogo (TRADUCTOR ACTIVADO: Nombres de usuario)
+  // 6. Ocupación (CORREGIDO: Usar reporte-citas-odontologo en vez de ocupacion-odontologos)
   async getOcupacionOdontologos(params?: { mes?: string }) {
     try {
-      const response = await api.get('/api/reportes/reportes/ocupacion-odontologos/', { params });
+      // CAMBIO CRÍTICO: Usamos el endpoint detallado que sí tiene citas/canceladas/etc
+      const response = await api.get('/api/reportes/reportes/reporte-citas-odontologo/', { params });
       const data = response.data;
 
       if (!Array.isArray(data)) return [];
 
       return data.map((item: any) => ({
-        odontologo_id: item.odontologo_id || item.id || item.usuario_id || 0,
-        // Si no hay nombre explícito, intentamos construirlo o usar email/username
-        odontologo_nombre: item.odontologo_nombre || item.nombre_completo || item.nombre || item.username || 'Odontólogo',
-        total_citas: Number(item.total_citas || item.citas_totales || 0),
-        citas_completadas: Number(item.citas_completadas || 0),
-        citas_canceladas: Number(item.citas_canceladas || 0),
-        horas_ocupadas: Number(item.horas_ocupadas || 0),
-        tasa_ocupacion: String(item.tasa_ocupacion || item.ocupacion || "0"),
-        pacientes_atendidos: Number(item.pacientes_atendidos || item.pacientes_unicos || 0)
+        odontologo_id: 0, // El reporte no devuelve ID, usamos 0 o índice
+        odontologo_nombre: item.odontologo || 'Desconocido',
+        total_citas: Number(item.total_citas || 0),
+        citas_completadas: Number(item.completadas || 0),
+        citas_canceladas: Number(item.canceladas || 0),
+        // El backend envía "tasa_completado" como string "50.0%", lo limpiamos
+        tasa_ocupacion: String(item.tasa_completado || "0").replace('%', ''),
+        horas_ocupadas: 0, // Dato no disponible en backend actual
+        pacientes_atendidos: 0 // Dato no disponible en backend actual
       }));
     } catch (error) {
       console.error('🔴 Error getOcupacionOdontologos:', error);
