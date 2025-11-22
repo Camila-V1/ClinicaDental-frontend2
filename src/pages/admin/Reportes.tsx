@@ -1,5 +1,6 @@
 /**
  * 📊 Página de Reportes y Dashboard - Admin
+ * (Corregido: Fusión inteligente de datos para evitar ceros)
  */
 
 import React, { useState } from 'react';
@@ -15,10 +16,6 @@ export default function Reportes() {
   const [diasTendencia, setDiasTendencia] = useState(15);
   const [periodoFinanciero, setPeriodoFinanciero] = useState('mes_actual');
 
-  console.log('📊 [Reportes] Componente renderizado');
-  console.log('   - diasTendencia:', diasTendencia);
-  console.log('   - periodoFinanciero:', periodoFinanciero);
-
   // Función para convertir "mes_actual" al formato YYYY-MM
   const getPeriodoFormateado = () => {
     if (periodoFinanciero === 'mes_actual') {
@@ -29,70 +26,66 @@ export default function Reportes() {
   };
 
   const periodoFormateado = getPeriodoFormateado();
-  console.log('   - periodoFormateado:', periodoFormateado);
 
   // ==================== QUERIES ====================
   
-  const { data: kpis, isLoading: loadingKPIs, error: errorKPIs } = useQuery({
+  const { data: kpis, isLoading: loadingKPIs } = useQuery({
     queryKey: ['dashboard-kpis'],
     queryFn: () => reportesService.getDashboardKpis(),
-    refetchInterval: 60000, // Refetch cada 60 segundos
+    refetchInterval: 60000,
   });
 
-  console.log('📊 [Reportes] KPIs Query Estado:');
-  console.log('   - isLoading:', loadingKPIs);
-  console.log('   - error:', errorKPIs);
-  console.log('   - data:', kpis);
-
-  const { data: estadisticas, isLoading: loadingStats, error: errorStats } = useQuery({
+  const { data: estadisticas, isLoading: loadingStats } = useQuery({
     queryKey: ['estadisticas-generales'],
     queryFn: () => reportesService.getEstadisticasGenerales(),
   });
 
-  console.log('📊 [Reportes] Estadísticas Query Estado:');
-  console.log('   - isLoading:', loadingStats);
-  console.log('   - error:', errorStats);
-  console.log('   - data:', estadisticas);
-
-  const { data: tendenciaCitas, isLoading: loadingTendencia, error: errorTendencia } = useQuery({
+  const { data: tendenciaCitas, isLoading: loadingTendencia } = useQuery({
     queryKey: ['tendencia-citas', diasTendencia],
     queryFn: () => reportesService.getTendenciaCitas({ dias: diasTendencia }),
   });
 
-  console.log('📊 [Reportes] Tendencia Citas Query Estado:');
-  console.log('   - isLoading:', loadingTendencia);
-  console.log('   - error:', errorTendencia);
-  console.log('   - data:', tendenciaCitas);
-
-  const { data: topProcedimientos, isLoading: loadingTop, error: errorTop } = useQuery({
+  const { data: topProcedimientos, isLoading: loadingTop } = useQuery({
     queryKey: ['top-procedimientos'],
     queryFn: () => reportesService.getTopProcedimientos({ limite: 5 }),
   });
 
-  console.log('📊 [Reportes] Top Procedimientos Query Estado:');
-  console.log('   - isLoading:', loadingTop);
-  console.log('   - error:', errorTop);
-  console.log('   - data:', topProcedimientos);
-
-  const { data: reporteFinanciero, isLoading: loadingFinanciero, error: errorFinanciero } = useQuery({
+  const { data: reporteFinanciero, isLoading: loadingFinanciero } = useQuery({
     queryKey: ['reporte-financiero', periodoFinanciero],
     queryFn: () => reportesService.getReporteFinanciero({ periodo: periodoFormateado }),
   });
 
-  console.log('📊 [Reportes] Reporte Financiero Query Estado:');
-  console.log('   - isLoading:', loadingFinanciero);
-  console.log('   - error:', errorFinanciero);
-  console.log('   - data:', reporteFinanciero);
-
-  const { data: ocupacionOdontologos, isLoading: loadingOcupacion, error: errorOcupacion } = useQuery({
+  const { data: ocupacionOdontologos, isLoading: loadingOcupacion } = useQuery({
     queryKey: ['ocupacion-odontologos'],
     queryFn: () => reportesService.getOcupacionOdontologos(),
   });
 
-  console.log('📊 [Reportes] Ocupación Odontólogos Query Estado:');
-  console.log('   - isLoading:', loadingOcupacion);
-  console.log('   - error:', errorOcupacion);
-  console.log('   - data:', ocupacionOdontologos);
+  // ==================== FUSIÓN DE DATOS (SOLUCIÓN DE CEROS) ====================
+  
+  // Creamos un objeto KPIs "Maestro" tomando el mejor dato disponible de cada fuente
+  const kpisMaestros = {
+    // Prioridad: KPI directo -> Estadísticas -> 0
+    total_pacientes: kpis?.total_pacientes || estadisticas?.total_pacientes_activos || 0,
+    citas_hoy: kpis?.citas_hoy || 0, 
+    
+    // Para ingresos, confiamos más en el reporte financiero real
+    ingresos_mes: reporteFinanciero?.total_pagado || estadisticas?.total_pagado_mes || kpis?.ingresos_mes || "0",
+    
+    tratamientos_activos: kpis?.tratamientos_activos || estadisticas?.planes_activos || 0,
+    pacientes_nuevos_mes: kpis?.pacientes_nuevos_mes || estadisticas?.pacientes_nuevos_mes || 0,
+    
+    // Si KPI es "0" (texto) o 0, usamos estadísticas
+    tasa_ocupacion: (kpis?.tasa_ocupacion && kpis.tasa_ocupacion !== "0") 
+      ? kpis.tasa_ocupacion 
+      : (estadisticas?.tasa_ocupacion || "0"),
+      
+    citas_pendientes: kpis?.citas_pendientes || estadisticas?.citas_pendientes || 0,
+    
+    // Usamos facturas vencidas como proxy de pendientes si no hay dato directo
+    facturas_pendientes: kpis?.facturas_pendientes || estadisticas?.facturas_vencidas || 0,
+  };
+
+  const loadingGlobalKPIs = loadingKPIs || loadingStats || loadingFinanciero;
 
   return (
     <div style={{ padding: '24px' }}>
@@ -106,8 +99,8 @@ export default function Reportes() {
         </p>
       </div>
 
-      {/* KPIs Dashboard */}
-      <DashboardKPIs kpis={kpis} loading={loadingKPIs} />
+      {/* KPIs Dashboard FUSIONADOS */}
+      <DashboardKPIs kpis={kpisMaestros} loading={loadingGlobalKPIs} />
 
       {/* Gráficos y Reportes */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '24px', marginTop: '24px' }}>
