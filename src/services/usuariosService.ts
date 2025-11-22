@@ -5,7 +5,10 @@ export interface Usuario {
   email: string;
   nombre: string;
   apellido: string;
+  first_name: string;
+  last_name: string;
   full_name: string;
+  nombre_completo: string;
   ci?: string;
   telefono?: string;
   direccion?: string;

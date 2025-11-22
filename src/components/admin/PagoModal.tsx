@@ -11,10 +11,10 @@ import Button from '@/components/ui/Button';
 import type { Pago, Factura, PagoCreateData } from '@/services/facturacionAdminService';
 
 const pagoSchema = z.object({
-  factura: z.number({ required_error: 'Seleccione una factura' }),
+  factura: z.number({ message: 'Seleccione una factura' }),
   fecha_pago: z.string(),
   monto: z.string().refine(val => parseFloat(val) > 0, 'El monto debe ser mayor a 0'),
-  metodo_pago: z.enum(['EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'CHEQUE']),
+  metodo_pago: z.enum(['EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'QR']),
   numero_transaccion: z.string().optional(),
   notas: z.string().optional(),
 });
@@ -61,13 +61,22 @@ export default function PagoModal({ isOpen, onClose, pago, facturas, onSubmit, i
   // Filtrar solo facturas pendientes
   const facturasPendientes = facturas.filter(f => f.estado === 'PENDIENTE' || f.estado === 'VENCIDA');
 
+  const handleFormSubmit = (data: PagoFormData) => {
+    // Transformar monto a monto_pagado para el backend
+    const pagoData: PagoCreateData = {
+      ...data,
+      monto_pagado: data.monto,
+    };
+    onSubmit(pagoData);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={pago ? 'Editar Pago' : 'Registrar Pago'}
     >
-      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <form onSubmit={handleSubmit(handleFormSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {/* Factura */}
         <div>
           <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#111827' }}>
@@ -185,20 +194,20 @@ export default function PagoModal({ isOpen, onClose, pago, facturas, onSubmit, i
             <option value="EFECTIVO">💵 Efectivo</option>
             <option value="TARJETA">💳 Tarjeta</option>
             <option value="TRANSFERENCIA">🏦 Transferencia</option>
-            <option value="CHEQUE">📝 Cheque</option>
+            <option value="QR">📱 QR</option>
           </select>
         </div>
 
         {/* Número de Transacción */}
-        {(metodoPago === 'TARJETA' || metodoPago === 'TRANSFERENCIA' || metodoPago === 'CHEQUE') && (
+        {(metodoPago === 'TARJETA' || metodoPago === 'TRANSFERENCIA' || metodoPago === 'QR') && (
           <div>
             <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#111827' }}>
-              {metodoPago === 'CHEQUE' ? 'Número de Cheque' : 'Número de Transacción'}
+              Número de Transacción
             </label>
             <input
               type="text"
               {...register('numero_transaccion')}
-              placeholder={metodoPago === 'CHEQUE' ? 'Ej: 001234' : 'Ej: TRX123456789'}
+              placeholder="Ej: TRX123456789"
               style={{
                 width: '100%',
                 padding: '10px 14px',

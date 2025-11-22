@@ -58,6 +58,12 @@ export interface PerfilOdontologo {
   telefono?: string;
 }
 
+export interface PerfilPaciente {
+  fecha_de_nacimiento?: string;
+  direccion?: string;
+  grupo_sanguineo?: string;
+}
+
 export interface Usuario {
   id: number;
   email: string;
@@ -75,8 +81,11 @@ export interface Usuario {
   experiencia?: string;
   especialidad?: string;
   telefono?: string;
-  // Objeto anidado (por compatibilidad)
+  ci?: string;
+  sexo?: 'M' | 'F' | '';
+  // Objetos anidados (por compatibilidad)
   perfil_odontologo?: PerfilOdontologo;
+  perfil_paciente?: PerfilPaciente;
 }
 
 export interface UsuarioFormData {
@@ -84,11 +93,19 @@ export interface UsuarioFormData {
   password?: string;
   first_name: string;
   last_name: string;
-  tipo_usuario: 'ADMIN' | 'ODONTOLOGO' | 'RECEPCIONISTA';
+  tipo_usuario: 'ADMIN' | 'ODONTOLOGO' | 'RECEPCIONISTA' | 'PACIENTE';
+  ci?: string;
+  telefono?: string;
+  sexo?: '' | 'M' | 'F';
   perfil_odontologo?: {
     especialidad?: string;
     numero_licencia?: string;
     telefono?: string;
+  };
+  perfil_paciente?: {
+    fecha_de_nacimiento?: string;
+    direccion?: string;
+    grupo_sanguineo?: string;
   };
 }
 

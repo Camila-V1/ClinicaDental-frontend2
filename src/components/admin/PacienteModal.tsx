@@ -26,6 +26,8 @@ const pacienteSchema = z.object({
   }).optional(),
 });
 
+type PacienteFormData = z.infer<typeof pacienteSchema>;
+
 interface PacienteModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -35,7 +37,7 @@ interface PacienteModalProps {
 }
 
 export default function PacienteModal({ isOpen, onClose, paciente, onSubmit, isLoading }: PacienteModalProps) {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<UsuarioFormData>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<PacienteFormData>({
     resolver: zodResolver(pacienteSchema),
     defaultValues: paciente ? {
       email: paciente.email,
@@ -51,6 +53,9 @@ export default function PacienteModal({ isOpen, onClose, paciente, onSubmit, isL
         grupo_sanguineo: paciente.perfil_paciente?.grupo_sanguineo || '',
       },
     } : {
+      email: '',
+      first_name: '',
+      last_name: '',
       tipo_usuario: 'PACIENTE',
       perfil_paciente: {},
     },

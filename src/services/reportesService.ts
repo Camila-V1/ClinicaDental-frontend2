@@ -98,7 +98,7 @@ export interface OcupacionOdontologo {
 // ==================== SERVICIO ====================
 
 class ReportesService {
-  // 1. Dashboard KPIs (Mapeo etiqueta/valor -> Objeto)
+  // 1. Dashboard KPIs (Blindado contra datos vacíos)
   async getDashboardKpis() {
     try {
       const response = await api.get('/api/reportes/reportes/dashboard-kpis/');
@@ -117,14 +117,14 @@ class ReportesService {
 
       if (Array.isArray(data)) {
         data.forEach((item: any) => {
-          // El backend envía "etiqueta" y "valor"
-          const label = (item.etiqueta || item.label || '').toLowerCase();
+          const rawLabel = item.etiqueta || item.label || '';
+          const label = String(rawLabel).toLowerCase();
           const value = item.valor || item.value || 0;
 
-          if (label.includes('pacientes')) kpisFormatted.total_pacientes = Number(value);
-          else if (label.includes('citas')) kpisFormatted.citas_hoy = Number(value);
+          if (label.includes('pacientes') && label.includes('activos')) kpisFormatted.total_pacientes = Number(value);
+          else if (label.includes('citas') && label.includes('hoy')) kpisFormatted.citas_hoy = Number(value);
           else if (label.includes('ingresos')) kpisFormatted.ingresos_mes = String(value);
-          else if (label.includes('saldo')) kpisFormatted.facturas_pendientes = Number(value);
+          else if (label.includes('saldo')) kpisFormatted.facturas_pendientes = Number(value); 
         });
       }
       return kpisFormatted;
@@ -134,13 +134,13 @@ class ReportesService {
     }
   }
 
-  // 2. Estadísticas Generales (Directo)
+  // 2. Estadísticas Generales
   async getEstadisticasGenerales() {
     const response = await api.get<EstadisticasGenerales>('/api/reportes/reportes/estadisticas-generales/');
     return response.data;
   }
 
-  // 3. Tendencia de Citas (Mapeo cantidad -> total)
+  // 3. Tendencia de Citas (Corrección: cantidad -> total)
   async getTendenciaCitas(params?: { dias?: number }) {
     try {
       const response = await api.get('/api/reportes/reportes/tendencia-citas/', { params });
@@ -148,12 +148,11 @@ class ReportesService {
       
       if (!Array.isArray(data)) return [];
 
-      // El backend envía "fecha" y "cantidad"
       return data.map((item: any) => ({
         fecha: item.fecha,
-        total: Number(item.cantidad || 0), // Mapeo crítico
-        completadas: 0, // El backend actual no desglosa por estado en este endpoint
-        canceladas: 0   // El backend actual no desglosa por estado en este endpoint
+        total: Number(item.cantidad || item.total || 0),
+        completadas: 0, 
+        canceladas: 0   
       }));
     } catch (error) {
       console.error('🔴 Error Tendencia:', error);
@@ -161,7 +160,7 @@ class ReportesService {
     }
   }
 
-  // 4. Top Procedimientos (Mapeo etiqueta -> nombre, valor -> cantidad)
+  // 4. Top Procedimientos (Corrección: etiqueta -> nombre + CÁLCULO DE PORCENTAJE)
   async getTopProcedimientos(params?: { limite?: number }) {
     try {
       const response = await api.get('/api/reportes/reportes/top-procedimientos/', { params });
@@ -169,12 +168,21 @@ class ReportesService {
 
       if (!Array.isArray(data)) return [];
 
-      // El backend envía "etiqueta" (nombre servicio) y "valor" (cantidad)
-      return data.map((item: any) => ({
-        nombre: item.etiqueta || 'Desconocido',
-        cantidad: Number(item.valor || 0),
-        porcentaje: "0" // Cálculo opcional en frontend si se requiere
-      }));
+      // Calcular el total para porcentajes
+      const totalCantidad = data.reduce((sum, item) => sum + (Number(item.valor || item.cantidad || 0)), 0);
+
+      return data.map((item: any) => {
+        const cantidad = Number(item.valor || item.cantidad || 0);
+        const porcentaje = totalCantidad > 0 
+          ? ((cantidad / totalCantidad) * 100).toFixed(1)
+          : "0";
+
+        return {
+          nombre: item.etiqueta || item.nombre || 'Sin Nombre',
+          cantidad: cantidad,
+          porcentaje: porcentaje
+        };
+      });
     } catch (error) {
       console.error('🔴 Error Top Procedimientos:', error);
       return [];
@@ -187,26 +195,43 @@ class ReportesService {
     return response.data;
   }
 
-  // 6. Ocupación (CORREGIDO: Usar reporte-citas-odontologo en vez de ocupacion-odontologos)
+  // 6. Ocupación de Odontólogos (REPARADO: Cálculo real de ocupación)
   async getOcupacionOdontologos(params?: { mes?: string }) {
     try {
-      // CAMBIO CRÍTICO: Usamos el endpoint detallado que sí tiene citas/canceladas/etc
+      // Usamos el endpoint detallado del backend
       const response = await api.get('/api/reportes/reportes/reporte-citas-odontologo/', { params });
       const data = response.data;
 
       if (!Array.isArray(data)) return [];
 
-      return data.map((item: any) => ({
-        odontologo_id: 0, // El reporte no devuelve ID, usamos 0 o índice
-        odontologo_nombre: item.odontologo || 'Desconocido',
-        total_citas: Number(item.total_citas || 0),
-        citas_completadas: Number(item.completadas || 0),
-        citas_canceladas: Number(item.canceladas || 0),
-        // El backend envía "tasa_completado" como string "50.0%", lo limpiamos
-        tasa_ocupacion: String(item.tasa_completado || "0").replace('%', ''),
-        horas_ocupadas: 0, // Dato no disponible en backend actual
-        pacientes_atendidos: 0 // Dato no disponible en backend actual
-      }));
+      return data.map((item: any) => {
+        const total = Number(item.total_citas || 0);
+        const confirmadas = Number(item.confirmadas || 0);
+        const completadas = Number(item.completadas || 0);
+        const canceladas = Number(item.canceladas || 0);
+
+        // CÁLCULO PROPIO: Consideramos ocupado si está confirmada o completada
+        // El backend solo contaba completadas, por eso daba 0%
+        let tasaCalculada = 0;
+        if (total > 0) {
+          tasaCalculada = ((confirmadas + completadas) / total) * 100;
+        }
+
+        return {
+          odontologo_id: 0,
+          odontologo_nombre: item.odontologo || 'Dr. Desconocido',
+          total_citas: total,
+          citas_completadas: completadas,
+          citas_canceladas: canceladas,
+          
+          // Corregimos el porcentaje
+          tasa_ocupacion: tasaCalculada.toFixed(1),
+          
+          // Estimaciones para rellenar datos que el backend no envía aún
+          horas_ocupadas: total * 1, // Asumimos 1 hora promedio por cita
+          pacientes_atendidos: total // Asumimos 1 paciente por cita
+        };
+      });
     } catch (error) {
       console.error('🔴 Error getOcupacionOdontologos:', error);
       return [];

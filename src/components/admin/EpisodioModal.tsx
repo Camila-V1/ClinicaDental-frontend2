@@ -11,7 +11,7 @@ import Button from '@/components/ui/Button';
 import type { EpisodioAtencion, HistorialClinico } from '@/services/historialClinicoService';
 
 const episodioSchema = z.object({
-  historial: z.number({ required_error: 'Seleccione un historial' }),
+  historial: z.number({ message: 'Seleccione un historial' }),
   fecha_atencion: z.string(),
   motivo_consulta: z.string().min(5, 'Mínimo 5 caracteres'),
   diagnostico: z.string().optional(),

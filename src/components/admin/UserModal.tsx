@@ -23,6 +23,8 @@ const userSchema = z.object({
   }).optional(),
 });
 
+type UserFormData = z.infer<typeof userSchema>;
+
 interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -32,7 +34,7 @@ interface UserModalProps {
 }
 
 export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }: UserModalProps) {
-  const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<UsuarioFormData>({
+  const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
     defaultValues: user ? {
       email: user.email,
@@ -42,6 +44,9 @@ export default function UserModal({ isOpen, onClose, user, onSubmit, isLoading }
       tipo_usuario: user.tipo_usuario as any,
       perfil_odontologo: user.perfil_odontologo,
     } : {
+      email: '',
+      first_name: '',
+      last_name: '',
       tipo_usuario: 'ODONTOLOGO',
     },
   });

@@ -20,22 +20,42 @@ export interface Insumo {
   id: number;
   codigo: string;
   nombre: string;
+  descripcion?: string;
+  categoria?: {
+    id: number;
+    nombre: string;
+  };
   categoria_nombre: string; // ✅ Backend envía esto en listado
   precio_venta: string; // ✅ Decimal como string
+  precio_unitario: string; // Alias de precio_venta
   stock_actual: string; // ✅ Decimal como string
+  stock_minimo: string; // ✅ Stock mínimo requerido
   unidad_medida: string; // ✅ Siempre presente
   requiere_reposicion: boolean; // ✅ Indica si stock_actual <= stock_minimo
+  fecha_vencimiento?: string;
+  proveedor?: string;
   activo: boolean;
 }
 
 // Interfaz para DETALLE (serializer completo)
-export interface InsumoDetalle extends Insumo {
-  categoria: number; // ID de la categoría
+export interface InsumoDetalle {
+  id: number;
+  codigo: string;
+  nombre: string;
+  categoria: number; // ID de la categoría en detalle
+  categoria_nombre: string;
   descripcion?: string;
+  precio_venta: string;
+  precio_unitario: string;
   precio_costo: string;
   margen_ganancia: string; // Calculado por backend
+  stock_actual: string;
   stock_minimo: string;
+  unidad_medida: string;
+  requiere_reposicion: boolean;
+  fecha_vencimiento?: string;
   proveedor?: string;
+  activo: boolean;
   creado: string;
   actualizado: string;
 }

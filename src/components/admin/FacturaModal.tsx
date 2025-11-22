@@ -13,7 +13,7 @@ import pacientesService from '@/services/pacientesService';
 import type { Factura, FacturaCreateData } from '@/services/facturacionAdminService';
 
 const facturaSchema = z.object({
-  paciente: z.number({ required_error: 'Seleccione un paciente' }),
+  paciente: z.number({ message: 'Seleccione un paciente' }),
   plan_tratamiento: z.number().optional(),
   fecha_emision: z.string(),
   fecha_vencimiento: z.string(),
@@ -88,13 +88,22 @@ export default function FacturaModal({ isOpen, onClose, factura, onSubmit, isLoa
 
   const pacientes = pacientesData?.results || [];
 
+  const handleFormSubmit = (data: FacturaFormData) => {
+    // Transformar datos para el backend
+    const facturaData: FacturaCreateData = {
+      ...data,
+      presupuesto: 0, // Campo requerido - se puede modificar según necesidad
+    };
+    onSubmit(facturaData);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={factura ? 'Editar Factura' : 'Nueva Factura'}
     >
-      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <form onSubmit={handleSubmit(handleFormSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {/* Paciente */}
         <div>
           <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#111827' }}>
@@ -117,7 +126,7 @@ export default function FacturaModal({ isOpen, onClose, factura, onSubmit, isLoa
             <option value="">Seleccione un paciente</option>
             {pacientes.map(p => (
               <option key={p.id} value={p.id}>
-                {p.nombre_completo} - CI: {p.ci}
+                {p.full_name || p.nombre_completo || `${p.first_name} ${p.last_name}`} {p.ci ? `- CI: ${p.ci}` : ''}
               </option>
             ))}
           </select>

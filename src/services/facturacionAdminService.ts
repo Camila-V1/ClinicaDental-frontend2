@@ -9,21 +9,36 @@ import api from '../config/apiConfig';
 // Interfaz para LISTADO de facturas (campos EXACTOS que envía el backend)
 export interface Factura {
   id: number;
+  paciente: number;
   paciente_nombre: string;
-  estado: 'PENDIENTE' | 'PAGADA' | 'ANULADA';
+  estado: 'PENDIENTE' | 'PAGADA' | 'ANULADA' | 'VENCIDA';
   estado_display: string;
   monto_total: string;
   monto_pagado: string;
   saldo_pendiente: string;
+  saldo: string;
   fecha_emision: string;
+  fecha_vencimiento: string;
   total_pagos: number;
   descripcion: string;
+  numero_factura: string;
+  plan_tratamiento?: number;
+  descuento?: string;
+  notas?: string;
+  items?: ItemFactura[];
   // Campos adicionales que puede enviar el backend
   numero?: number;
   monto?: string;
   total?: string;
-  saldo?: string;
   fecha?: string;
+}
+
+export interface ItemFactura {
+  id?: number;
+  descripcion: string;
+  cantidad: number;
+  precio_unitario: string;
+  subtotal?: string;
 }
 
 // Interfaz para DETALLE de factura
@@ -50,12 +65,15 @@ export interface Pago {
   factura_total: string;
   paciente: number;
   paciente_nombre: string;
-  paciente_email: string;
+  monto: string;
   monto_pagado: string;
   metodo_pago: 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA' | 'QR';
+  estado: 'COMPLETADO' | 'PENDIENTE' | 'CANCELADO';
   estado_pago: 'COMPLETADO' | 'PENDIENTE' | 'CANCELADO';
   fecha_pago: string;
+  numero_transaccion: string;
   referencia_transaccion: string;
+  created_by_nombre: string;
   notas: string;
 }
 

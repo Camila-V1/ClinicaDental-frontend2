@@ -13,7 +13,7 @@ import type { Servicio, CategoriaServicio } from '@/services/tratamientosService
 const servicioSchema = z.object({
   nombre: z.string().min(2, 'Mínimo 2 caracteres'),
   descripcion: z.string().optional(),
-  categoria: z.number({ required_error: 'Seleccione una categoría' }),
+  categoria: z.number({ message: 'Seleccione una categoría' }),
   precio_base: z.number().min(0, 'El precio debe ser mayor a 0'),
   duracion_estimada: z.number().min(0).optional(),
   activo: z.boolean().optional(),

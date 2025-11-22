@@ -253,12 +253,12 @@ export default function Dashboard() {
         <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', padding: '24px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#111827' }}>Alertas</h2>
           <AlertList alerts={[
-            ...(stockBajo && stockBajo.count > 0 ? [{
+            ...(stockBajo && Array.isArray(stockBajo) && stockBajo.length > 0 ? [{
               type: 'warning' as const,
               title: 'Stock Bajo',
-              message: `${stockBajo.count} insumos con stock bajo`,
+              message: `${stockBajo.length} insumos con stock bajo`,
               link: '/admin/inventario?stock_bajo=true',
-              count: stockBajo.count
+              count: stockBajo.length
             }] : [])
           ]} />
         </div>
