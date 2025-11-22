@@ -33,18 +33,18 @@ export interface EstadisticasGenerales {
   citas_canceladas: number;
   
   // Tratamientos
-  tratamientos_completados: number;
   planes_activos: number;
+  planes_completados: number;  // ✅ Nombre correcto del backend
   total_procedimientos: number;
   
   // Financiero
-  ingresos_mes_actual: number;
-  monto_pendiente: number;
+  total_pagado_mes: string;    // ✅ Nombre correcto del backend (string)
+  monto_pendiente: string;     // ✅ Backend envía como string
   facturas_vencidas: number;
-  promedio_factura: number;
+  promedio_factura: string;    // ✅ Backend envía como string
   
   // Ocupación
-  tasa_ocupacion: number;
+  tasa_ocupacion: string;      // ✅ Backend envía como string "14.29"
 }
 
 export interface TendenciaCitas {
@@ -121,11 +121,11 @@ class ReportesService {
     console.log('      - citas_pendientes:', response.data?.citas_pendientes);
     console.log('      - citas_canceladas:', response.data?.citas_canceladas);
     console.log('   📋 TRATAMIENTOS:');
-    console.log('      - tratamientos_completados:', response.data?.tratamientos_completados);
     console.log('      - planes_activos:', response.data?.planes_activos);
+    console.log('      - planes_completados:', response.data?.planes_completados);
     console.log('      - total_procedimientos:', response.data?.total_procedimientos);
     console.log('   📋 FINANCIERO:');
-    console.log('      - ingresos_mes_actual:', response.data?.ingresos_mes_actual);
+    console.log('      - total_pagado_mes:', response.data?.total_pagado_mes);
     console.log('      - monto_pendiente:', response.data?.monto_pendiente);
     console.log('      - facturas_vencidas:', response.data?.facturas_vencidas);
     console.log('      - promedio_factura:', response.data?.promedio_factura);

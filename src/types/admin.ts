@@ -27,18 +27,18 @@ export interface EstadisticasGenerales {
   citas_canceladas: number;
   
   // Tratamientos
-  tratamientos_completados: number;
   planes_activos: number;
+  planes_completados: number;  // ✅ Nombre correcto del backend
   total_procedimientos: number;
   
   // Financiero
-  ingresos_mes_actual: number;
-  monto_pendiente: number;
+  total_pagado_mes: string;    // ✅ Nombre correcto del backend (string)
+  monto_pendiente: string;     // ✅ Backend envía como string
   facturas_vencidas: number;
-  promedio_factura: number;
+  promedio_factura: string;    // ✅ Backend envía como string
   
   // Ocupación
-  tasa_ocupacion: number;
+  tasa_ocupacion: string;      // ✅ Backend envía como string "14.29"
 }
 
 export interface TendenciaCita {

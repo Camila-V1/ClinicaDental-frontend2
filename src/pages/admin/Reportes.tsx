@@ -263,7 +263,7 @@ export default function Reportes() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#831843' }}>Completados:</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.tratamientos_completados ?? 0}</strong>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.planes_completados ?? 0}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#831843' }}>Procedimientos:</span>
@@ -280,11 +280,11 @@ export default function Reportes() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Ingresos (mes):</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {(estadisticas.ingresos_mes_actual ?? 0).toFixed(2)}</strong>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {parseFloat(estadisticas.total_pagado_mes || '0').toFixed(2)}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Pendiente:</span>
-                    <strong style={{ fontSize: '13px', color: '#f59e0b' }}>Bs. {(estadisticas.monto_pendiente ?? 0).toFixed(2)}</strong>
+                    <strong style={{ fontSize: '13px', color: '#f59e0b' }}>Bs. {parseFloat(estadisticas.monto_pendiente || '0').toFixed(2)}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Vencidas:</span>
@@ -292,7 +292,7 @@ export default function Reportes() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Promedio factura:</span>
-                    <strong style={{ fontSize: '13px', color: '#065f46' }}>Bs. {(estadisticas.promedio_factura ?? 0).toFixed(2)}</strong>
+                    <strong style={{ fontSize: '13px', color: '#065f46' }}>Bs. {parseFloat(estadisticas.promedio_factura || '0').toFixed(2)}</strong>
                   </div>
                 </div>
               </div>
@@ -305,8 +305,8 @@ export default function Reportes() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#3730a3' }}>Tasa de ocupación:</span>
-                    <strong style={{ fontSize: '13px', color: estadisticas.tasa_ocupacion > 70 ? '#10b981' : '#f59e0b' }}>
-                      {(estadisticas.tasa_ocupacion ?? 0).toFixed(1)}%
+                    <strong style={{ fontSize: '13px', color: parseFloat(estadisticas.tasa_ocupacion || '0') > 70 ? '#10b981' : '#f59e0b' }}>
+                      {parseFloat(estadisticas.tasa_ocupacion || '0').toFixed(1)}%
                     </strong>
                   </div>
                 </div>

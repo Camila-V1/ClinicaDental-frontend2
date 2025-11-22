@@ -55,8 +55,8 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       color: '#8b5cf6', // violet-600
     },
     {
-      label: 'Tratamientos Completados',
-      value: formatNumber(stats.tratamientos_completados || 0),
+      label: 'Planes Completados',
+      value: formatNumber(stats.planes_completados || 0),
       color: '#ea580c', // orange-600
     },
     {
@@ -66,12 +66,12 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     },
     {
       label: 'Ingresos del Mes',
-      value: formatCurrency(stats.ingresos_mes_actual || 0),
+      value: formatCurrency(parseFloat(stats.total_pagado_mes || '0')),
       color: '#059669', // emerald-600
     },
     {
       label: 'Monto Pendiente',
-      value: formatCurrency(stats.monto_pendiente || 0),
+      value: formatCurrency(parseFloat(stats.monto_pendiente || '0')),
       color: '#f97316', // orange-600
     },
     {
@@ -81,12 +81,12 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     },
     {
       label: 'Promedio por Factura',
-      value: formatCurrency(stats.promedio_factura || 0),
+      value: formatCurrency(parseFloat(stats.promedio_factura || '0')),
       color: '#0891b2', // cyan-600
     },
     {
       label: 'Tasa de Ocupación',
-      value: `${typeof stats.tasa_ocupacion === 'number' ? stats.tasa_ocupacion.toFixed(1) : '0.0'}%`,
+      value: `${parseFloat(stats.tasa_ocupacion || '0').toFixed(1)}%`,
       color: '#4f46e5', // indigo-600
     },
   ];
