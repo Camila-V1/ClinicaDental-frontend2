@@ -1,6 +1,6 @@
 /**
  * 📊 Servicio de Reportes y Dashboard
- * (Corregido con Adaptador de Datos para /admin/reportes)
+ * (Corregido con Mapeo Inteligente de Campos)
  */
 
 import api from '../config/apiConfig';
@@ -100,13 +100,10 @@ export interface OcupacionOdontologo {
 class ReportesService {
   // Dashboard KPIs principales (Con Adaptador Array -> Object)
   async getDashboardKpis() {
-    console.log('📊 [ReportesService] Solicitando dashboard-kpis...');
     try {
       const response = await api.get('/api/reportes/reportes/dashboard-kpis/');
       const data = response.data;
-      console.log('📊 [ReportesService] RAW:', data);
 
-      // 🛠️ ADAPTADOR: Convertir Array a Objeto plano
       let kpisFormatted = {
         total_pacientes: 0,
         citas_hoy: 0,
@@ -120,7 +117,6 @@ class ReportesService {
 
       if (Array.isArray(data)) {
         data.forEach((item: any) => {
-          // Protección contra undefined
           const rawKey = item.key || item.label || '';
           const key = String(rawKey).toLowerCase().replace(/ /g, '_');
           const value = item.value;
@@ -137,8 +133,6 @@ class ReportesService {
       } else if (typeof data === 'object' && data !== null) {
         kpisFormatted = { ...kpisFormatted, ...data };
       }
-
-      console.log('✅ [ReportesService] Adaptado:', kpisFormatted);
       return kpisFormatted;
     } catch (error) {
       console.error('🔴 Error getDashboardKpis:', error);
@@ -148,45 +142,70 @@ class ReportesService {
 
   // Estadísticas generales del sistema
   async getEstadisticasGenerales() {
-    console.log('📊 [ReportesService] Solicitando estadisticas-generales...');
     const response = await api.get<EstadisticasGenerales>('/api/reportes/reportes/estadisticas-generales/');
     return response.data;
   }
 
-  // Tendencia de citas (gráfico)
+  // Tendencia de citas (TRADUCTOR ACTIVADO: cantidad -> total)
   async getTendenciaCitas(params?: { dias?: number }) {
-    console.log('📊 [ReportesService] Solicitando tendencia-citas:', params);
-    const response = await api.get<TendenciaCitas[]>('/api/reportes/reportes/tendencia-citas/', { params });
-    return Array.isArray(response.data) ? response.data : [];
+    try {
+      const response = await api.get('/api/reportes/reportes/tendencia-citas/', { params });
+      const data = response.data;
+      
+      if (!Array.isArray(data)) return [];
+
+      // Mapeo para corregir nombres de campos
+      return data.map((item: any) => ({
+        fecha: item.fecha || item.date || '',
+        // Si viene 'cantidad', lo usamos como 'total'
+        total: Number(item.total || item.cantidad || item.count || 0),
+        completadas: Number(item.completadas || item.citas_completadas || 0),
+        canceladas: Number(item.canceladas || item.citas_canceladas || 0)
+      }));
+    } catch (error) {
+      console.error('🔴 Error Tendencia:', error);
+      return [];
+    }
   }
 
-  // Top procedimientos más realizados
+  // Top procedimientos (TRADUCTOR ACTIVADO)
   async getTopProcedimientos(params?: { limite?: number }) {
-    console.log('📊 [ReportesService] Solicitando top-procedimientos:', params);
-    const response = await api.get<TopProcedimiento[]>('/api/reportes/reportes/top-procedimientos/', { params });
-    return Array.isArray(response.data) ? response.data : [];
+    try {
+      const response = await api.get('/api/reportes/reportes/top-procedimientos/', { params });
+      const data = response.data;
+
+      if (!Array.isArray(data)) return [];
+
+      return data.map((item: any) => ({
+        // Buscamos nombre en varias propiedades posibles
+        nombre: item.nombre || item.procedimiento || item.servicio_nombre || 'Procedimiento',
+        cantidad: Number(item.cantidad || item.count || item.total || 0),
+        porcentaje: String(item.porcentaje || item.percentage || "0")
+      }));
+    } catch (error) {
+      console.error('🔴 Error Top Procedimientos:', error);
+      return [];
+    }
   }
 
   // Reporte financiero por período
   async getReporteFinanciero(params?: { periodo?: string; fecha_inicio?: string; fecha_fin?: string }) {
-    console.log('📊 [ReportesService] Solicitando reporte-financiero:', params);
     const response = await api.get<ReporteFinanciero>('/api/reportes/reportes/reporte-financiero/', { params });
     return response.data;
   }
 
-  // Ocupación por odontólogo (Con Mapeo Seguro)
+  // Ocupación por odontólogo (TRADUCTOR ACTIVADO: Nombres de usuario)
   async getOcupacionOdontologos(params?: { mes?: string }) {
-    console.log('📊 [ReportesService] Solicitando ocupacion-odontologos:', params);
     try {
       const response = await api.get('/api/reportes/reportes/ocupacion-odontologos/', { params });
       const data = response.data;
 
       if (!Array.isArray(data)) return [];
 
-      // Mapeo explícito para asegurar que el frontend reciba los nombres exactos
       return data.map((item: any) => ({
-        odontologo_id: item.odontologo_id || item.id || 0,
-        odontologo_nombre: item.odontologo_nombre || item.nombre_completo || item.nombre || 'Desconocido',
+        odontologo_id: item.odontologo_id || item.id || item.usuario_id || 0,
+        // Si no hay nombre explícito, intentamos construirlo o usar email/username
+        odontologo_nombre: item.odontologo_nombre || item.nombre_completo || item.nombre || item.username || 'Odontólogo',
         total_citas: Number(item.total_citas || item.citas_totales || 0),
         citas_completadas: Number(item.citas_completadas || 0),
         citas_canceladas: Number(item.citas_canceladas || 0),
