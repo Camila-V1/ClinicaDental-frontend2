@@ -36,8 +36,9 @@ export default function ReporteFinanciero({ reporte, loading }: ReporteFinancier
   console.log('✅ [ReporteFinanciero] Datos disponibles:');
   console.log('   - periodo:', reporte.periodo);
   console.log('   - total_facturado:', reporte.total_facturado);
-  console.log('   - total_cobrado:', reporte.total_cobrado);
-  console.log('   - total_pendiente:', reporte.total_pendiente);
+  console.log('   - total_pagado:', reporte.total_pagado);
+  console.log('   - saldo_pendiente:', reporte.saldo_pendiente);
+  console.log('   - numero_facturas:', reporte.numero_facturas);
   console.log('   - ingresos_por_metodo:', reporte.ingresos_por_metodo);
 
   const formatCurrency = (amount: string | number) => {
@@ -64,19 +65,19 @@ export default function ReporteFinanciero({ reporte, loading }: ReporteFinancier
 
         <div style={{ padding: '16px', background: '#d1fae5', borderRadius: '8px', border: '1px solid #86efac' }}>
           <p style={{ fontSize: '12px', color: '#065f46', margin: '0 0 8px 0', fontWeight: '500' }}>
-            Total Cobrado
+            Total Pagado
           </p>
           <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981', margin: 0 }}>
-            {formatCurrency(reporte.total_cobrado)}
+            {formatCurrency(reporte.total_pagado)}
           </p>
         </div>
 
         <div style={{ padding: '16px', background: '#fee2e2', borderRadius: '8px', border: '1px solid #fca5a5' }}>
           <p style={{ fontSize: '12px', color: '#991b1b', margin: '0 0 8px 0', fontWeight: '500' }}>
-            Total Pendiente
+            Saldo Pendiente
           </p>
           <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#ef4444', margin: 0 }}>
-            {formatCurrency(reporte.total_pendiente)}
+            {formatCurrency(reporte.saldo_pendiente)}
           </p>
         </div>
       </div>
@@ -84,23 +85,35 @@ export default function ReporteFinanciero({ reporte, loading }: ReporteFinancier
       {/* Facturas Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '24px' }}>
         <div style={{ padding: '12px', background: '#f9fafb', borderRadius: '6px', textAlign: 'center' }}>
-          <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 4px 0' }}>Emitidas</p>
+          <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 4px 0' }}>Total Facturas</p>
           <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', margin: 0 }}>
-            {reporte.facturas_emitidas}
+            {reporte.numero_facturas ?? 0}
           </p>
         </div>
-        <div style={{ padding: '12px', background: '#f9fafb', borderRadius: '6px', textAlign: 'center' }}>
-          <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 4px 0' }}>Pagadas</p>
-          <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#10b981', margin: 0 }}>
-            {reporte.facturas_pagadas}
-          </p>
-        </div>
-        <div style={{ padding: '12px', background: '#f9fafb', borderRadius: '6px', textAlign: 'center' }}>
-          <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 4px 0' }}>Pendientes</p>
-          <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#f59e0b', margin: 0 }}>
-            {reporte.facturas_pendientes}
-          </p>
-        </div>
+        {reporte.facturas_emitidas !== undefined && (
+          <div style={{ padding: '12px', background: '#f9fafb', borderRadius: '6px', textAlign: 'center' }}>
+            <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 4px 0' }}>Emitidas</p>
+            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', margin: 0 }}>
+              {reporte.facturas_emitidas}
+            </p>
+          </div>
+        )}
+        {reporte.facturas_pagadas !== undefined && (
+          <div style={{ padding: '12px', background: '#f9fafb', borderRadius: '6px', textAlign: 'center' }}>
+            <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 4px 0' }}>Pagadas</p>
+            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#10b981', margin: 0 }}>
+              {reporte.facturas_pagadas}
+            </p>
+          </div>
+        )}
+        {reporte.facturas_pendientes !== undefined && (
+          <div style={{ padding: '12px', background: '#f9fafb', borderRadius: '6px', textAlign: 'center' }}>
+            <p style={{ fontSize: '11px', color: '#6b7280', margin: '0 0 4px 0' }}>Pendientes</p>
+            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#f59e0b', margin: 0 }}>
+              {reporte.facturas_pendientes}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Ingresos por Método de Pago */}

@@ -61,12 +61,13 @@ export interface TopProcedimiento {
 export interface ReporteFinanciero {
   periodo: string;
   total_facturado: string;
-  total_cobrado: string;
-  total_pendiente: string;
-  facturas_emitidas: number;
-  facturas_pagadas: number;
-  facturas_pendientes: number;
-  ingresos_por_metodo?: {
+  total_pagado: string;        // ✅ Nombre correcto del backend
+  saldo_pendiente: string;     // ✅ Nombre correcto del backend
+  numero_facturas: number;     // ✅ Nombre correcto del backend
+  facturas_emitidas?: number;  // Opcional - puede no venir
+  facturas_pagadas?: number;   // Opcional - puede no venir
+  facturas_pendientes?: number; // Opcional - puede no venir
+  ingresos_por_metodo?: {      // Opcional - no viene del backend actualmente
     EFECTIVO: string;
     TARJETA: string;
     TRANSFERENCIA: string;
