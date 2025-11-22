@@ -47,22 +47,32 @@ export const adminDashboardService = {
       };
 
       if (Array.isArray(data)) {
-        // Si es un array, intentamos mapear buscando por claves o labels comunes
+        // Si es un array, intentamos mapear buscando por etiqueta (NO key)
         data.forEach((item: any) => {
-          // CORRECCIÓN: Asegurar que key siempre sea string
-          // Usamos (item.key O item.label O texto vacío)
-          const rawKey = item.key || item.label || ''; 
+          // ✅ CORRECCIÓN: Backend envía "etiqueta" y "valor", NO "key" y "value"
+          const rawKey = item.etiqueta || item.key || item.label || ''; 
           const key = String(rawKey).toLowerCase().replace(/ /g, '_');
-          const value = item.value;
+          const value = Number(item.valor || item.value || 0);
 
-          if (key.includes('pacientes') && key.includes('total')) kpisFormatted.total_pacientes = value;
-          else if (key.includes('citas') && key.includes('hoy')) kpisFormatted.citas_hoy = value;
-          else if (key.includes('ingresos')) kpisFormatted.ingresos_mes = String(value);
-          else if (key.includes('tratamientos')) kpisFormatted.tratamientos_activos = value;
-          else if (key.includes('nuevos')) kpisFormatted.pacientes_nuevos_mes = value;
-          else if (key.includes('ocupacion') || key.includes('ocupación')) kpisFormatted.tasa_ocupacion = value;
-          else if (key.includes('citas') && key.includes('pendientes')) kpisFormatted.citas_pendientes = value;
-          else if (key.includes('facturas')) kpisFormatted.facturas_pendientes = value;
+          console.log(`  Procesando KPI: "${rawKey}" = ${value} (key normalizado: "${key}")`);
+
+          if (key.includes('pacientes') && (key.includes('activos') || key.includes('total'))) {
+            kpisFormatted.total_pacientes = value;
+          } else if (key.includes('citas') && key.includes('hoy')) {
+            kpisFormatted.citas_hoy = value;
+          } else if (key.includes('ingresos')) {
+            kpisFormatted.ingresos_mes = String(value);
+          } else if (key.includes('tratamientos')) {
+            kpisFormatted.tratamientos_activos = value;
+          } else if (key.includes('nuevos')) {
+            kpisFormatted.pacientes_nuevos_mes = value;
+          } else if (key.includes('ocupacion') || key.includes('ocupación')) {
+            kpisFormatted.tasa_ocupacion = value;
+          } else if (key.includes('citas') && key.includes('pendientes')) {
+            kpisFormatted.citas_pendientes = value;
+          } else if (key.includes('facturas') || key.includes('saldo') || key.includes('pendiente')) {
+            kpisFormatted.facturas_pendientes = value;
+          }
         });
       } else if (typeof data === 'object' && data !== null) {
         // Si ya es objeto, lo mezclamos con los defaults

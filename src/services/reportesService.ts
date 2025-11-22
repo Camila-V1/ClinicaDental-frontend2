@@ -122,15 +122,28 @@ class ReportesService {
       if (Array.isArray(data)) {
         console.log('🔄 [ReportesService] Procesando items de KPIs:');
         data.forEach((item: any, index: number) => {
+          // ✅ Backend envía 'etiqueta' y 'valor'
           const rawLabel = item.etiqueta || item.label || '';
           const label = String(rawLabel).toLowerCase();
           const value = item.valor || item.value || 0;
-          console.log(`   ${index + 1}. "${rawLabel}" = ${value} (label normalizado: "${label}")`);
+          console.log(`   ${index + 1}. "${rawLabel}" = ${value} (normalizado: "${label}")`);
 
-          if (label.includes('pacientes') && label.includes('activos')) kpisFormatted.total_pacientes = Number(value);
-          else if (label.includes('citas') && label.includes('hoy')) kpisFormatted.citas_hoy = Number(value);
-          else if (label.includes('ingresos')) kpisFormatted.ingresos_mes = String(value);
-          else if (label.includes('saldo')) kpisFormatted.facturas_pendientes = Number(value); 
+          if (label.includes('pacientes') && label.includes('activos')) {
+            kpisFormatted.total_pacientes = Number(value);
+            console.log('      ✅ Mapeado a: total_pacientes =', Number(value));
+          }
+          else if (label.includes('citas') && label.includes('hoy')) {
+            kpisFormatted.citas_hoy = Number(value);
+            console.log('      ✅ Mapeado a: citas_hoy =', Number(value));
+          }
+          else if (label.includes('ingresos')) {
+            kpisFormatted.ingresos_mes = String(value);
+            console.log('      ✅ Mapeado a: ingresos_mes =', String(value));
+          }
+          else if (label.includes('saldo')) {
+            kpisFormatted.facturas_pendientes = Number(value);
+            console.log('      ✅ Mapeado a: facturas_pendientes =', Number(value));
+          }
         });
       }
       console.log('📦 [ReportesService] KPIs formateados:', kpisFormatted);
