@@ -1,5 +1,6 @@
 /**
  * 📊 Servicio de Reportes y Dashboard
+ * (Corregido con Adaptador de Datos para /admin/reportes)
  */
 
 import api from '../config/apiConfig';
@@ -97,79 +98,106 @@ export interface OcupacionOdontologo {
 // ==================== SERVICIO ====================
 
 class ReportesService {
-  // Dashboard KPIs principales
+  // Dashboard KPIs principales (Con Adaptador Array -> Object)
   async getDashboardKpis() {
     console.log('📊 [ReportesService] Solicitando dashboard-kpis...');
-    const response = await api.get<DashboardKPIs>('/api/reportes/reportes/dashboard-kpis/');
-    console.log('📊 [ReportesService] Dashboard KPIs recibidos:', response.data);
-    return response.data;
+    try {
+      const response = await api.get('/api/reportes/reportes/dashboard-kpis/');
+      const data = response.data;
+      console.log('📊 [ReportesService] RAW:', data);
+
+      // 🛠️ ADAPTADOR: Convertir Array a Objeto plano
+      let kpisFormatted = {
+        total_pacientes: 0,
+        citas_hoy: 0,
+        ingresos_mes: "0",
+        tratamientos_activos: 0,
+        pacientes_nuevos_mes: 0,
+        tasa_ocupacion: "0",
+        citas_pendientes: 0,
+        facturas_pendientes: 0
+      };
+
+      if (Array.isArray(data)) {
+        data.forEach((item: any) => {
+          // Protección contra undefined
+          const rawKey = item.key || item.label || '';
+          const key = String(rawKey).toLowerCase().replace(/ /g, '_');
+          const value = item.value;
+
+          if (key.includes('pacientes') && key.includes('total')) kpisFormatted.total_pacientes = value;
+          else if (key.includes('citas') && key.includes('hoy')) kpisFormatted.citas_hoy = value;
+          else if (key.includes('ingresos')) kpisFormatted.ingresos_mes = String(value);
+          else if (key.includes('tratamientos')) kpisFormatted.tratamientos_activos = value;
+          else if (key.includes('nuevos')) kpisFormatted.pacientes_nuevos_mes = value;
+          else if (key.includes('ocupacion') || key.includes('ocupación')) kpisFormatted.tasa_ocupacion = String(value);
+          else if (key.includes('citas') && key.includes('pendientes')) kpisFormatted.citas_pendientes = value;
+          else if (key.includes('facturas')) kpisFormatted.facturas_pendientes = value;
+        });
+      } else if (typeof data === 'object' && data !== null) {
+        kpisFormatted = { ...kpisFormatted, ...data };
+      }
+
+      console.log('✅ [ReportesService] Adaptado:', kpisFormatted);
+      return kpisFormatted;
+    } catch (error) {
+      console.error('🔴 Error getDashboardKpis:', error);
+      throw error;
+    }
   }
 
   // Estadísticas generales del sistema
   async getEstadisticasGenerales() {
     console.log('📊 [ReportesService] Solicitando estadisticas-generales...');
     const response = await api.get<EstadisticasGenerales>('/api/reportes/reportes/estadisticas-generales/');
-    console.log('📊 [ReportesService] Estadísticas generales recibidas:', response.data);
-    console.log('   📋 PACIENTES:');
-    console.log('      - total_pacientes_activos:', response.data?.total_pacientes_activos);
-    console.log('      - pacientes_nuevos_mes:', response.data?.pacientes_nuevos_mes);
-    console.log('   📋 ODONTÓLOGOS:');
-    console.log('      - total_odontologos:', response.data?.total_odontologos);
-    console.log('   📋 CITAS:');
-    console.log('      - citas_mes_actual:', response.data?.citas_mes_actual);
-    console.log('      - citas_completadas:', response.data?.citas_completadas);
-    console.log('      - citas_pendientes:', response.data?.citas_pendientes);
-    console.log('      - citas_canceladas:', response.data?.citas_canceladas);
-    console.log('   📋 TRATAMIENTOS:');
-    console.log('      - planes_activos:', response.data?.planes_activos);
-    console.log('      - planes_completados:', response.data?.planes_completados);
-    console.log('      - total_procedimientos:', response.data?.total_procedimientos);
-    console.log('   📋 FINANCIERO:');
-    console.log('      - total_pagado_mes:', response.data?.total_pagado_mes);
-    console.log('      - monto_pendiente:', response.data?.monto_pendiente);
-    console.log('      - facturas_vencidas:', response.data?.facturas_vencidas);
-    console.log('      - promedio_factura:', response.data?.promedio_factura);
-    console.log('   📋 OCUPACIÓN:');
-    console.log('      - tasa_ocupacion:', response.data?.tasa_ocupacion);
     return response.data;
   }
 
   // Tendencia de citas (gráfico)
   async getTendenciaCitas(params?: { dias?: number }) {
-    console.log('📊 [ReportesService] Solicitando tendencia-citas con params:', params);
+    console.log('📊 [ReportesService] Solicitando tendencia-citas:', params);
     const response = await api.get<TendenciaCitas[]>('/api/reportes/reportes/tendencia-citas/', { params });
-    console.log('📊 [ReportesService] Tendencia citas recibida:', response.data);
-    console.log('   - Total registros:', response.data?.length);
-    return response.data;
+    return Array.isArray(response.data) ? response.data : [];
   }
 
   // Top procedimientos más realizados
   async getTopProcedimientos(params?: { limite?: number }) {
-    console.log('📊 [ReportesService] Solicitando top-procedimientos con params:', params);
+    console.log('📊 [ReportesService] Solicitando top-procedimientos:', params);
     const response = await api.get<TopProcedimiento[]>('/api/reportes/reportes/top-procedimientos/', { params });
-    console.log('📊 [ReportesService] Top procedimientos recibidos:', response.data);
-    console.log('   - Total procedimientos:', response.data?.length);
-    return response.data;
+    return Array.isArray(response.data) ? response.data : [];
   }
 
   // Reporte financiero por período
   async getReporteFinanciero(params?: { periodo?: string; fecha_inicio?: string; fecha_fin?: string }) {
-    console.log('📊 [ReportesService] Solicitando reporte-financiero con params:', params);
+    console.log('📊 [ReportesService] Solicitando reporte-financiero:', params);
     const response = await api.get<ReporteFinanciero>('/api/reportes/reportes/reporte-financiero/', { params });
-    console.log('📊 [ReportesService] Reporte financiero recibido:', response.data);
-    console.log('   - Periodo:', response.data?.periodo);
-    console.log('   - Total facturado:', response.data?.total_facturado);
-    console.log('   - Ingresos por método:', response.data?.ingresos_por_metodo);
     return response.data;
   }
 
-  // Ocupación por odontólogo
+  // Ocupación por odontólogo (Con Mapeo Seguro)
   async getOcupacionOdontologos(params?: { mes?: string }) {
-    console.log('📊 [ReportesService] Solicitando ocupacion-odontologos con params:', params);
-    const response = await api.get<OcupacionOdontologo[]>('/api/reportes/reportes/ocupacion-odontologos/', { params });
-    console.log('📊 [ReportesService] Ocupación odontólogos recibida:', response.data);
-    console.log('   - Total odontólogos:', response.data?.length);
-    return response.data;
+    console.log('📊 [ReportesService] Solicitando ocupacion-odontologos:', params);
+    try {
+      const response = await api.get('/api/reportes/reportes/ocupacion-odontologos/', { params });
+      const data = response.data;
+
+      if (!Array.isArray(data)) return [];
+
+      // Mapeo explícito para asegurar que el frontend reciba los nombres exactos
+      return data.map((item: any) => ({
+        odontologo_id: item.odontologo_id || item.id || 0,
+        odontologo_nombre: item.odontologo_nombre || item.nombre_completo || item.nombre || 'Desconocido',
+        total_citas: Number(item.total_citas || item.citas_totales || 0),
+        citas_completadas: Number(item.citas_completadas || 0),
+        citas_canceladas: Number(item.citas_canceladas || 0),
+        horas_ocupadas: Number(item.horas_ocupadas || 0),
+        tasa_ocupacion: String(item.tasa_ocupacion || item.ocupacion || "0"),
+        pacientes_atendidos: Number(item.pacientes_atendidos || item.pacientes_unicos || 0)
+      }));
+    } catch (error) {
+      console.error('🔴 Error getOcupacionOdontologos:', error);
+      return [];
+    }
   }
 }
 
