@@ -1,5 +1,6 @@
 /**
  * 📊 Servicio para Dashboard del Administrador
+ * (Corregido con adaptadores de datos)
  */
 
 import api from '@/config/apiConfig';
@@ -10,78 +11,154 @@ import type {
   TopProcedimiento 
 } from '@/types/admin';
 
+// Interfaz local para asegurar el tipado de salida de ocupación
+interface OcupacionOdontologoUI {
+  odontologo_id: number;
+  odontologo_nombre: string;
+  tasa_ocupacion: string;
+  total_citas: number;
+  citas_completadas: number;
+  citas_canceladas: number;
+  horas_ocupadas: number;
+  pacientes_atendidos: number;
+}
+
 export const adminDashboardService = {
   /**
    * Obtener KPIs principales del dashboard
+   * Se aplica transformación de Array -> Objeto
    */
-  async getKPIs(): Promise<KPI[]> {
+  async getKPIs(): Promise<any> {
     console.log('🔵 [adminDashboardService.getKPIs] Iniciando petición...');
-    console.log('🔵 [adminDashboardService.getKPIs] URL:', '/api/reportes/reportes/dashboard-kpis/');
     try {
       const { data } = await api.get('/api/reportes/reportes/dashboard-kpis/');
-      console.log('🟢 [adminDashboardService.getKPIs] Respuesta exitosa:', data);
-      return data;
+      console.log('🟢 [adminDashboardService.getKPIs] Respuesta RAW:', data);
+
+      // 🛠️ ADAPTADOR: Convertir Array de backend a Objeto para frontend
+      let kpisFormatted = {
+        total_pacientes: 0,
+        citas_hoy: 0,
+        ingresos_mes: "0",
+        tratamientos_activos: 0,
+        pacientes_nuevos_mes: 0,
+        tasa_ocupacion: 0,
+        citas_pendientes: 0,
+        facturas_pendientes: 0
+      };
+
+      if (Array.isArray(data)) {
+        // Si es un array, intentamos mapear buscando por claves o labels comunes
+        data.forEach((item: any) => {
+          // Normalizamos la clave para buscar coincidencias (ej: "total_pacientes" o "Total Pacientes")
+          const key = item.key || item.label?.toLowerCase().replace(/ /g, '_');
+          const value = item.value;
+
+          if (key.includes('pacientes') && key.includes('total')) kpisFormatted.total_pacientes = value;
+          else if (key.includes('citas') && key.includes('hoy')) kpisFormatted.citas_hoy = value;
+          else if (key.includes('ingresos')) kpisFormatted.ingresos_mes = String(value);
+          else if (key.includes('tratamientos')) kpisFormatted.tratamientos_activos = value;
+          else if (key.includes('nuevos')) kpisFormatted.pacientes_nuevos_mes = value;
+          else if (key.includes('ocupacion') || key.includes('ocupación')) kpisFormatted.tasa_ocupacion = value;
+          else if (key.includes('citas') && key.includes('pendientes')) kpisFormatted.citas_pendientes = value;
+          else if (key.includes('facturas')) kpisFormatted.facturas_pendientes = value;
+        });
+      } else if (typeof data === 'object') {
+        // Si ya es objeto, lo mezclamos con los defaults para evitar undefined
+        kpisFormatted = { ...kpisFormatted, ...data };
+      }
+
+      console.log('✅ [adminDashboardService.getKPIs] Datos Adaptados:', kpisFormatted);
+      return kpisFormatted;
+
     } catch (error: any) {
-      console.error('🔴 [adminDashboardService.getKPIs] Error completo:', error);
-      console.error('🔴 [adminDashboardService.getKPIs] Response:', error.response);
-      console.error('🔴 [adminDashboardService.getKPIs] Status:', error.response?.status);
-      console.error('🔴 [adminDashboardService.getKPIs] Data:', error.response?.data);
-      console.error('🔴 [adminDashboardService.getKPIs] Headers:', error.response?.headers);
+      console.error('🔴 [adminDashboardService.getKPIs] Error:', error);
       throw error;
     }
   },
 
   /**
-   * Obtener tendencia de citas (últimos N días)
+   * Obtener tendencia de citas
    */
   async getTendenciaCitas(dias: number = 15): Promise<TendenciaCita[]> {
-    console.log('🔵 [adminDashboardService.getTendenciaCitas] Iniciando petición...');
     console.log('🔵 [adminDashboardService.getTendenciaCitas] Días:', dias);
     try {
-      const { data } = await api.get('/api/reportes/reportes/tendencia-citas/', {
-        params: { dias }
-      });
-      console.log('🟢 [adminDashboardService.getTendenciaCitas] Respuesta exitosa:', data);
-      return data;
+      const { data } = await api.get('/api/reportes/reportes/tendencia-citas/', { params: { dias } });
+      return data || [];
     } catch (error: any) {
-      console.error('🔴 [adminDashboardService.getTendenciaCitas] Error:', error);
-      console.error('🔴 [adminDashboardService.getTendenciaCitas] Response:', error.response?.data);
-      throw error;
+      console.error('🔴 Error Tendencia:', error);
+      return [];
     }
   },
 
   /**
-   * Obtener top procedimientos más realizados
+   * Obtener top procedimientos
    */
   async getTopProcedimientos(limite: number = 5): Promise<TopProcedimiento[]> {
-    console.log('🔵 [adminDashboardService.getTopProcedimientos] Iniciando petición...');
-    console.log('🔵 [adminDashboardService.getTopProcedimientos] Límite:', limite);
     try {
-      const { data } = await api.get('/api/reportes/reportes/top-procedimientos/', {
-        params: { limite }
-      });
-      console.log('🟢 [adminDashboardService.getTopProcedimientos] Respuesta exitosa:', data);
+      const { data } = await api.get('/api/reportes/reportes/top-procedimientos/', { params: { limite } });
+      // Asegurar que data sea un array
+      return Array.isArray(data) ? data : [];
+    } catch (error: any) {
+      console.error('🔴 Error Top Procedimientos:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Obtener estadísticas generales
+   */
+  async getEstadisticasGenerales(): Promise<EstadisticasGenerales> {
+    try {
+      const { data } = await api.get('/api/reportes/reportes/estadisticas-generales/');
       return data;
     } catch (error: any) {
-      console.error('🔴 [adminDashboardService.getTopProcedimientos] Error:', error);
-      console.error('🔴 [adminDashboardService.getTopProcedimientos] Response:', error.response?.data);
+      console.error('🔴 Error Estadísticas:', error);
       throw error;
     }
   },
 
   /**
-   * Obtener estadísticas generales de la clínica
+   * Obtener reporte financiero
    */
-  async getEstadisticasGenerales(): Promise<EstadisticasGenerales> {
-    console.log('🔵 [adminDashboardService.getEstadisticasGenerales] Iniciando petición...');
+  async getReporteFinanciero(params: { periodo: string }) {
     try {
-      const { data } = await api.get('/api/reportes/reportes/estadisticas-generales/');
-      console.log('🟢 [adminDashboardService.getEstadisticasGenerales] Respuesta exitosa:', data);
-      return data;
+        const { data } = await api.get('/api/reportes/reportes/reporte-financiero/', { params });
+        return data;
+    } catch (error) {
+        console.error('Error financiero', error);
+        return null;
+    }
+  },
+
+  /**
+   * Obtener ocupación de odontólogos
+   * Se aplica transformación de claves (snake_case mapping)
+   */
+  async getOcupacionOdontologos(): Promise<OcupacionOdontologoUI[]> {
+    console.log('🔵 [adminDashboardService.getOcupacion] Iniciando...');
+    try {
+      const { data } = await api.get('/api/reportes/reportes/ocupacion-odontologos/');
+      console.log('🟢 [adminDashboardService.getOcupacion] RAW:', data);
+
+      if (!Array.isArray(data)) return [];
+
+      // 🛠️ ADAPTADOR: Mapear claves del backend a lo que espera el componente
+      const mappedData = data.map((item: any) => ({
+        odontologo_id: item.odontologo_id || item.id || 0,
+        odontologo_nombre: item.odontologo_nombre || item.nombre_completo || item.nombre || 'Desconocido',
+        tasa_ocupacion: String(item.tasa_ocupacion || item.ocupacion || "0"),
+        total_citas: Number(item.total_citas || item.citas_totales || 0),
+        citas_completadas: Number(item.citas_completadas || 0),
+        citas_canceladas: Number(item.citas_canceladas || 0),
+        horas_ocupadas: Number(item.horas_ocupadas || 0),
+        pacientes_atendidos: Number(item.pacientes_atendidos || item.pacientes_unicos || 0)
+      }));
+
+      console.log('✅ [adminDashboardService.getOcupacion] Mapped:', mappedData);
+      return mappedData;
     } catch (error: any) {
-      console.error('🔴 [adminDashboardService.getEstadisticasGenerales] Error:', error);
-      console.error('🔴 [adminDashboardService.getEstadisticasGenerales] Response:', error.response?.data);
-      throw error;
+      console.error('🔴 Error Ocupación:', error);
+      return [];
     }
   },
 
@@ -89,41 +166,27 @@ export const adminDashboardService = {
    * Obtener insumos con stock bajo
    */
   async getStockBajo() {
-    console.log('🔵 [adminDashboardService.getStockBajo] Iniciando petición...');
-    console.log('🔵 [adminDashboardService.getStockBajo] URL:', '/api/inventario/insumos/bajo_stock/');
     try {
-      const { data } = await api.get('/api/inventario/insumos/bajo_stock/', {
-        params: { 
-          page_size: 10
-        }
-      });
-      console.log('🟢 [adminDashboardService.getStockBajo] Respuesta exitosa:', data);
+      const { data } = await api.get('/api/inventario/insumos/bajo_stock/', { params: { page_size: 10 } });
       return data;
     } catch (error: any) {
-      console.error('🔴 [adminDashboardService.getStockBajo] Error:', error);
-      console.error('🔴 [adminDashboardService.getStockBajo] Response:', error.response?.data);
-      throw error;
+      console.error('🔴 Error Stock:', error);
+      return [];
     }
   },
 
   /**
-   * Obtener actividad reciente (bitácora)
+   * Obtener actividad reciente
    */
   async getActividadReciente() {
-    console.log('🔵 [adminDashboardService.getActividadReciente] Iniciando petición...');
     try {
-      const { data } = await api.get('/api/reportes/bitacora/', {
-        params: { 
-          page: 1,
-          page_size: 10
-        }
-      });
-      console.log('🟢 [adminDashboardService.getActividadReciente] Respuesta exitosa:', data);
+      const { data } = await api.get('/api/reportes/bitacora/', { params: { page: 1, page_size: 10 } });
       return data;
     } catch (error: any) {
-      console.error('🔴 [adminDashboardService.getActividadReciente] Error:', error);
-      console.error('🔴 [adminDashboardService.getActividadReciente] Response:', error.response?.data);
-      throw error;
+      console.error('🔴 Error Bitácora:', error);
+      return [];
     }
   },
 };
+
+export default adminDashboardService;
