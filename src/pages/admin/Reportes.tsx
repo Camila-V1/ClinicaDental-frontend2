@@ -167,15 +167,15 @@ export default function Reportes() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Total:</span>
-                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.pacientes.total}</strong>
+                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.pacientes?.total ?? 0}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Nuevos (mes):</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.pacientes.nuevos_mes}</strong>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.pacientes?.nuevos_mes ?? 0}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Activos:</span>
-                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.pacientes.activos}</strong>
+                    <strong style={{ fontSize: '13px', color: '#065f46' }}>{estadisticas.pacientes?.activos ?? 0}</strong>
                   </div>
                 </div>
               </div>
@@ -188,15 +188,15 @@ export default function Reportes() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#1e40af' }}>Total:</span>
-                    <strong style={{ fontSize: '13px', color: '#1e40af' }}>{estadisticas.citas.total_mes}</strong>
+                    <strong style={{ fontSize: '13px', color: '#1e40af' }}>{estadisticas.citas?.total_mes ?? 0}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#1e40af' }}>Completadas:</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.citas.completadas}</strong>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>{estadisticas.citas?.completadas ?? 0}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#1e40af' }}>Pendientes:</span>
-                    <strong style={{ fontSize: '13px', color: '#f59e0b' }}>{estadisticas.citas.pendientes}</strong>
+                    <strong style={{ fontSize: '13px', color: '#f59e0b' }}>{estadisticas.citas?.pendientes ?? 0}</strong>
                   </div>
                 </div>
               </div>
@@ -209,15 +209,15 @@ export default function Reportes() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#92400e' }}>Ingresos (mes):</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {estadisticas.financiero.ingresos_mes}</strong>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {estadisticas.financiero?.ingresos_mes ?? '0.00'}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#92400e' }}>Pendiente:</span>
-                    <strong style={{ fontSize: '13px', color: '#ef4444' }}>Bs. {estadisticas.financiero.facturas_pendientes}</strong>
+                    <strong style={{ fontSize: '13px', color: '#ef4444' }}>Bs. {estadisticas.financiero?.facturas_pendientes ?? '0.00'}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#92400e' }}>Vencidas:</span>
-                    <strong style={{ fontSize: '13px', color: '#92400e' }}>{estadisticas.financiero.facturas_vencidas}</strong>
+                    <strong style={{ fontSize: '13px', color: '#92400e' }}>{estadisticas.financiero?.facturas_vencidas ?? 0}</strong>
                   </div>
                 </div>
               </div>
@@ -230,11 +230,11 @@ export default function Reportes() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#831843' }}>Planes activos:</span>
-                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos.planes_activos}</strong>
+                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos?.planes_activos ?? 0}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#831843' }}>Procedimientos:</span>
-                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos.procedimientos_realizados}</strong>
+                    <strong style={{ fontSize: '13px', color: '#831843' }}>{estadisticas.tratamientos?.procedimientos_realizados ?? 0}</strong>
                   </div>
                 </div>
               </div>
