@@ -6,23 +6,24 @@ import api from '../config/apiConfig';
 
 // ==================== INTERFACES ====================
 
-// Interfaz para LISTADO de facturas
+// Interfaz para LISTADO de facturas (campos EXACTOS que envía el backend)
 export interface Factura {
   id: number;
-  numero: number; // Alias de id
   paciente_nombre: string;
   estado: 'PENDIENTE' | 'PAGADA' | 'ANULADA';
   estado_display: string;
   monto_total: string;
-  monto: string; // Alias de monto_total
-  total: string; // Alias de monto_total
   monto_pagado: string;
   saldo_pendiente: string;
-  saldo: string; // Alias de saldo_pendiente
   fecha_emision: string;
-  fecha: string; // Alias de fecha_emision
   total_pagos: number;
   descripcion: string;
+  // Campos adicionales que puede enviar el backend
+  numero?: number;
+  monto?: string;
+  total?: string;
+  saldo?: string;
+  fecha?: string;
 }
 
 // Interfaz para DETALLE de factura

@@ -61,13 +61,6 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
   return (
     <div style={{ display: 'grid', gap: '16px' }}>
       {facturas.map((factura) => {
-        // ✅ Usar campos exactos del backend según documentación
-        const numeroFactura = factura.numero || factura.id;
-        const montoTotal = parseFloat(factura.monto_total || factura.total || factura.monto || '0');
-        const montoPagado = parseFloat(factura.monto_pagado || '0');
-        const saldoPendiente = parseFloat(factura.saldo_pendiente || factura.saldo || '0');
-        const fechaEmision = factura.fecha_emision || factura.fecha;
-        
         const estadoColor = getEstadoColor(factura.estado);
         
         return (
@@ -102,7 +95,7 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
                   </div>
                   <div>
                     <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', margin: 0 }}>
-                      Factura #{numeroFactura}
+                      Factura #{factura.id}
                     </h3>
                     <p style={{ fontSize: '14px', color: '#6b7280', margin: '2px 0 0 0' }}>
                       {factura.paciente_nombre}
@@ -131,25 +124,25 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
               <div>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Fecha Emisión</p>
                 <p style={{ fontSize: '14px', fontWeight: '500', color: '#111827', margin: 0 }}>
-                  📅 {formatDate(fechaEmision)}
+                  📅 {formatDate(factura.fecha_emision)}
                 </p>
               </div>
               <div>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Monto Total</p>
                 <p style={{ fontSize: '16px', fontWeight: '700', color: '#10b981', margin: 0 }}>
-                  {formatCurrency(montoTotal)}
+                  {formatCurrency(factura.monto_total)}
                 </p>
               </div>
               <div>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Pagado</p>
                 <p style={{ fontSize: '16px', fontWeight: '700', color: '#059669', margin: 0 }}>
-                  {formatCurrency(montoPagado)}
+                  {formatCurrency(factura.monto_pagado)}
                 </p>
               </div>
               <div>
                 <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0' }}>Saldo Pendiente</p>
-                <p style={{ fontSize: '16px', fontWeight: '700', color: saldoPendiente === 0 ? '#10b981' : '#ef4444', margin: 0 }}>
-                  {formatCurrency(saldoPendiente)}
+                <p style={{ fontSize: '16px', fontWeight: '700', color: parseFloat(factura.saldo_pendiente) === 0 ? '#10b981' : '#ef4444', margin: 0 }}>
+                  {formatCurrency(factura.saldo_pendiente)}
                 </p>
               </div>
             </div>
