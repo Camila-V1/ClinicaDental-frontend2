@@ -60,6 +60,7 @@ import Solicitudes from './pages/superadmin/Solicitudes';
 
 // Public Pages
 import RegistroClinica from './pages/public/RegistroClinica';
+import RegistroConfirmacion from './pages/public/RegistroConfirmacion';
 
 function App() {
   return (
@@ -99,6 +100,8 @@ function App() {
             {/* Rutas públicas */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/registro" element={<RegistroClinica />} />
+            <Route path="/registro/confirmacion/:solicitudId" element={<RegistroConfirmacion />} />
             <Route path="/registro-clinica" element={<RegistroClinica />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             

@@ -1,18 +1,22 @@
 /**
- * 📝 REGISTRO DE CLÍNICA - Página Pública
- * Formulario para solicitar registro de nueva clínica
+ * 📝 REGISTRO DE CLÍNICA - Página Pública con Pago
+ * Guía 46: Formulario de registro con pago automático
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import tenantsService, { Plan } from '../../services/tenantsService';
+import registroService from '../../services/registroService';
 
 export default function RegistroClinica() {
   const navigate = useNavigate();
+  const [step, setStep] = useState<1 | 2>(1); // 1: Formulario, 2: Seleccionar Pago
   const [planes, setPlanes] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPlanes, setLoadingPlanes] = useState(true);
+  const [solicitudId, setSolicitudId] = useState<number | null>(null);
+  const [tokenSolicitud, setTokenSolicitud] = useState<string>('');
   const [formData, setFormData] = useState({
     nombre_clinica: '',
     dominio_deseado: '',
@@ -66,30 +70,15 @@ export default function RegistroClinica() {
     
     setLoading(true);
     try {
-      await tenantsService.crearSolicitud({
+      const response = await registroService.crearSolicitud({
         ...formData,
         plan_solicitado: parseInt(formData.plan_solicitado)
       });
       
-      toast.success('✅ Solicitud enviada exitosamente. Te contactaremos pronto.');
-      
-      // Resetear formulario
-      setFormData({
-        nombre_clinica: '',
-        dominio_deseado: '',
-        nombre_contacto: '',
-        email: '',
-        telefono: '',
-        direccion: '',
-        ciudad: '',
-        pais: 'Bolivia',
-        plan_solicitado: ''
-      });
-
-      // Opcional: Redirigir al login después de 2 segundos
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+      setSolicitudId(response.solicitud_id);
+      setTokenSolicitud(response.token);
+      setStep(2);
+      toast.success('✅ Solicitud creada. Selecciona tu método de pago.');
     } catch (error: any) {
       console.error('Error al enviar solicitud:', error);
       const mensaje = error.response?.data?.error || 
@@ -97,6 +86,29 @@ export default function RegistroClinica() {
                      'Error al enviar solicitud';
       toast.error(mensaje);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePagar = async (metodoPago: 'STRIPE' | 'PAYPAL' | 'MERCADOPAGO') => {
+    if (!solicitudId) return;
+
+    setLoading(true);
+    try {
+      const returnUrl = `${window.location.origin}/registro/confirmacion/${solicitudId}`;
+      const cancelUrl = `${window.location.origin}/registro`;
+
+      const response = await registroService.iniciarPago(
+        solicitudId,
+        metodoPago,
+        returnUrl,
+        cancelUrl
+      );
+
+      // Redirigir a la pasarela de pago
+      window.location.href = response.payment_url;
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Error iniciando pago');
       setLoading(false);
     }
   };
