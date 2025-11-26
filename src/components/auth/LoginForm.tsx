@@ -1,19 +1,13 @@
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCredentials((prev) => ({ ...prev, [name]: value }));
-  };
 /**
  * 🔑 LOGIN FORM - Formulario de inicio de sesión
  * Basado en: GUIA_FRONT/01d_componentes_auth.md
  */
-
 
 import { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { Smile, Mail, Lock } from 'lucide-react';
-
 
 function LoginForm() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -24,6 +18,11 @@ function LoginForm() {
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -31,15 +30,7 @@ function LoginForm() {
     try {
       const result = await login(credentials);
       if (result.success) {
-        let dashboardUrl = '/dashboard';
-        if (result.user?.tipo_usuario === 'PACIENTE') {
-          dashboardUrl = '/paciente/dashboard';
-        } else if (result.user?.tipo_usuario === 'ODONTOLOGO') {
-          dashboardUrl = '/dashboard';
-        } else if (result.user?.tipo_usuario === 'ADMIN') {
-          dashboardUrl = '/dashboard';
-        }
-        navigate(dashboardUrl, { replace: true });
+        navigate('/dashboard', { replace: true });
       } else {
         setError(result.error || 'Error al iniciar sesión');
       }
@@ -224,7 +215,6 @@ function LoginForm() {
               onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
               onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
             >
-// Eliminar duplicado de cierre, solo debe haber un cierre de JSX
               Regístrate aquí
             </Link>
           </p>
