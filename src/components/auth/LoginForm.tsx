@@ -30,6 +30,8 @@ function LoginForm() {
     try {
       const result = await login(credentials);
       if (result.success) {
+        // El DashboardPage ya maneja la redirección según el tipo de usuario
+        // Siempre redirigir a /dashboard que detectará el rol automáticamente
         navigate('/dashboard', { replace: true });
       } else {
         setError(result.error || 'Error al iniciar sesión');
