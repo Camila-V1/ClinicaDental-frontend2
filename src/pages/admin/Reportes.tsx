@@ -176,6 +176,7 @@ export default function Reportes() {
           <FileText size={18} />
           📄 Imprimir Documentación
         </button>
+        </div>
       </div>
 
       {/* KPIs Dashboard FUSIONADOS */}
