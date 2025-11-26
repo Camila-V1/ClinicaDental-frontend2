@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import facturacionService, { type Factura, type Pago, type FacturaCreateData, type PagoCreateData } from '@/services/facturacionAdminService';
@@ -11,8 +12,10 @@ import FacturasList from '@/components/admin/FacturasList';
 import FacturaModal from '@/components/admin/FacturaModal';
 import PagosList from '@/components/admin/PagosList';
 import PagoModal from '@/components/admin/PagoModal';
+import ModalRegistrarPago from '@/components/facturacion/ModalRegistrarPago';
 
 export default function Facturacion() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'facturas' | 'pagos'>('facturas');
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFilter, setEstadoFilter] = useState('');
@@ -22,6 +25,7 @@ export default function Facturacion() {
   // Modals
   const [facturaModalOpen, setFacturaModalOpen] = useState(false);
   const [pagoModalOpen, setPagoModalOpen] = useState(false);
+  const [modalRegistrarPagoOpen, setModalRegistrarPagoOpen] = useState(false);
   const [selectedFactura, setSelectedFactura] = useState<Factura | null>(null);
   const [selectedPago, setSelectedPago] = useState<Pago | null>(null);
 
@@ -194,6 +198,16 @@ export default function Facturacion() {
     }
   };
 
+  const handleRegistrarPago = (factura: Factura) => {
+    setSelectedFactura(factura);
+    setModalRegistrarPagoOpen(true);
+  };
+
+  const handlePagoSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-facturas'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-pagos'] });
+  };
+
   // Safe default
   const facturas = Array.isArray(facturasData) ? facturasData : [];
   const pagos = Array.isArray(pagosData) ? pagosData : [];
@@ -201,13 +215,33 @@ export default function Facturacion() {
   return (
     <div style={{ padding: '24px' }}>
       {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>
-          💰 Facturación y Pagos
-        </h1>
-        <p style={{ color: '#6b7280', fontSize: '14px' }}>
-          Gestión financiera de la clínica
-        </p>
+      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', marginBottom: '8px' }}>
+            💰 Facturación y Pagos
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: '14px' }}>
+            Gestión financiera de la clínica
+          </p>
+        </div>
+        
+        {/* Botón Crear Facturas desde Presupuestos */}
+        <button
+          onClick={() => navigate('/admin/presupuestos-facturar')}
+          style={{
+            padding: '12px 20px',
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)',
+          }}
+        >
+          📋 Crear Facturas
+        </button>
       </div>
 
       {/* Tabs */}
@@ -350,6 +384,7 @@ export default function Facturacion() {
               onDelete={handleDeleteFactura}
               onMarcarPagada={handleMarcarPagada}
               onCancelar={handleCancelarFactura}
+              onRegistrarPago={handleRegistrarPago}
             />
           )}
         </>
@@ -418,6 +453,19 @@ export default function Facturacion() {
         onSubmit={(data) => savePagoMutation.mutate(data)}
         isLoading={savePagoMutation.isPending}
       />
+
+      {/* Modal Registrar Pago - NUEVO */}
+      {modalRegistrarPagoOpen && selectedFactura && (
+        <ModalRegistrarPago
+          facturaId={selectedFactura.id}
+          saldoPendiente={parseFloat(selectedFactura.saldo_pendiente || '0')}
+          onClose={() => {
+            setModalRegistrarPagoOpen(false);
+            setSelectedFactura(null);
+          }}
+          onSuccess={handlePagoSuccess}
+        />
+      )}
     </div>
   );
 }

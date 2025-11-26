@@ -278,6 +278,120 @@ class ReportesService {
       return [];
     }
   }
+
+  // ==================== EXPORTACIÓN DE REPORTES ====================
+
+  /**
+   * Exportar reporte genérico en formato PDF o Excel
+   */
+  async exportarReporte(
+    endpoint: string,
+    params: Record<string, any> = {},
+    formato: 'pdf' | 'excel'
+  ): Promise<void> {
+    try {
+      console.log(`📥 [ReportesService] Exportando ${endpoint} en formato ${formato}...`);
+      
+      const queryParams = new URLSearchParams({
+        ...params,
+        formato
+      }).toString();
+
+      const token = localStorage.getItem('access_token');
+      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const url = `${baseURL}/reportes/reportes/${endpoint}/?${queryParams}`;
+
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'X-Tenant': localStorage.getItem('tenant') || ''
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      const extension = formato === 'pdf' ? 'pdf' : 'xlsx';
+      const fecha = new Date().toISOString().split('T')[0];
+      const nombreArchivo = `reporte_${endpoint}_${fecha}.${extension}`;
+      
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = nombreArchivo;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      window.URL.revokeObjectURL(blobUrl);
+      
+      console.log(`✅ [ReportesService] Archivo descargado: ${nombreArchivo}`);
+    } catch (error) {
+      console.error('🔴 Error al exportar reporte:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Exportar Dashboard KPIs
+   */
+  exportarDashboardKPIs(formato: 'pdf' | 'excel'): Promise<void> {
+    return this.exportarReporte('dashboard-kpis', {}, formato);
+  }
+
+  /**
+   * Exportar Tendencia de Citas
+   */
+  exportarTendenciaCitas(dias: number, formato: 'pdf' | 'excel'): Promise<void> {
+    return this.exportarReporte('tendencia-citas', { dias }, formato);
+  }
+
+  /**
+   * Exportar Top Procedimientos
+   */
+  exportarTopProcedimientos(limite: number, formato: 'pdf' | 'excel'): Promise<void> {
+    return this.exportarReporte('top-procedimientos', { limite }, formato);
+  }
+
+  /**
+   * Exportar Estadísticas Generales
+   */
+  exportarEstadisticas(formato: 'pdf' | 'excel'): Promise<void> {
+    return this.exportarReporte('estadisticas-generales', {}, formato);
+  }
+
+  /**
+   * Exportar Reporte de Ingresos
+   */
+  exportarIngresos(fechaInicio: string, fechaFin: string, formato: 'pdf' | 'excel'): Promise<void> {
+    return this.exportarReporte('ingresos', { 
+      fecha_inicio: fechaInicio, 
+      fecha_fin: fechaFin 
+    }, formato);
+  }
+
+  /**
+   * Exportar Reporte Financiero
+   */
+  exportarReporteFinanciero(fechaInicio: string, fechaFin: string, formato: 'pdf' | 'excel'): Promise<void> {
+    return this.exportarReporte('reporte-financiero', {
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFin
+    }, formato);
+  }
+
+  /**
+   * Exportar Ocupación de Odontólogos
+   */
+  exportarOcupacionOdontologos(fechaInicio: string, fechaFin: string, formato: 'pdf' | 'excel'): Promise<void> {
+    return this.exportarReporte('ocupacion-odontologos', {
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFin
+    }, formato);
+  }
 }
 
 export default new ReportesService();

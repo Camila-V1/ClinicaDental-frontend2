@@ -62,7 +62,8 @@ export interface InsumoDetalle {
 
 export interface AjusteStock {
   cantidad: number;
-  motivo?: string;
+  motivo: string;
+  observaciones?: string;
 }
 
 // ==================== CATEGORÍAS ====================

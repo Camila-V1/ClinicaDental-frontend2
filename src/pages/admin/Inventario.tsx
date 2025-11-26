@@ -9,7 +9,7 @@ import CategoriasList from '@/components/admin/CategoriasList';
 import InsumosList from '@/components/admin/InsumosList';
 import CategoriaModal from '@/components/admin/CategoriaModal';
 import InsumoModal from '@/components/admin/InsumoModal';
-import AjustarStockModal from '@/components/admin/AjustarStockModal';
+import ModalAjustarStock from '@/components/inventario/ModalAjustarStock';
 import type { Categoria, Insumo } from '@/services/inventarioService';
 
 export default function Inventario() {
@@ -202,9 +202,13 @@ export default function Inventario() {
       )} */}
 
       {showStockModal && insumoStock && (
-        <AjustarStockModal
+        <ModalAjustarStock
           insumo={insumoStock}
           onClose={() => setShowStockModal(false)}
+          onSuccess={() => {
+            setShowStockModal(false);
+            // Re-fetch para actualizar la lista
+          }}
         />
       )}
     </div>

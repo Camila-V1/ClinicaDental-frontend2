@@ -8,6 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 import { FileText } from 'lucide-react';
 import reportesService from '@/services/reportesService';
 import DashboardKPIs from '@/components/admin/DashboardKPIs';
+import BotonesExportar from '@/components/reportes/BotonesExportar';
+import ModalExportarPersonalizado from '@/components/reportes/ModalExportarPersonalizado';
 import TendenciaCitasChart from '@/components/admin/TendenciaCitasChart';
 import TopProcedimientosChart from '@/components/admin/TopProcedimientosChart';
 import ReporteFinanciero from '@/components/admin/ReporteFinanciero';
@@ -17,6 +19,7 @@ import { generateReportesDocumentation, downloadMarkdownFile } from '@/utils/gen
 export default function Reportes() {
   const [diasTendencia, setDiasTendencia] = useState(15);
   const [periodoFinanciero, setPeriodoFinanciero] = useState('mes_actual');
+  const [showModalExportar, setShowModalExportar] = useState(false);
 
   // Función para convertir "mes_actual" al formato YYYY-MM
   const getPeriodoFormateado = () => {
@@ -107,6 +110,41 @@ export default function Reportes() {
             Dashboard ejecutivo con métricas y estadísticas del sistema
           </p>
         </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <BotonesExportar
+            onExportar={(formato) => reportesService.exportarEstadisticas(formato)}
+            nombreReporte="Estadísticas Generales"
+          />
+          <button
+            onClick={() => setShowModalExportar(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              backgroundColor: '#8b5cf6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(139, 92, 246, 0.3)',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#7c3aed';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 8px rgba(139, 92, 246, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#8b5cf6';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(139, 92, 246, 0.3)';
+            }}
+          >
+            📥 Exportar Personalizado
+          </button>
         <button
           onClick={handleGenerarDocumentacion}
           style={{
@@ -147,36 +185,50 @@ export default function Reportes() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '24px', marginTop: '24px' }}>
         {/* Tendencia de Citas */}
         <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>
               📈 Tendencia de Citas
             </h2>
-            <select
-              value={diasTendencia}
-              onChange={(e) => setDiasTendencia(Number(e.target.value))}
-              style={{
-                padding: '6px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '13px',
-                color: '#111827',
-                backgroundColor: 'white',
-                outline: 'none',
-              }}
-            >
-              <option value={7}>Últimos 7 días</option>
-              <option value={15}>Últimos 15 días</option>
-              <option value={30}>Últimos 30 días</option>
-            </select>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <select
+                value={diasTendencia}
+                onChange={(e) => setDiasTendencia(Number(e.target.value))}
+                style={{
+                  padding: '6px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  color: '#111827',
+                  backgroundColor: 'white',
+                  outline: 'none',
+                }}
+              >
+                <option value={7}>Últimos 7 días</option>
+                <option value={15}>Últimos 15 días</option>
+                <option value={30}>Últimos 30 días</option>
+              </select>
+              <div style={{ marginLeft: '8px' }}>
+                <BotonesExportar
+                  onExportar={(formato) => reportesService.exportarTendenciaCitas(diasTendencia, formato)}
+                  nombreReporte="Tendencia de Citas"
+                />
+              </div>
+            </div>
           </div>
           <TendenciaCitasChart data={tendenciaCitas || []} loading={loadingTendencia} />
         </div>
 
         {/* Top Procedimientos */}
         <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '20px' }}>
-            🏆 Procedimientos Más Realizados
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>
+              🏆 Procedimientos Más Realizados
+            </h2>
+            <BotonesExportar
+              onExportar={(formato) => reportesService.exportarTopProcedimientos(5, formato)}
+              nombreReporte="Top Procedimientos"
+            />
+          </div>
           <TopProcedimientosChart data={topProcedimientos || []} loading={loadingTop} />
         </div>
       </div>
@@ -348,6 +400,11 @@ export default function Reportes() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal de Exportación Personalizada */}
+      {showModalExportar && (
+        <ModalExportarPersonalizado onClose={() => setShowModalExportar(false)} />
       )}
     </div>
   );

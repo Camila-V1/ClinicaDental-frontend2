@@ -16,17 +16,21 @@ export interface BitacoraLog {
   detalles?: string;
   ip_address: string;
   timestamp: string;
+  descripcion?: string;
+  user_agent?: string;
+  fecha_hora?: string;
 }
 
 // ==================== BITÁCORA ====================
 
 const getLogs = async (params?: {
   page?: number;
-  usuario?: string;
-  accion?: string;
-  fecha_desde?: string;
-  fecha_hasta?: string;
-  limit?: number;
+  usuario?: number | string;
+  accion?: 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW' | 'LOGIN' | 'LOGOUT' | string;
+  modelo?: string;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  page_size?: number;
 }): Promise<{ results: BitacoraLog[]; count: number; next: string | null; previous: string | null }> => {
   const response = await api.get('/api/reportes/bitacora/', { params });
   
@@ -47,8 +51,11 @@ const getLogs = async (params?: {
     modelo: log.modelo || '',
     objeto_id: log.object_id || log.objeto_id || '',
     detalles: log.descripcion || log.detalles || '',
+    descripcion: log.descripcion || log.detalles || '',
     ip_address: log.ip_address || '',
-    timestamp: log.fecha_hora || log.timestamp || new Date().toISOString()
+    timestamp: log.fecha_hora || log.timestamp || new Date().toISOString(),
+    fecha_hora: log.fecha_hora || log.timestamp || new Date().toISOString(),
+    user_agent: log.user_agent || ''
   }));
   
   console.log('✅ [bitacoraService] Logs transformados:', transformedLogs.length);
@@ -62,10 +69,81 @@ const getLogs = async (params?: {
   };
 };
 
+const getLogDetalle = async (id: number): Promise<BitacoraLog> => {
+  const response = await api.get(`/api/reportes/bitacora/${id}/`);
+  const log = response.data;
+  
+  return {
+    id: log.id,
+    usuario: log.usuario?.nombre_completo || log.usuario || 'Usuario desconocido',
+    accion: log.accion || '',
+    modelo: log.modelo || '',
+    objeto_id: log.object_id || log.objeto_id || '',
+    detalles: log.descripcion || log.detalles || '',
+    descripcion: log.descripcion || log.detalles || '',
+    ip_address: log.ip_address || '',
+    timestamp: log.fecha_hora || log.timestamp || new Date().toISOString(),
+    fecha_hora: log.fecha_hora || log.timestamp || new Date().toISOString(),
+    user_agent: log.user_agent || ''
+  };
+};
+
+// Helper para convertir a CSV
+const convertirACSV = (logs: BitacoraLog[]): string => {
+  if (logs.length === 0) return '';
+  
+  const headers = ['ID', 'Fecha', 'Usuario', 'Acción', 'Modelo', 'Descripción', 'IP'];
+  const rows = logs.map(log => [
+    log.id,
+    new Date(log.fecha_hora || log.timestamp).toLocaleString(),
+    log.usuario || 'Sistema',
+    log.accion,
+    log.modelo,
+    log.descripcion || log.detalles || '',
+    log.ip_address
+  ]);
+  
+  return [
+    headers.join(','),
+    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+  ].join('\n');
+};
+
+// Exportar logs a CSV o JSON
+const exportarLogs = async (params: any, formato: 'csv' | 'json'): Promise<void> => {
+  const data = await getLogs(params);
+  const logs = data.results || [];
+  
+  if (formato === 'json') {
+    const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `logs_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } else if (formato === 'csv') {
+    const csv = convertirACSV(logs);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `logs_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+};
+
 // ==================== EXPORTAR ====================
 
 const bitacoraService = {
   getLogs,
+  getLogDetalle,
+  exportarLogs,
 };
 
 export default bitacoraService;

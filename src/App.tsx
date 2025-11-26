@@ -48,10 +48,18 @@ import AdminAgenda from './pages/admin/Agenda';
 import AdminTratamientos from './pages/admin/Tratamientos';
 import AdminHistorialClinico from './pages/admin/HistorialClinico';
 import AdminFacturacion from './pages/admin/Facturacion';
+import PresupuestosParaFacturar from './pages/admin/PresupuestosParaFacturar';
 import AdminReportes from './pages/admin/Reportes';
 import AdminConfiguracion from './pages/admin/Configuracion';
 import AdminInventario from './pages/admin/Inventario';
 import AdminBitacora from './pages/admin/Bitacora';
+import AdminBackups from './pages/admin/Backups';
+
+// SuperAdmin Pages
+import Solicitudes from './pages/superadmin/Solicitudes';
+
+// Public Pages
+import RegistroClinica from './pages/public/RegistroClinica';
 
 function App() {
   return (
@@ -91,6 +99,7 @@ function App() {
             {/* Rutas públicas */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/registro-clinica" element={<RegistroClinica />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             
             {/* Rutas protegidas */}
@@ -309,7 +318,7 @@ function App() {
             <Route
               path="/admin"
               element={
-                <ProtectedRoute allowedRoles={['ADMIN']}>
+                <ProtectedRoute requiredRole="ADMIN">
                   <AdminLayout />
                 </ProtectedRoute>
               }
@@ -321,13 +330,21 @@ function App() {
               <Route path="tratamientos" element={<AdminTratamientos />} />
               <Route path="historial-clinico" element={<AdminHistorialClinico />} />
               <Route path="facturacion" element={<AdminFacturacion />} />
+              <Route path="presupuestos-facturar" element={<PresupuestosParaFacturar />} />
               <Route path="reportes" element={<AdminReportes />} />
               <Route path="configuracion" element={<AdminConfiguracion />} />
               <Route path="inventario" element={<AdminInventario />} />
               <Route path="bitacora" element={<AdminBitacora />} />
+              <Route path="backups" element={<AdminBackups />} />
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
             {/* ============ FIN RUTAS ADMIN ============ */}
+
+            {/* ============ RUTAS SUPERADMIN ============ */}
+            <Route path="/superadmin">
+              <Route path="solicitudes" element={<Solicitudes />} />
+            </Route>
+            {/* ============ FIN RUTAS SUPERADMIN ============ */}
 
             {/* Ruta raíz redirige al dashboard */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />            {/* 404 - Not Found */}

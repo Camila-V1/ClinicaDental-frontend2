@@ -12,9 +12,10 @@ interface FacturasListProps {
   onDelete: (id: number) => void;
   onMarcarPagada: (id: number) => void;
   onCancelar: (id: number) => void;
+  onRegistrarPago?: (factura: Factura) => void; // Nueva prop
 }
 
-export default function FacturasList({ facturas, loading, onEdit, onDelete, onMarcarPagada, onCancelar }: FacturasListProps) {
+export default function FacturasList({ facturas, loading, onEdit, onDelete, onMarcarPagada, onCancelar, onRegistrarPago }: FacturasListProps) {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
@@ -180,6 +181,25 @@ export default function FacturasList({ facturas, loading, onEdit, onDelete, onMa
               >
                 ✏️ Editar
               </button>
+              
+              {/* Botón Registrar Pago - NUEVO */}
+              {factura.estado !== 'PAGADA' && factura.estado !== 'ANULADA' && parseFloat(factura.saldo_pendiente) > 0 && onRegistrarPago && (
+                <button
+                  onClick={() => onRegistrarPago(factura)}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#dcfce7',
+                    color: '#166534',
+                    border: '1px solid #22c55e',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                  }}
+                >
+                  💰 Registrar Pago
+                </button>
+              )}
               
               {factura.estado === 'PENDIENTE' && (
                 <>
