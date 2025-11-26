@@ -2,13 +2,15 @@
  * 📊 DASHBOARD PAGE - Redirige al dashboard según el rol
  */
 
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import AdminDashboard from './AdminDashboard';
 import DoctorDashboard from './DoctorDashboard';
-import PacienteDashboard from './PacienteDashboard';
 
 function DashboardPage() {
   const { userType, user } = useAuthContext();
+  const navigate = useNavigate();
 
   // Debug: Ver qué datos tenemos
   console.log('🔍 DashboardPage - userType:', userType);
@@ -17,6 +19,14 @@ function DashboardPage() {
   // Normalizar el tipo de usuario a minúsculas para la comparación
   const normalizedUserType = userType?.toLowerCase();
   console.log('🔍 DashboardPage - normalizedUserType:', normalizedUserType);
+
+  // Redirigir a pacientes a su dashboard específico
+  useEffect(() => {
+    if (normalizedUserType === 'paciente') {
+      console.log('🔄 Redirigiendo paciente a /paciente/dashboard');
+      navigate('/paciente/dashboard', { replace: true });
+    }
+  }, [normalizedUserType, navigate]);
 
   // Renderizar dashboard según el tipo de usuario
   switch (normalizedUserType) {
@@ -27,8 +37,15 @@ function DashboardPage() {
       console.log('✅ Renderizando DoctorDashboard');
       return <DoctorDashboard />;
     case 'paciente':
-      console.log('✅ Renderizando PacienteDashboard');
-      return <PacienteDashboard />;
+      // Se redirige en el useEffect, mostrar loading mientras tanto
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🦷</div>
+            <p style={{ color: '#666' }}>Redirigiendo a tu panel...</p>
+          </div>
+        </div>
+      );
     default:
       console.log('⚠️ Tipo de usuario no reconocido, mostrando pantalla de carga');
       return (
