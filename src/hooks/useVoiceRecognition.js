@@ -32,15 +32,18 @@ export const useVoiceRecognition = () => {
         let finalTranscript = '';
         let interimTranscript = '';
         
-        for (let i = event.resultIndex; i < event.results.length; i++) {
+        // Recorrer todos los resultados para obtener texto final e intermedio
+        for (let i = 0; i < event.results.length; i++) {
           const transcriptPart = event.results[i][0].transcript;
           const confidence = event.results[i][0].confidence;
           
-          console.log(`🎤 Resultado [${i}]:`, {
-            texto: transcriptPart,
-            confianza: confidence,
-            esFinal: event.results[i].isFinal
-          });
+          if (i >= event.resultIndex) {
+            console.log(`🎤 Resultado [${i}]:`, {
+              texto: transcriptPart,
+              confianza: confidence,
+              esFinal: event.results[i].isFinal
+            });
+          }
           
           if (event.results[i].isFinal) {
             finalTranscript += transcriptPart + ' ';
@@ -49,17 +52,15 @@ export const useVoiceRecognition = () => {
           }
         }
         
-        const newText = finalTranscript || interimTranscript;
-        if (newText) {
-          console.log('📝 Transcripción actualizada:', newText);
+        // ✅ CORRECCIÓN: Solo acumular texto final confirmado
+        if (finalTranscript) {
+          console.log('📝 Texto final agregado:', finalTranscript.trim());
+          setTranscript(prev => prev + finalTranscript);
         }
         
-        // ✅ CORRECCIÓN: Acumular solo texto final, mostrar interim sin guardar
-        if (finalTranscript) {
-          setTranscript(prev => prev + finalTranscript);
-        } else if (interimTranscript) {
-          // Para resultados parciales, actualizar sin acumular
-          setTranscript(prev => prev + interimTranscript);
+        // Log de texto intermedio (no se guarda, solo para debugging)
+        if (interimTranscript && !finalTranscript) {
+          console.log('💭 Texto intermedio (preview):', interimTranscript);
         }
       };
       
