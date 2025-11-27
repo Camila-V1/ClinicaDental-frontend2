@@ -63,6 +63,7 @@ import Solicitudes from './pages/superadmin/Solicitudes';
 // Public Pages
 import RegistroClinica from './pages/public/RegistroClinica';
 import RegistroConfirmacion from './pages/public/RegistroConfirmacion';
+import DescargarPage from './pages/public/Descargar';
 
 function App() {
   return (
@@ -108,6 +109,7 @@ function App() {
             <Route path="/registro" element={<RegistroClinica />} />
             <Route path="/registro/confirmacion/:solicitudId" element={<RegistroConfirmacion />} />
             <Route path="/registro-clinica" element={<RegistroClinica />} />
+            <Route path="/descargar" element={<DescargarPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             
             {/* Rutas protegidas */}
