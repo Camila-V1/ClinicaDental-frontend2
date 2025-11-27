@@ -22,6 +22,7 @@ export const useVoiceRecognition = () => {
       
       // Eventos
       recognitionRef.current.onstart = () => {
+        console.log('✅ Reconocimiento iniciado');
         setIsListening(true);
         setError(null);
       };
@@ -32,6 +33,14 @@ export const useVoiceRecognition = () => {
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcriptPart = event.results[i][0].transcript;
+          const confidence = event.results[i][0].confidence;
+          
+          console.log(`🎤 Resultado [${i}]:`, {
+            texto: transcriptPart,
+            confianza: confidence,
+            esFinal: event.results[i].isFinal
+          });
+          
           if (event.results[i].isFinal) {
             finalTranscript += transcriptPart + ' ';
           } else {
@@ -39,20 +48,28 @@ export const useVoiceRecognition = () => {
           }
         }
         
+        const newText = finalTranscript || interimTranscript;
+        if (newText) {
+          console.log('📝 Transcripción actualizada:', newText);
+        }
+        
         setTranscript(prev => prev + finalTranscript || interimTranscript);
       };
       
       recognitionRef.current.onerror = (event) => {
-        console.error('Error de reconocimiento:', event.error);
+        console.error('❌ Error de reconocimiento:', event.error);
         
         // Si es "no-speech", no mostrar error (es normal si el usuario no habla)
         if (event.error !== 'no-speech') {
           setError(getErrorMessage(event.error));
+        } else {
+          console.log('⏸️ Pausa detectada (no-speech) - esperando voz...');
         }
         setIsListening(false);
       };
       
       recognitionRef.current.onend = () => {
+        console.log('⏹️ Reconocimiento finalizado');
         setIsListening(false);
       };
       
@@ -74,9 +91,16 @@ export const useVoiceRecognition = () => {
       setTranscript('');
       setError(null);
       try {
+        console.log('🎙️ Iniciando reconocimiento de voz...');
+        console.log('📌 Configuración:', {
+          lang: 'es-ES',
+          continuous: true,
+          interimResults: true
+        });
         recognitionRef.current.start();
       } catch (err) {
-        console.error('Error al iniciar:', err);
+        console.error('❌ Error al iniciar:', err);
+        setError('Error al iniciar el micrófono: ' + err.message);
       }
     }
   };

@@ -104,6 +104,13 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
                 </div>
               )}
 
+              {/* Info de Debug */}
+              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px', padding: '8px', background: '#f9fafb', borderRadius: '6px' }}>
+                <div><strong>Navegador:</strong> {navigator.userAgent.includes('Chrome') ? '✅ Chrome' : navigator.userAgent.includes('Edge') ? '✅ Edge' : '⚠️ Otro'}</div>
+                <div><strong>Idioma:</strong> es-ES</div>
+                <div><strong>Tip:</strong> Habla claro y despacio. Di frases completas como "Dame las citas de hoy"</div>
+              </div>
+
               {/* Ejemplos */}
               <div className="examples">
                 <p className="examples-title">Ejemplos:</p>
