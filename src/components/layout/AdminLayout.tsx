@@ -7,7 +7,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, UserCog, Calendar, FileText, 
   DollarSign, Package, BarChart3, Shield, Settings,
-  Menu, X, LogOut, Bell
+  Menu, X, LogOut, Bell, Database
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -27,6 +27,7 @@ export default function AdminLayout() {
     { path: '/admin/inventario', icon: Package, label: 'Inventario' },
     { path: '/admin/reportes', icon: BarChart3, label: 'Reportes' },
     { path: '/admin/bitacora', icon: Shield, label: 'Bitácora' },
+    { path: '/admin/backups', icon: Database, label: 'Backups' },
     { path: '/admin/configuracion', icon: Settings, label: 'Configuración' },
   ];
 
