@@ -12,6 +12,9 @@ interface StatsGridProps {
 
 export default function StatsGrid({ stats }: StatsGridProps) {
   console.log('📊 [StatsGrid] Renderizando con stats:', stats);
+  console.log('📊 [StatsGrid] planes_activos:', stats.planes_activos);
+  console.log('📊 [StatsGrid] planes_completados:', stats.planes_completados);
+  console.log('📊 [StatsGrid] total_procedimientos:', stats.total_procedimientos);
 
   const items = [
     {
