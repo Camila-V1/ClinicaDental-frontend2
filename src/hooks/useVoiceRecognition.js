@@ -6,6 +6,7 @@ export const useVoiceRecognition = () => {
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState(null);
   const [isSupported, setIsSupported] = useState(false);
+  const shouldListenRef = useRef(false); // ✅ Flag para saber si debe continuar
   
   const recognitionRef = useRef(null);
 
@@ -59,18 +60,34 @@ export const useVoiceRecognition = () => {
       recognitionRef.current.onerror = (event) => {
         console.error('❌ Error de reconocimiento:', event.error);
         
-        // Si es "no-speech", no mostrar error (es normal si el usuario no habla)
-        if (event.error !== 'no-speech') {
-          setError(getErrorMessage(event.error));
-        } else {
-          console.log('⏸️ Pausa detectada (no-speech) - esperando voz...');
+        // ✅ SOLUCIÓN: Ignorar 'no-speech' completamente y continuar escuchando
+        if (event.error === 'no-speech') {
+          console.log('⏸️ Pausa detectada (no-speech) - continuando escucha...');
+          return; // ✅ NO cambiar isListening, NO mostrar error
         }
+        
+        // Solo detener y mostrar error para problemas reales
+        setError(getErrorMessage(event.error));
         setIsListening(false);
       };
       
       recognitionRef.current.onend = () => {
         console.log('⏹️ Reconocimiento finalizado');
         setIsListening(false);
+        
+        // ✅ Auto-reiniciar si aún debería estar escuchando
+        if (shouldListenRef.current) {
+          console.log('🔄 Reiniciando reconocimiento automáticamente...');
+          setTimeout(() => {
+            if (shouldListenRef.current && recognitionRef.current) {
+              try {
+                recognitionRef.current.start();
+              } catch (err) {
+                console.error('❌ Error al reiniciar:', err);
+              }
+            }
+          }, 100);
+        }
       };
       
       setIsSupported(true);
@@ -90,6 +107,7 @@ export const useVoiceRecognition = () => {
     if (recognitionRef.current && !isListening) {
       setTranscript('');
       setError(null);
+      shouldListenRef.current = true; // ✅ Marcar que debe continuar
       try {
         console.log('🎙️ Iniciando reconocimiento de voz...');
         console.log('📌 Configuración:', {
@@ -101,11 +119,13 @@ export const useVoiceRecognition = () => {
       } catch (err) {
         console.error('❌ Error al iniciar:', err);
         setError('Error al iniciar el micrófono: ' + err.message);
+        shouldListenRef.current = false;
       }
     }
   };
 
   const stopListening = () => {
+    shouldListenRef.current = false; // ✅ Marcar que debe detenerse
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
     }
