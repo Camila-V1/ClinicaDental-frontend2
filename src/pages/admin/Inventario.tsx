@@ -68,36 +68,179 @@ export default function Inventario() {
         </p>
       </div>
 
-      {/* Alertas de Stock Bajo */}
+      {/* Alertas de Stock Bajo - Mejoradas */}
       {stockBajo && stockBajo.length > 0 && (
         <div style={{
           background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
           border: '2px solid #f59e0b',
-          borderRadius: '12px',
-          padding: '16px',
+          borderRadius: '16px',
+          padding: '20px',
           marginBottom: '24px',
+          boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-            <span style={{ fontSize: '20px', marginRight: '8px' }}>⚠️</span>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#92400e', margin: 0 }}>
-              Alertas de Stock Bajo ({stockBajo.length})
-            </h3>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '8px' }}>
-            {stockBajo.map((insumo) => (
-              <div
-                key={insumo.id}
-                style={{
-                  padding: '8px 12px',
-                  background: 'white',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  color: '#78350f',
-                }}
-              >
-                <strong>{insumo.nombre}:</strong> {insumo.stock_actual} {insumo.unidad_medida}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontSize: '24px', marginRight: '12px' }}>⚠️</span>
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#92400e', margin: 0 }}>
+                  Alertas de Stock Bajo
+                </h3>
+                <p style={{ fontSize: '13px', color: '#78350f', margin: '2px 0 0 0' }}>
+                  {stockBajo.length} {stockBajo.length === 1 ? 'insumo requiere' : 'insumos requieren'} reposición inmediata
+                </p>
               </div>
-            ))}
+            </div>
+            <div style={{
+              background: '#dc2626',
+              color: 'white',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              fontSize: '14px',
+              fontWeight: '700',
+            }}>
+              🚨 {stockBajo.length}
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '12px' }}>
+            {stockBajo.map((insumo) => {
+              const porcentaje = insumo.stock_minimo > 0 
+                ? (Number(insumo.stock_actual) / Number(insumo.stock_minimo)) * 100 
+                : 0;
+              const esCritico = Number(insumo.stock_actual) <= 0;
+              
+              return (
+                <div
+                  key={insumo.id}
+                  style={{
+                    padding: '16px',
+                    background: 'white',
+                    borderRadius: '10px',
+                    fontSize: '14px',
+                    color: '#78350f',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    border: esCritico ? '2px solid #dc2626' : '1px solid #fbbf24',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                  }}
+                  onClick={() => {
+                    setInsumoStock(insumo);
+                    setShowStockModal(true);
+                  }}
+                  title="Click para ajustar stock"
+                >
+                  {/* Badge de estado */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    background: esCritico ? '#dc2626' : '#f59e0b',
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: '12px',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                  }}>
+                    {esCritico ? '🔴 CRÍTICO' : '⚠️ BAJO'}
+                  </div>
+
+                  {/* Nombre del insumo */}
+                  <div style={{ 
+                    fontWeight: '700', 
+                    fontSize: '15px', 
+                    color: '#111827',
+                    marginBottom: '8px',
+                    paddingRight: '80px',
+                  }}>
+                    📦 {insumo.nombre}
+                  </div>
+
+                  {/* Información de stock */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: '8px',
+                  }}>
+                    <span style={{ fontSize: '13px', color: '#6b7280' }}>
+                      Stock actual:
+                    </span>
+                    <span style={{ 
+                      fontSize: '15px', 
+                      fontWeight: '700',
+                      color: esCritico ? '#dc2626' : '#f59e0b',
+                    }}>
+                      {insumo.stock_actual} {insumo.unidad_medida}
+                    </span>
+                  </div>
+
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: '10px',
+                  }}>
+                    <span style={{ fontSize: '13px', color: '#6b7280' }}>
+                      Stock mínimo:
+                    </span>
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#111827' }}>
+                      {insumo.stock_minimo} {insumo.unidad_medma}
+                    </span>
+                  </div>
+
+                  {/* Barra de progreso */}
+                  <div style={{
+                    width: '100%',
+                    height: '8px',
+                    background: '#f3f4f6',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    marginBottom: '8px',
+                  }}>
+                    <div style={{
+                      width: `${Math.min(porcentaje, 100)}%`,
+                      height: '100%',
+                      background: esCritico 
+                        ? 'linear-gradient(90deg, #dc2626 0%, #991b1b 100%)'
+                        : 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)',
+                      transition: 'width 0.3s ease',
+                    }} />
+                  </div>
+
+                  {/* Porcentaje */}
+                  <div style={{ 
+                    fontSize: '12px', 
+                    color: '#6b7280',
+                    textAlign: 'center',
+                  }}>
+                    {porcentaje.toFixed(1)}% del mínimo requerido
+                  </div>
+
+                  {/* Hover hint */}
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '8px',
+                    background: '#fef3c7',
+                    borderRadius: '6px',
+                    fontSize: '11px',
+                    color: '#78350f',
+                    textAlign: 'center',
+                    fontWeight: '600',
+                  }}>
+                    🖱️ Click para ajustar stock
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
