@@ -9,7 +9,7 @@ export const voiceReportService = {
    */
   async processVoiceCommand(texto) {
     try {
-      const response = await apiClient.post('/reportes/voice-query/', {
+      const response = await apiClient.post('/api/reportes/voice-query/', {
         texto: texto.trim()
       });
       
