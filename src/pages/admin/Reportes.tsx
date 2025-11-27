@@ -14,12 +14,15 @@ import TendenciaCitasChart from '@/components/admin/TendenciaCitasChart';
 import TopProcedimientosChart from '@/components/admin/TopProcedimientosChart';
 import ReporteFinanciero from '@/components/admin/ReporteFinanciero';
 import OcupacionOdontologos from '@/components/admin/OcupacionOdontologos';
+import VoiceReportCapture from '@/components/reportes/VoiceReportCapture';
 import { generateReportesDocumentation, downloadMarkdownFile } from '@/utils/generateReportesDocumentation';
+import '@/styles/voice-report.css';
 
 export default function Reportes() {
   const [diasTendencia, setDiasTendencia] = useState(15);
   const [periodoFinanciero, setPeriodoFinanciero] = useState('mes_actual');
   const [showModalExportar, setShowModalExportar] = useState(false);
+  const [reporteVoz, setReporteVoz] = useState<any>(null);
 
   // Función para convertir "mes_actual" al formato YYYY-MM
   const getPeriodoFormateado = () => {
@@ -98,6 +101,15 @@ export default function Reportes() {
     downloadMarkdownFile(markdown, 'DOCUMENTACION_SISTEMA_REPORTES.md');
   };
 
+  // Manejador para reportes por voz
+  const handleVoiceReportGenerated = (voiceData: any) => {
+    console.log('📊 Reporte por voz generado:', voiceData);
+    setReporteVoz(voiceData);
+    
+    // Aquí puedes actualizar el dashboard con los datos del reporte por voz
+    // Por ejemplo, mostrar una tabla con voiceData.datos
+  };
+
   return (
     <div style={{ padding: '24px' }}>
       {/* Header */}
@@ -111,6 +123,7 @@ export default function Reportes() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
+          <VoiceReportCapture onReportGenerated={handleVoiceReportGenerated} />
           <BotonesExportar
             onExportar={(formato) => reportesService.exportarEstadisticas(formato)}
             nombreReporte="Estadísticas Generales"
