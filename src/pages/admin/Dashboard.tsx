@@ -160,43 +160,69 @@ export default function Dashboard() {
       }}>
         {loadingKpis ? (
           <>
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div key={i} style={{ height: '128px', backgroundColor: '#f3f4f6', borderRadius: '8px', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
             ))}
           </>
         ) : (
           <>
-            {kpis && kpis[0] && (
-              <KPICard
-                label={kpis[0].etiqueta}
-                value={kpis[0].valor}
-                icon="Users"
-                color="blue"
-              />
-            )}
-            {kpis && kpis[1] && (
-              <KPICard
-                label={kpis[1].etiqueta}
-                value={kpis[1].valor}
-                icon="Calendar"
-                color="green"
-              />
-            )}
-            {kpis && kpis[2] && (
-              <KPICard
-                label={kpis[2].etiqueta}
-                value={kpis[2].valor}
-                icon="DollarSign"
-                color="purple"
-              />
-            )}
-            {kpis && kpis[3] && (
-              <KPICard
-                label={kpis[3].etiqueta}
-                value={kpis[3].valor}
-                icon="AlertCircle"
-                color="orange"
-              />
+            {kpis && (
+              <>
+                <KPICard
+                  label="Pacientes Activos"
+                  value={kpis.total_pacientes}
+                  icon="Users"
+                  color="blue"
+                />
+                <KPICard
+                  label="Citas Hoy"
+                  value={kpis.citas_hoy}
+                  icon="Calendar"
+                  color="green"
+                />
+                <KPICard
+                  label="Ingresos del Mes"
+                  value={kpis.ingresos_mes}
+                  icon="DollarSign"
+                  color="purple"
+                  prefix="Bs. "
+                  format="currency"
+                />
+                <KPICard
+                  label="Saldo Pendiente"
+                  value={kpis.saldo_pendiente}
+                  icon="AlertCircle"
+                  color="orange"
+                  prefix="Bs. "
+                  format="currency"
+                />
+                <KPICard
+                  label="Tratamientos Activos"
+                  value={kpis.tratamientos_activos}
+                  icon="Activity"
+                  color="indigo"
+                />
+                <KPICard
+                  label="Planes Completados"
+                  value={kpis.planes_completados}
+                  icon="CheckCircle"
+                  color="teal"
+                />
+                <KPICard
+                  label="Promedio por Factura"
+                  value={kpis.promedio_factura}
+                  icon="TrendingUp"
+                  color="cyan"
+                  prefix="Bs. "
+                  format="currency"
+                />
+                <KPICard
+                  label="Facturas Vencidas"
+                  value={kpis.facturas_vencidas}
+                  icon="AlertTriangle"
+                  color="red"
+                />
+              </>
             )}
           </>
         )}

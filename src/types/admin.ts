@@ -12,6 +12,19 @@ export interface KPI {
   };
 }
 
+export interface DashboardKPIs {
+  total_pacientes: number;
+  citas_hoy: number;
+  ingresos_mes: number;
+  saldo_pendiente: number;
+  tratamientos_activos: number;
+  planes_completados: number;
+  promedio_factura: number;
+  facturas_vencidas: number;
+  total_procedimientos: number;
+  pacientes_nuevos_mes: number;
+}
+
 export interface EstadisticasGenerales {
   // Pacientes
   total_pacientes_activos: number;

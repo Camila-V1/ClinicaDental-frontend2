@@ -6,6 +6,7 @@
 import api from '@/config/apiConfig';
 import type { 
   KPI, 
+  DashboardKPIs,
   EstadisticasGenerales, 
   TendenciaCita, 
   TopProcedimiento 
@@ -26,61 +27,41 @@ interface OcupacionOdontologoUI {
 export const adminDashboardService = {
   /**
    * Obtener KPIs principales del dashboard
-   * Se aplica transformación de Array -> Objeto
+   * ✅ CORREGIDO: Mapeo EXACTO por etiquetas del backend
    */
-  async getKPIs(): Promise<any> {
+  async getKPIs(): Promise<DashboardKPIs> {
     console.log('🔵 [adminDashboardService.getKPIs] Iniciando petición...');
     try {
       const { data } = await api.get('/api/reportes/reportes/dashboard-kpis/');
-      console.log('🟢 [adminDashboardService.getKPIs] Respuesta RAW:', data);
+      console.log('🟢 [adminDashboardService.getKPIs] Respuesta RAW del backend:', data);
 
-      // 🛠️ ADAPTADOR: Convertir Array de backend a Objeto para frontend
-      let kpisFormatted = {
-        total_pacientes: 0,
-        citas_hoy: 0,
-        ingresos_mes: "0",
-        tratamientos_activos: 0,
-        pacientes_nuevos_mes: 0,
-        tasa_ocupacion: 0,
-        citas_pendientes: 0,
-        facturas_pendientes: 0
-      };
-
+      // Crear un mapa para acceso rápido por etiqueta
+      const kpisMap = new Map<string, number>();
       if (Array.isArray(data)) {
-        // Si es un array, intentamos mapear buscando por etiqueta (NO key)
         data.forEach((item: any) => {
-          // ✅ CORRECCIÓN: Backend envía "etiqueta" y "valor", NO "key" y "value"
-          const rawKey = item.etiqueta || item.key || item.label || ''; 
-          const key = String(rawKey).toLowerCase().replace(/ /g, '_');
-          const value = Number(item.valor || item.value || 0);
-
-          console.log(`  Procesando KPI: "${rawKey}" = ${value} (key normalizado: "${key}")`);
-
-          if (key.includes('pacientes') && (key.includes('activos') || key.includes('total'))) {
-            kpisFormatted.total_pacientes = value;
-          } else if (key.includes('citas') && key.includes('hoy')) {
-            kpisFormatted.citas_hoy = value;
-          } else if (key.includes('ingresos')) {
-            kpisFormatted.ingresos_mes = String(value);
-          } else if (key.includes('tratamientos')) {
-            kpisFormatted.tratamientos_activos = value;
-          } else if (key.includes('nuevos')) {
-            kpisFormatted.pacientes_nuevos_mes = value;
-          } else if (key.includes('ocupacion') || key.includes('ocupación')) {
-            kpisFormatted.tasa_ocupacion = value;
-          } else if (key.includes('citas') && key.includes('pendientes')) {
-            kpisFormatted.citas_pendientes = value;
-          } else if (key.includes('facturas') || key.includes('saldo') || key.includes('pendiente')) {
-            kpisFormatted.facturas_pendientes = value;
-          }
+          const etiqueta = item.etiqueta || '';
+          const valor = Number(item.valor || 0);
+          kpisMap.set(etiqueta, valor);
+          console.log(`  📊 Mapeando KPI: "${etiqueta}" = ${valor}`);
         });
-      } else if (typeof data === 'object' && data !== null) {
-        // Si ya es objeto, lo mezclamos con los defaults
-        kpisFormatted = { ...kpisFormatted, ...data };
       }
 
-      console.log('✅ [adminDashboardService.getKPIs] Datos Adaptados:', kpisFormatted);
-      return kpisFormatted;
+      // Mapeo EXACTO por etiquetas del backend (sin normalización)
+      const kpis: DashboardKPIs = {
+        total_pacientes: kpisMap.get('Pacientes Activos') || 0,
+        citas_hoy: kpisMap.get('Citas Hoy') || 0,
+        ingresos_mes: kpisMap.get('Ingresos Este Mes') || 0,
+        saldo_pendiente: kpisMap.get('Saldo Pendiente') || 0,
+        tratamientos_activos: kpisMap.get('Tratamientos Activos') || 0,
+        planes_completados: kpisMap.get('Planes Completados') || 0,
+        promedio_factura: kpisMap.get('Promedio por Factura') || 0,
+        facturas_vencidas: kpisMap.get('Facturas Vencidas') || 0,
+        total_procedimientos: kpisMap.get('Total Procedimientos') || 0,
+        pacientes_nuevos_mes: kpisMap.get('Pacientes Nuevos Mes') || 0,
+      };
+
+      console.log('✅ [adminDashboardService.getKPIs] KPIs mapeados correctamente:', kpis);
+      return kpis;
 
     } catch (error: any) {
       console.error('🔴 [adminDashboardService.getKPIs] Error:', error);
@@ -88,12 +69,14 @@ export const adminDashboardService = {
       return {
         total_pacientes: 0,
         citas_hoy: 0,
-        ingresos_mes: "0",
+        ingresos_mes: 0,
+        saldo_pendiente: 0,
         tratamientos_activos: 0,
+        planes_completados: 0,
+        promedio_factura: 0,
+        facturas_vencidas: 0,
+        total_procedimientos: 0,
         pacientes_nuevos_mes: 0,
-        tasa_ocupacion: 0,
-        citas_pendientes: 0,
-        facturas_pendientes: 0
       };
     }
   },
