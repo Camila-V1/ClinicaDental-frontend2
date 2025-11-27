@@ -47,10 +47,19 @@ export default function KPICard({
 
   // Formatear el valor
   const formatValue = (val: string | number): string => {
+    console.log(`🔢 [KPICard] Formateando ${label}:`, { val, tipo: typeof val, prefix, format });
+    
     const numVal = typeof val === 'string' ? parseFloat(val) : val;
     
+    if (isNaN(numVal)) {
+      console.warn(`⚠️ [KPICard] Valor NaN para ${label}:`, val);
+      return prefix + '0.00';
+    }
+    
     if (format === 'currency') {
-      return prefix + numVal.toFixed(2);
+      const formatted = prefix + numVal.toFixed(2);
+      console.log(`💰 [KPICard] ${label} formateado:`, formatted);
+      return formatted;
     }
     
     return prefix + numVal.toString();
