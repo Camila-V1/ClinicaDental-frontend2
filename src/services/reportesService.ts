@@ -309,7 +309,7 @@ class ReportesService {
 
       const token = localStorage.getItem('access_token');
       const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const url = `${baseURL}/reportes/reportes/${endpoint}/?${queryParams}`;
+      const url = `${baseURL}/api/reportes/reportes/${endpoint}/?${queryParams}`;
 
       const response = await fetch(url, {
         headers: {
