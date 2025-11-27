@@ -317,14 +317,15 @@ class ReportesService {
       console.log(`🌐 [ReportesService] URL: ${url}`);
 
       const response = await fetch(url, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'X-Tenant-ID': tenant,
-          'Content-Type': 'application/json'
+          'X-Tenant-ID': tenant
         }
       });
 
       console.log(`📤 [ReportesService] Response status: ${response.status}`);
+      console.log(`📤 [ReportesService] Content-Type: ${response.headers.get('content-type')}`);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -332,7 +333,21 @@ class ReportesService {
         throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
       }
 
+      // Verificar que sea un archivo binario
+      const contentType = response.headers.get('content-type');
+      if (contentType?.includes('application/json')) {
+        const jsonResponse = await response.json();
+        console.error('🔴 [ReportesService] Respuesta JSON en lugar de archivo:', jsonResponse);
+        throw new Error('El servidor devolvió JSON en lugar de un archivo');
+      }
+
       const blob = await response.blob();
+      console.log(`📦 [ReportesService] Blob size: ${blob.size} bytes, type: ${blob.type}`);
+      
+      if (blob.size === 0) {
+        throw new Error('El archivo descargado está vacío');
+      }
+
       const blobUrl = window.URL.createObjectURL(blob);
       
       const extension = formato === 'pdf' ? 'pdf' : 'xlsx';
@@ -342,11 +357,15 @@ class ReportesService {
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = nombreArchivo;
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
       
-      window.URL.revokeObjectURL(blobUrl);
+      // Esperar un poco antes de limpiar
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
       
       console.log(`✅ [ReportesService] Archivo descargado: ${nombreArchivo}`);
     } catch (error) {
