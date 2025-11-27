@@ -100,11 +100,9 @@ export const getCurrentTenant = (): string => {
  * DESARROLLO LOCAL:
  * - localhost:5173 → http://localhost:8000
  * 
- * PRODUCCIÓN MULTI-TENANT:
- * - clinicademo1.dentaabcxy.store → https://clinicademo1.dentaabcxy.store
- * - clinicaabc.dentaabcxy.store → https://clinicaabc.dentaabcxy.store
- * 
- * El subdominio del frontend DEBE coincidir con el subdominio del backend
+ * PRODUCCIÓN:
+ * - Siempre usar el backend de Render: https://clinica-dental-backend.onrender.com
+ * - El tenant se detecta por el header X-Tenant-ID (que viene del subdominio del frontend)
  */
 export const getApiBaseUrl = (): string => {
   // SSR/Node environment
@@ -113,17 +111,16 @@ export const getApiBaseUrl = (): string => {
   }
 
   const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
   
   // 🏠 DESARROLLO LOCAL: usar localhost:8000
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:8000';
   }
   
-  // 🌐 PRODUCCIÓN: usar el mismo subdominio que el frontend
-  // Si estás en clinicademo1.dentaabcxy.store → API en https://clinicademo1.dentaabcxy.store
-  // El backend en Render debe estar configurado con custom domains
-  return `${protocol}//${hostname}`;
+  // 🌐 PRODUCCIÓN: usar el backend de Render (dominio único)
+  // Frontend en Vercel: https://clinicademo1.dentaabcxy.store
+  // Backend en Render: https://clinica-dental-backend.onrender.com
+  return 'https://clinica-dental-backend.onrender.com';
 };
 
 /**
