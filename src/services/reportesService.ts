@@ -16,6 +16,12 @@ export interface DashboardKPIs {
   tasa_ocupacion: string;
   citas_pendientes: number;
   facturas_pendientes: number;
+  // ✅ CAMPOS NUEVOS QUE FALTABAN
+  saldo_pendiente: number;
+  planes_completados: number;
+  promedio_factura: string;
+  facturas_vencidas: number;
+  total_procedimientos?: number;  // Opcional (a veces viene en KPIs)
 }
 
 // ✅ Usar la interfaz correcta que coincide con el backend
@@ -108,7 +114,7 @@ class ReportesService {
       console.log('   - Tipo de datos:', Array.isArray(data) ? 'Array' : typeof data);
       console.log('   - Longitud:', Array.isArray(data) ? data.length : 'N/A');
 
-      let kpisFormatted = {
+      let kpisFormatted: any = {
         total_pacientes: 0,
         citas_hoy: 0,
         ingresos_mes: "0",
@@ -116,7 +122,12 @@ class ReportesService {
         pacientes_nuevos_mes: 0,
         tasa_ocupacion: "0",
         citas_pendientes: 0,
-        facturas_pendientes: 0
+        facturas_pendientes: 0,
+        // ✅ AGREGAR CAMPOS FALTANTES
+        saldo_pendiente: 0,
+        planes_completados: 0,
+        promedio_factura: "0",
+        facturas_vencidas: 0
       };
 
       if (Array.isArray(data)) {
@@ -124,25 +135,54 @@ class ReportesService {
         data.forEach((item: any, index: number) => {
           // ✅ Backend envía 'etiqueta' y 'valor'
           const rawLabel = item.etiqueta || item.label || '';
-          const label = String(rawLabel).toLowerCase();
+          const label = String(rawLabel).toLowerCase().trim();
           const value = item.valor || item.value || 0;
           console.log(`   ${index + 1}. "${rawLabel}" = ${value} (normalizado: "${label}")`);
 
-          if (label.includes('pacientes') && label.includes('activos')) {
+          // ✅ MAPEO COMPLETO DE TODOS LOS KPIs
+          if (label.includes('pacientes activos')) {
             kpisFormatted.total_pacientes = Number(value);
             console.log('      ✅ Mapeado a: total_pacientes =', Number(value));
           }
-          else if (label.includes('citas') && label.includes('hoy')) {
+          else if (label.includes('citas hoy')) {
             kpisFormatted.citas_hoy = Number(value);
             console.log('      ✅ Mapeado a: citas_hoy =', Number(value));
           }
-          else if (label.includes('ingresos')) {
+          else if (label.includes('ingresos este mes')) {
             kpisFormatted.ingresos_mes = String(value);
             console.log('      ✅ Mapeado a: ingresos_mes =', String(value));
           }
-          else if (label.includes('saldo')) {
-            kpisFormatted.facturas_pendientes = Number(value);
-            console.log('      ✅ Mapeado a: facturas_pendientes =', Number(value));
+          else if (label.includes('saldo pendiente')) {
+            // ✅ CORRECCIÓN: Usar saldo_pendiente en lugar de facturas_pendientes
+            kpisFormatted.saldo_pendiente = Number(value);
+            console.log('      ✅ Mapeado a: saldo_pendiente =', Number(value));
+          }
+          else if (label.includes('tratamientos activos')) {
+            kpisFormatted.tratamientos_activos = Number(value);
+            console.log('      ✅ Mapeado a: tratamientos_activos =', Number(value));
+          }
+          else if (label.includes('planes completados')) {
+            // ✅ NUEVO MAPEO
+            kpisFormatted.planes_completados = Number(value);
+            console.log('      ✅ Mapeado a: planes_completados =', Number(value));
+          }
+          else if (label.includes('promedio por factura')) {
+            // ✅ NUEVO MAPEO
+            kpisFormatted.promedio_factura = String(value);
+            console.log('      ✅ Mapeado a: promedio_factura =', String(value));
+          }
+          else if (label.includes('facturas vencidas')) {
+            // ✅ NUEVO MAPEO
+            kpisFormatted.facturas_vencidas = Number(value);
+            console.log('      ✅ Mapeado a: facturas_vencidas =', Number(value));
+          }
+          else if (label.includes('total procedimientos')) {
+            kpisFormatted.total_procedimientos = Number(value);
+            console.log('      ✅ Mapeado a: total_procedimientos =', Number(value));
+          }
+          else if (label.includes('pacientes nuevos')) {
+            kpisFormatted.pacientes_nuevos_mes = Number(value);
+            console.log('      ✅ Mapeado a: pacientes_nuevos_mes =', Number(value));
           }
         });
       }
