@@ -206,6 +206,8 @@ class ReportesService {
       const response = await api.get('/api/reportes/reportes/top-procedimientos/', { params });
       const data = response.data;
       console.log('✅ [ReportesService] Top procedimientos recibidos:', data);
+      console.log('   - Tipo de datos:', Array.isArray(data) ? 'Array' : typeof data);
+      console.log('   - Cantidad de items:', Array.isArray(data) ? data.length : 'N/A');
 
       if (!Array.isArray(data)) {
         console.warn('⚠️ [ReportesService] Top procedimientos no es array');
@@ -214,7 +216,7 @@ class ReportesService {
 
       // Calcular el total para porcentajes
       const totalCantidad = data.reduce((sum, item) => sum + (Number(item.valor || item.cantidad || 0)), 0);
-      console.log('📊 [ReportesService] Total cantidad:', totalCantidad);
+      console.log('📊 [ReportesService] Total cantidad de procedimientos:', totalCantidad);
 
       const resultado = data.map((item: any, index: number) => {
         const cantidad = Number(item.valor || item.cantidad || 0);
@@ -222,7 +224,7 @@ class ReportesService {
           ? ((cantidad / totalCantidad) * 100).toFixed(1)
           : "0";
 
-        console.log(`   ${index + 1}. ${item.etiqueta || item.nombre}: ${cantidad} (${porcentaje}%)`);
+        console.log(`   ${index + 1}. ${item.etiqueta || item.nombre}: ${cantidad} realizados (${porcentaje}%)`);
 
         return {
           nombre: item.etiqueta || item.nombre || 'Sin Nombre',
@@ -230,7 +232,15 @@ class ReportesService {
           porcentaje: porcentaje
         };
       });
+      
       console.log('📦 [ReportesService] Procedimientos mapeados:', resultado.length, 'items');
+      if (resultado.length > 0) {
+        console.log('   - Top 3 procedimientos más frecuentes:');
+        resultado.slice(0, 3).forEach((proc, idx) => {
+          console.log(`      ${idx + 1}. ${proc.nombre}: ${proc.cantidad} (${proc.porcentaje}%)`);
+        });
+      }
+      
       return resultado;
     } catch (error) {
       console.error('🔴 Error Top Procedimientos:', error);

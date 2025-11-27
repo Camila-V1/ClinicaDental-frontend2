@@ -61,23 +61,47 @@ export const obtenerMisFacturas = async (filtros?: FiltrosFacturas): Promise<Fac
   if (filtros?.fecha_inicio) params.append('fecha_inicio', filtros.fecha_inicio);
   if (filtros?.fecha_fin) params.append('fecha_fin', filtros.fecha_fin);
 
-  console.log('💰 Obteniendo facturas del paciente...');
+  console.log('💰 [FacturacionService] Obteniendo facturas del paciente...');
+  console.log('   - Filtros:', filtros);
+  console.log('   - Params URL:', params.toString());
   
   try {
     // Intentar con guion bajo (convención Django)
     const response = await api.get<Factura[]>(`/api/facturacion/facturas/mis_facturas/?${params}`);
-    console.log('✅ Facturas recibidas:', response.data.length);
+    console.log('✅ [FacturacionService] Facturas recibidas:', response.data.length);
+    console.log('   - Tipo de datos:', Array.isArray(response.data) ? 'Array' : typeof response.data);
+    
+    if (Array.isArray(response.data) && response.data.length > 0) {
+      console.log('   - Primera factura:', {
+        id: response.data[0].id,
+        numero: response.data[0].numero,
+        estado: response.data[0].estado,
+        total: response.data[0].total,
+        fecha_emision: response.data[0].fecha_emision
+      });
+      console.log('   - Resumen por estado:');
+      const estadosCount = response.data.reduce((acc: any, f) => {
+        acc[f.estado] = (acc[f.estado] || 0) + 1;
+        return acc;
+      }, {});
+      Object.entries(estadosCount).forEach(([estado, count]) => {
+        console.log(`      ${estado}: ${count} facturas`);
+      });
+    }
+    
     return response.data;
   } catch (error: any) {
+    console.error('❌ [FacturacionService] Error obteniendo facturas:', error.response?.status, error.message);
+    
     // Fallback: intentar con guion medio
     if (error.response?.status === 404) {
-      console.log('⚠️ Endpoint con guion bajo no encontrado, intentando con guion medio...');
+      console.log('⚠️ [FacturacionService] Endpoint con guion bajo no encontrado, intentando con guion medio...');
       try {
         const response = await api.get<Factura[]>(`/api/facturacion/facturas/mis-facturas/?${params}`);
-        console.log('✅ Facturas recibidas (fallback):', response.data.length);
+        console.log('✅ [FacturacionService] Facturas recibidas (fallback):', response.data.length);
         return response.data;
       } catch (fallbackError) {
-        console.error('❌ Error en fallback:', fallbackError);
+        console.error('❌ [FacturacionService] Error en fallback:', fallbackError);
         throw fallbackError;
       }
     }
@@ -89,11 +113,28 @@ export const obtenerMisFacturas = async (filtros?: FiltrosFacturas): Promise<Fac
  * 🔍 Obtener detalle de una factura
  */
 export const obtenerDetalleFactura = async (id: number): Promise<Factura> => {
-  console.log('🔍 Obteniendo detalle de factura:', id);
+  console.log('🔍 [FacturacionService] Obteniendo detalle de factura:', id);
   
   const response = await api.get<Factura>(`/api/facturacion/facturas/${id}/`);
   
-  console.log('✅ Factura obtenida:', response.data);
+  console.log('✅ [FacturacionService] Factura obtenida:', {
+    id: response.data.id,
+    numero: response.data.numero,
+    estado: response.data.estado,
+    total: response.data.total,
+    pagado: response.data.pagado,
+    saldo: response.data.saldo,
+    items_count: response.data.items?.length || 0,
+    pagos_count: response.data.pagos?.length || 0
+  });
+  
+  if (response.data.items && response.data.items.length > 0) {
+    console.log('   - Items de la factura:');
+    response.data.items.forEach((item, idx) => {
+      console.log(`      ${idx + 1}. ${item.servicio_nombre} - $${item.precio_unitario} x ${item.cantidad} = $${item.subtotal}`);
+    });
+  }
+  
   return response.data;
 };
 
@@ -101,11 +142,25 @@ export const obtenerDetalleFactura = async (id: number): Promise<Factura> => {
  * 💳 Obtener pagos de una factura
  */
 export const obtenerPagosFactura = async (facturaId: number): Promise<Pago[]> => {
-  console.log('💳 Obteniendo pagos de factura:', facturaId);
+  console.log('💳 [FacturacionService] Obteniendo pagos de factura:', facturaId);
   
   const response = await api.get<Pago[]>(`/api/facturacion/facturas/${facturaId}/pagos/`);
   
-  console.log('✅ Pagos recibidos:', response.data.length);
+  console.log('✅ [FacturacionService] Pagos recibidos:', response.data.length);
+  console.log('   - Tipo de datos:', Array.isArray(response.data) ? 'Array' : typeof response.data);
+  
+  if (Array.isArray(response.data) && response.data.length > 0) {
+    console.log('   - Detalle de pagos:');
+    response.data.forEach((pago, idx) => {
+      console.log(`      ${idx + 1}. ${pago.metodo_pago}: $${pago.monto} - ${pago.fecha_pago}${pago.referencia ? ' (Ref: ' + pago.referencia + ')' : ''}`);
+    });
+    
+    const totalPagado = response.data.reduce((sum, p) => sum + Number(p.monto), 0);
+    console.log(`   - Total pagado: $${totalPagado.toFixed(2)}`);
+  } else if (!Array.isArray(response.data)) {
+    console.warn('⚠️ [FacturacionService] Pagos NO es un array:', response.data);
+  }
+  
   return response.data;
 };
 
@@ -137,12 +192,28 @@ export interface EstadoCuenta {
 }
 
 export const obtenerEstadoCuenta = async (): Promise<EstadoCuenta> => {
-  console.log('📊 Obteniendo estado de cuenta...');
+  console.log('📊 [FacturacionService] Obteniendo estado de cuenta...');
   
   // Nota: DRF convierte def estado_cuenta → URL estado_cuenta/ (guión bajo, no medio)
   const response = await api.get<EstadoCuenta>('/api/facturacion/facturas/estado_cuenta/');
   
-  console.log('✅ Estado de cuenta obtenido:', response.data);
+  console.log('✅ [FacturacionService] Estado de cuenta obtenido:', {
+    paciente_nombre: response.data.paciente_nombre,
+    total_facturas: response.data.total_facturas,
+    total_facturado: response.data.total_facturado,
+    total_pagado: response.data.total_pagado,
+    saldo_pendiente: response.data.saldo_pendiente,
+    facturas_pendientes: response.data.facturas_pendientes,
+    facturas_vencidas: response.data.facturas_vencidas
+  });
+  
+  if (response.data.ultima_factura) {
+    console.log('   - Última factura:', response.data.ultima_factura);
+  }
+  if (response.data.proximo_vencimiento) {
+    console.log('   - Próximo vencimiento:', response.data.proximo_vencimiento);
+  }
+  
   return response.data;
 };
 
