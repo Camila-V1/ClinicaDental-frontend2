@@ -27,7 +27,7 @@ interface OcupacionOdontologoUI {
 export const adminDashboardService = {
   /**
    * Obtener KPIs principales del dashboard
-   * ✅ CORREGIDO: Mapeo EXACTO por etiquetas del backend
+   * ✅ CORREGIDO v3.2: Usar formato dual del backend {items: [], kpis: {}}
    */
   async getKPIs(): Promise<DashboardKPIs> {
     console.log('🔵 [adminDashboardService.getKPIs] Iniciando petición...');
@@ -35,10 +35,30 @@ export const adminDashboardService = {
       const { data } = await api.get('/api/reportes/reportes/dashboard-kpis/');
       console.log('🟢 [adminDashboardService.getKPIs] Respuesta RAW del backend:', data);
 
-      // Crear un mapa para acceso rápido por etiqueta
+      // ✅ PRIORIDAD 1: Usar objeto directo si existe (backend v3.2)
+      if (data.kpis) {
+        console.log('✅ [adminDashboardService.getKPIs] Usando objeto kpis directo:', data.kpis);
+        return {
+          total_pacientes: Number(data.kpis.total_pacientes || 0),
+          citas_hoy: Number(data.kpis.citas_hoy || 0),
+          ingresos_mes: Number(data.kpis.ingresos_mes || 0),
+          saldo_pendiente: Number(data.kpis.saldo_pendiente || 0),
+          tratamientos_activos: Number(data.kpis.tratamientos_activos || 0),
+          planes_completados: Number(data.kpis.planes_completados || 0),
+          promedio_factura: Number(data.kpis.promedio_factura || 0),
+          facturas_vencidas: Number(data.kpis.facturas_vencidas || 0),
+          total_procedimientos: Number(data.kpis.total_procedimientos || 0),
+          pacientes_nuevos_mes: Number(data.kpis.pacientes_nuevos_mes || 0),
+        };
+      }
+
+      // ⚠️ FALLBACK: Procesar array 'items' si no existe 'kpis'
+      console.log('⚠️ [adminDashboardService.getKPIs] Usando formato antiguo (items)');
+      const items = data.items || data;
       const kpisMap = new Map<string, number>();
-      if (Array.isArray(data)) {
-        data.forEach((item: any) => {
+      
+      if (Array.isArray(items)) {
+        items.forEach((item: any) => {
           const etiqueta = item.etiqueta || '';
           const valor = Number(item.valor || 0);
           kpisMap.set(etiqueta, valor);
@@ -46,7 +66,7 @@ export const adminDashboardService = {
         });
       }
 
-      // Mapeo EXACTO por etiquetas del backend (sin normalización)
+      // Mapeo por etiquetas del backend
       const kpis: DashboardKPIs = {
         total_pacientes: kpisMap.get('Pacientes Activos') || 0,
         citas_hoy: kpisMap.get('Citas Hoy') || 0,
