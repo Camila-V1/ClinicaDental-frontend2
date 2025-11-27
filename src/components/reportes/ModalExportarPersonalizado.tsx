@@ -18,9 +18,15 @@ export default function ModalExportarPersonalizado({ onClose }: Props) {
     dias: 15,
     limite: 5
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleExportar = async (formato: 'pdf' | 'excel') => {
-    switch (tipoReporte) {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      switch (tipoReporte) {
       case 'dashboard-kpis':
         await reportesService.exportarDashboardKPIs(formato);
         break;
@@ -55,6 +61,18 @@ export default function ModalExportarPersonalizado({ onClose }: Props) {
           throw new Error('Debes seleccionar fechas de inicio y fin');
         }
         break;
+      }
+      
+      // Cerrar modal después de exportar exitosamente
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+      
+    } catch (err: any) {
+      console.error('❌ Error al exportar:', err);
+      setError(err.message || 'Error al exportar el reporte. El backend no soporta exportación de archivos PDF/Excel.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -173,6 +191,15 @@ export default function ModalExportarPersonalizado({ onClose }: Props) {
           )}
         </div>
 
+        {/* Mensaje de error */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-800">
+              <strong>⚠️ Error:</strong> {error}
+            </p>
+          </div>
+        )}
+
         <div className="mb-4">
           <BotonesExportar
             onExportar={handleExportar}
@@ -180,9 +207,16 @@ export default function ModalExportarPersonalizado({ onClose }: Props) {
           />
         </div>
 
+        {loading && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center">
+            <p className="text-sm text-blue-700">⏳ Exportando...</p>
+          </div>
+        )}
+
         <button
           onClick={onClose}
-          className="w-full bg-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-400 font-medium transition-colors"
+          disabled={loading}
+          className="w-full bg-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-400 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cerrar
         </button>
