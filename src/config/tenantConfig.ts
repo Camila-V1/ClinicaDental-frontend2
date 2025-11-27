@@ -96,21 +96,34 @@ export const getCurrentTenant = (): string => {
 
 /**
  * 🌐 Construir la URL base de la API
- * Siempre retorna la URL del backend en Render (producción) o localhost (desarrollo)
+ * 
+ * DESARROLLO LOCAL:
+ * - localhost:5173 → http://localhost:8000
+ * 
+ * PRODUCCIÓN MULTI-TENANT:
+ * - clinicademo1.dentaabcxy.store → https://clinicademo1.dentaabcxy.store
+ * - clinicaabc.dentaabcxy.store → https://clinicaabc.dentaabcxy.store
+ * 
+ * El subdominio del frontend DEBE coincidir con el subdominio del backend
  */
 export const getApiBaseUrl = (): string => {
-  // Usar variables de entorno con fallback
-  const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
-  
-  if (apiUrl) {
-    return apiUrl;
+  // SSR/Node environment
+  if (typeof window === 'undefined') {
+    return 'https://clinica-dental-backend.onrender.com';
   }
 
-  // Fallback basado en entorno
-  const isProduction = import.meta.env.VITE_ENV === 'production';
-  return isProduction 
-    ? 'https://clinica-dental-backend.onrender.com'
-    : 'http://localhost:8000';
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  
+  // 🏠 DESARROLLO LOCAL: usar localhost:8000
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:8000';
+  }
+  
+  // 🌐 PRODUCCIÓN: usar el mismo subdominio que el frontend
+  // Si estás en clinicademo1.dentaabcxy.store → API en https://clinicademo1.dentaabcxy.store
+  // El backend en Render debe estar configurado con custom domains
+  return `${protocol}//${hostname}`;
 };
 
 /**
