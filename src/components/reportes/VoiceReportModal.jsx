@@ -136,7 +136,7 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
 
               {/* Campo de texto manual */}
               <div className="manual-input-container" style={{ marginTop: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#111827' }}>
                   ✍️ O escribe tu comando manualmente:
                 </label>
                 <textarea
@@ -154,6 +154,7 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
                     resize: 'vertical',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
+                    color: '#111827',
                     transition: 'border-color 0.2s ease'
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
@@ -183,10 +184,10 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
               )}
 
               {/* Info de Debug */}
-              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px', padding: '8px', background: '#f9fafb', borderRadius: '6px' }}>
-                <div><strong>Navegador:</strong> {navigator.userAgent.includes('Chrome') ? '✅ Chrome' : navigator.userAgent.includes('Edge') ? '✅ Edge' : '⚠️ Otro'}</div>
-                <div><strong>Idioma:</strong> es-ES</div>
-                <div><strong>Tip:</strong> Habla claro y despacio. Di frases completas como "Dame las citas de hoy"</div>
+              <div style={{ fontSize: '12px', color: '#4b5563', marginBottom: '12px', padding: '8px', background: '#f9fafb', borderRadius: '6px' }}>
+                <div style={{ color: '#374151' }}><strong style={{ color: '#111827' }}>Navegador:</strong> {navigator.userAgent.includes('Chrome') ? '✅ Chrome' : navigator.userAgent.includes('Edge') ? '✅ Edge' : '⚠️ Otro'}</div>
+                <div style={{ color: '#374151' }}><strong style={{ color: '#111827' }}>Idioma:</strong> es-ES</div>
+                <div style={{ color: '#374151' }}><strong style={{ color: '#111827' }}>Tip:</strong> Habla claro y despacio. Di frases completas como "Dame las citas de hoy"</div>
               </div>
 
               {/* Ejemplos */}
