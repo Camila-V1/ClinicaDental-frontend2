@@ -8,6 +8,11 @@ export const useVoiceRecognition = () => {
   const [isSupported, setIsSupported] = useState(false);
   const shouldListenRef = useRef(false); // ✅ Flag para saber si debe continuar
   
+  // ✅ Exponer setTranscript para uso manual
+  const updateTranscript = (text) => {
+    setTranscript(text);
+  };
+  
   const recognitionRef = useRef(null);
 
   useEffect(() => {
@@ -150,7 +155,8 @@ export const useVoiceRecognition = () => {
     isSupported,
     startListening,
     stopListening,
-    resetTranscript
+    resetTranscript,
+    setTranscript: updateTranscript
   };
 };
 

@@ -11,8 +11,11 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
     isSupported,
     startListening,
     stopListening,
-    resetTranscript
+    resetTranscript,
+    setTranscript
   } = useVoiceRecognition();
+  
+  const [manualText, setManualText] = React.useState('');
 
   // Auto-iniciar al abrir el modal
   useEffect(() => {
@@ -28,14 +31,21 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
   const handleClose = () => {
     stopListening();
     resetTranscript();
+    setManualText('');
     onClose();
   };
 
   const handleSubmit = () => {
-    if (transcript.trim()) {
+    const finalText = manualText.trim() || transcript.trim();
+    if (finalText) {
       stopListening();
-      onSubmit(transcript);
+      onSubmit(finalText);
+      setManualText('');
     }
+  };
+  
+  const handleManualTextChange = (e) => {
+    setManualText(e.target.value);
   };
 
   if (!isOpen) return null;
@@ -82,14 +92,14 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
                 </p>
               </div>
 
-              {/* Transcripción */}
+              {/* Transcripción por voz */}
               <div className="transcript-container">
-                <label>Transcripción en tiempo real:</label>
+                <label>Transcripción por voz:</label>
                 <div className="transcript-box" style={{
-                  minHeight: '120px',
-                  fontSize: '18px',
+                  minHeight: '80px',
+                  fontSize: '16px',
                   lineHeight: '1.6',
-                  padding: '16px',
+                  padding: '12px',
                   backgroundColor: isListening ? '#f0fdf4' : '#f9fafb',
                   border: isListening ? '2px solid #10b981' : '1px solid #e5e7eb',
                   transition: 'all 0.3s ease'
@@ -119,7 +129,47 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
                     gap: '4px'
                   }}>
                     <span>✅</span>
-                    <span>{transcript.split(' ').length} palabras capturadas</span>
+                    <span>{transcript.split(' ').length} palabras capturadas por voz</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Campo de texto manual */}
+              <div className="manual-input-container" style={{ marginTop: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                  ✍️ O escribe tu comando manualmente:
+                </label>
+                <textarea
+                  value={manualText}
+                  onChange={handleManualTextChange}
+                  placeholder="Escribe aquí tu comando... Ejemplo: Dame las citas del 1 al 5 de septiembre"
+                  style={{
+                    width: '100%',
+                    minHeight: '100px',
+                    fontSize: '16px',
+                    lineHeight: '1.6',
+                    padding: '12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    resize: 'vertical',
+                    fontFamily: 'inherit',
+                    backgroundColor: '#ffffff',
+                    transition: 'border-color 0.2s ease'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                />
+                {manualText && (
+                  <div style={{
+                    marginTop: '8px',
+                    fontSize: '12px',
+                    color: '#3b82f6',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <span>✅</span>
+                    <span>{manualText.split(' ').length} palabras escritas</span>
                   </div>
                 )}
               </div>
@@ -177,10 +227,10 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
             <button
               onClick={handleSubmit}
               className="btn-submit"
-              disabled={!transcript.trim() || isProcessing}
+              disabled={(!transcript.trim() && !manualText.trim()) || isProcessing}
             >
               <Send size={16} />
-              {isProcessing ? 'Procesando...' : 'Enviar'}
+              {isProcessing ? 'Procesando...' : 'Enviar Comando'}
             </button>
           </div>
         )}
