@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FileText } from 'lucide-react';
 import reportesService from '@/services/reportesService';
 import DashboardKPIs from '@/components/admin/DashboardKPIs';
+import BotonesExportar from '@/components/reportes/BotonesExportar';
 import ModalExportarPersonalizado from '@/components/reportes/ModalExportarPersonalizado';
 import TendenciaCitasChart from '@/components/admin/TendenciaCitasChart';
 import TopProcedimientosChart from '@/components/admin/TopProcedimientosChart';
@@ -123,6 +124,10 @@ export default function Reportes() {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <VoiceReportCapture onReportGenerated={handleVoiceReportGenerated} />
+          <BotonesExportar
+            onExportar={(formato) => reportesService.exportarEstadisticas(formato)}
+            nombreReporte="Estadísticas Generales"
+          />
           <button
             onClick={() => setShowModalExportar(true)}
             style={{
@@ -216,6 +221,12 @@ export default function Reportes() {
                 <option value={15}>Últimos 15 días</option>
                 <option value={30}>Últimos 30 días</option>
               </select>
+              <div style={{ marginLeft: '8px' }}>
+                <BotonesExportar
+                  onExportar={(formato) => reportesService.exportarTendenciaCitas(diasTendencia, formato)}
+                  nombreReporte="Tendencia de Citas"
+                />
+              </div>
             </div>
           </div>
           <TendenciaCitasChart data={tendenciaCitas || []} loading={loadingTendencia} />
@@ -227,6 +238,10 @@ export default function Reportes() {
             <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>
               🏆 Procedimientos Más Realizados
             </h2>
+            <BotonesExportar
+              onExportar={(formato) => reportesService.exportarTopProcedimientos(5, formato)}
+              nombreReporte="Top Procedimientos"
+            />
           </div>
           <TopProcedimientosChart data={topProcedimientos || []} loading={loadingTop} />
         </div>
