@@ -193,7 +193,7 @@ export default function Inventario() {
                       Stock mínimo:
                     </span>
                     <span style={{ fontSize: '13px', fontWeight: '600', color: '#111827' }}>
-                      {insumo.stock_minimo} {insumo.unidad_medma}
+                      {insumo.stock_minimo} {insumo.unidad_medida}
                     </span>
                   </div>
 
