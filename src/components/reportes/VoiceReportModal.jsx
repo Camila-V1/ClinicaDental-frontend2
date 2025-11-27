@@ -84,16 +84,44 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
 
               {/* Transcripción */}
               <div className="transcript-container">
-                <label>Transcripción:</label>
-                <div className="transcript-box">
-                  {transcript || (
-                    <span className="placeholder">
+                <label>Transcripción en tiempo real:</label>
+                <div className="transcript-box" style={{
+                  minHeight: '120px',
+                  fontSize: '18px',
+                  lineHeight: '1.6',
+                  padding: '16px',
+                  backgroundColor: isListening ? '#f0fdf4' : '#f9fafb',
+                  border: isListening ? '2px solid #10b981' : '1px solid #e5e7eb',
+                  transition: 'all 0.3s ease'
+                }}>
+                  {transcript ? (
+                    <span style={{ color: '#111827', fontWeight: '500' }}>
+                      {transcript}
+                    </span>
+                  ) : (
+                    <span className="placeholder" style={{
+                      color: isListening ? '#10b981' : '#9ca3af',
+                      fontStyle: 'italic'
+                    }}>
                       {isListening 
-                        ? 'Habla ahora...' 
-                        : 'Presiona el botón para comenzar'}
+                        ? '🎤 Escuchando... Habla ahora' 
+                        : '🔇 Presiona "Iniciar" para comenzar'}
                     </span>
                   )}
                 </div>
+                {transcript && (
+                  <div style={{
+                    marginTop: '8px',
+                    fontSize: '12px',
+                    color: '#10b981',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <span>✅</span>
+                    <span>{transcript.split(' ').length} palabras capturadas</span>
+                  </div>
+                )}
               </div>
 
               {/* Error */}

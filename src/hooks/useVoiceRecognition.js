@@ -54,7 +54,13 @@ export const useVoiceRecognition = () => {
           console.log('📝 Transcripción actualizada:', newText);
         }
         
-        setTranscript(prev => prev + finalTranscript || interimTranscript);
+        // ✅ CORRECCIÓN: Acumular solo texto final, mostrar interim sin guardar
+        if (finalTranscript) {
+          setTranscript(prev => prev + finalTranscript);
+        } else if (interimTranscript) {
+          // Para resultados parciales, actualizar sin acumular
+          setTranscript(prev => prev + interimTranscript);
+        }
       };
       
       recognitionRef.current.onerror = (event) => {
