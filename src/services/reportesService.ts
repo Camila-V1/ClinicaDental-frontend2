@@ -307,8 +307,8 @@ class ReportesService {
         formato
       }).toString();
 
-      const token = localStorage.getItem('access_token');
-      const tenant = localStorage.getItem('tenant') || 'clinica_demo';
+      const token = localStorage.getItem('accessToken');
+      const tenant = localStorage.getItem('currentTenant') || 'clinica_demo';
       const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       const url = `${baseURL}/api/reportes/reportes/${endpoint}/?${queryParams}`;
 
