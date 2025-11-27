@@ -14,15 +14,21 @@ export default function BotonesExportar({ onExportar, nombreReporte = 'reporte' 
   const [exportando, setExportando] = useState(false);
 
   const handleExportar = async (formato: 'pdf' | 'excel') => {
+    console.log(`🔵 [BotonesExportar] Iniciando exportación a ${formato.toUpperCase()} de "${nombreReporte}"`);
     setExportando(true);
     try {
+      console.log(`📤 [BotonesExportar] Llamando a onExportar(${formato})...`);
       await onExportar(formato);
+      console.log(`✅ [BotonesExportar] Exportación exitosa a ${formato.toUpperCase()}`);
       toast.success(`✅ ${nombreReporte} exportado a ${formato.toUpperCase()}`);
     } catch (error: any) {
-      console.error('Error al exportar:', error);
+      console.error('❌ [BotonesExportar] Error al exportar:', error);
+      console.error('❌ [BotonesExportar] Mensaje de error:', error.message);
+      console.error('❌ [BotonesExportar] Stack:', error.stack);
       const mensaje = error.message || `Error al exportar a ${formato.toUpperCase()}`;
       toast.error(mensaje);
     } finally {
+      console.log(`🏁 [BotonesExportar] Finalizando exportación (exportando=false)`);
       setExportando(false);
     }
   };
