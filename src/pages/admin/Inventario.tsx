@@ -69,7 +69,7 @@ export default function Inventario() {
       </div>
 
       {/* Alertas de Stock Bajo - Mejoradas */}
-      {stockBajo && stockBajo.length > 0 && (
+      {stockBajo && stockBajo.length > 0 ? (
         <div style={{
           background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
           border: '2px solid #f59e0b',
@@ -243,7 +243,28 @@ export default function Inventario() {
             })}
           </div>
         </div>
-      )}
+      ) : stockBajo && stockBajo.length === 0 ? (
+        <div style={{
+          background: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
+          border: '2px solid #10b981',
+          borderRadius: '16px',
+          padding: '20px',
+          marginBottom: '24px',
+          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.15)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '32px' }}>✅</span>
+            <div>
+              <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#065f46', margin: 0 }}>
+                Stock en Óptimas Condiciones
+              </h3>
+              <p style={{ fontSize: '14px', color: '#047857', margin: '4px 0 0 0' }}>
+                Todos los insumos tienen stock suficiente. No hay alertas en este momento.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Tabs */}
       <div style={{ marginBottom: '24px', display: 'flex', gap: '12px' }}>
