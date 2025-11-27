@@ -10,11 +10,13 @@ interface KPICardProps {
   label: string;
   value: string | number;
   icon: keyof typeof Icons;
-  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
+  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'indigo' | 'teal' | 'cyan' | 'yellow' | 'lime';
   trend?: {
     value: number;
     isPositive: boolean;
   };
+  prefix?: string;
+  format?: 'currency' | 'number';
 }
 
 export default function KPICard({ 
@@ -22,7 +24,9 @@ export default function KPICard({
   value, 
   icon, 
   color = 'blue',
-  trend 
+  trend,
+  prefix = '',
+  format = 'number'
 }: KPICardProps) {
   const Icon = Icons[icon] as React.ElementType;
 
@@ -32,9 +36,25 @@ export default function KPICard({
     purple: { bg: '#f3e8ff', text: '#9333ea' },
     orange: { bg: '#ffedd5', text: '#ea580c' },
     red: { bg: '#fee2e2', text: '#dc2626' },
+    indigo: { bg: '#e0e7ff', text: '#4f46e5' },
+    teal: { bg: '#ccfbf1', text: '#0d9488' },
+    cyan: { bg: '#cffafe', text: '#0891b2' },
+    yellow: { bg: '#fef9c3', text: '#ca8a04' },
+    lime: { bg: '#ecfccb', text: '#65a30d' },
   };
 
   const currentStyle = colorStyles[color];
+
+  // Formatear el valor
+  const formatValue = (val: string | number): string => {
+    const numVal = typeof val === 'string' ? parseFloat(val) : val;
+    
+    if (format === 'currency') {
+      return prefix + numVal.toFixed(2);
+    }
+    
+    return prefix + numVal.toString();
+  };
 
   return (
     <div style={{ 
@@ -46,7 +66,9 @@ export default function KPICard({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: '14px', color: '#4b5563', fontWeight: '500', margin: 0 }}>{label}</p>
-          <p style={{ fontSize: '30px', fontWeight: 'bold', color: '#111827', marginTop: '8px', marginBottom: 0 }}>{value}</p>
+          <p style={{ fontSize: '30px', fontWeight: 'bold', color: '#111827', marginTop: '8px', marginBottom: 0 }}>
+            {formatValue(value)}
+          </p>
           
           {trend && (
             <div style={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
