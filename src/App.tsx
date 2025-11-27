@@ -9,6 +9,8 @@ import { TenantProvider } from './context/TenantContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { TenantDebugInfo } from './components/TenantDebugInfo';
+import ChatWidget from './components/chatbot/ChatWidget';
+import './styles/chatbot.css';
 
 // Pages
 import LoginPage from './pages/auth/LoginPage';
@@ -95,6 +97,9 @@ function App() {
           
           {/* Componente de debug de tenant (solo en desarrollo) */}
           {import.meta.env.DEV && <TenantDebugInfo />}
+          
+          {/* Chatbot flotante - disponible en toda la aplicación */}
+          <ChatWidget />
           
           <Routes>
             {/* Rutas públicas */}
@@ -349,8 +354,10 @@ function App() {
             </Route>
             {/* ============ FIN RUTAS SUPERADMIN ============ */}
 
-            {/* Ruta raíz redirige al dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />            {/* 404 - Not Found */}
+            {/* Ruta raíz muestra el formulario de registro de clínica */}
+            <Route path="/" element={<RegistroClinica />} />
+            
+            {/* 404 - Not Found */}
             <Route path="*" element={
               <div style={{ 
                 minHeight: '100vh', 
