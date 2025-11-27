@@ -308,18 +308,28 @@ class ReportesService {
       }).toString();
 
       const token = localStorage.getItem('access_token');
+      const tenant = localStorage.getItem('tenant') || 'clinica_demo';
       const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       const url = `${baseURL}/api/reportes/reportes/${endpoint}/?${queryParams}`;
+
+      console.log(`🔐 [ReportesService] Exportando con token: ${token ? '✅ Presente' : '❌ Ausente'}`);
+      console.log(`🏢 [ReportesService] Tenant: ${tenant}`);
+      console.log(`🌐 [ReportesService] URL: ${url}`);
 
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'X-Tenant': localStorage.getItem('tenant') || ''
+          'X-Tenant-ID': tenant,
+          'Content-Type': 'application/json'
         }
       });
 
+      console.log(`📤 [ReportesService] Response status: ${response.status}`);
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(`🔴 [ReportesService] Error response: ${errorText}`);
+        throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
       }
 
       const blob = await response.blob();
