@@ -1,5 +1,5 @@
 // src/services/voiceReportService.js
-import apiClient from './api';
+import apiClient from '../config/apiConfig';
 
 export const voiceReportService = {
   /**
