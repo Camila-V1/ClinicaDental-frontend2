@@ -44,7 +44,11 @@ export const useVoiceRecognition = () => {
       
       recognitionRef.current.onerror = (event) => {
         console.error('Error de reconocimiento:', event.error);
-        setError(getErrorMessage(event.error));
+        
+        // Si es "no-speech", no mostrar error (es normal si el usuario no habla)
+        if (event.error !== 'no-speech') {
+          setError(getErrorMessage(event.error));
+        }
         setIsListening(false);
       };
       
@@ -103,14 +107,16 @@ export const useVoiceRecognition = () => {
 function getErrorMessage(error) {
   switch (error) {
     case 'no-speech':
-      return 'No se detectó ningún audio. Por favor, habla más cerca del micrófono.';
+      return '🎙️ Esperando que hables... Acerca el micrófono y habla claramente.';
     case 'audio-capture':
-      return 'No se pudo acceder al micrófono. Verifica los permisos.';
+      return '❌ No se pudo acceder al micrófono. Verifica los permisos del navegador.';
     case 'not-allowed':
-      return 'Permiso denegado. Habilita el acceso al micrófono en la configuración.';
+      return '🚫 Permiso denegado. Habilita el micrófono en la configuración del navegador.';
     case 'network':
-      return 'Error de red. Verifica tu conexión a internet.';
+      return '📡 Error de red. Verifica tu conexión a internet.';
+    case 'aborted':
+      return '⏹️ Reconocimiento detenido.';
     default:
-      return `Error de reconocimiento: ${error}`;
+      return `⚠️ Error: ${error}`;
   }
 }
