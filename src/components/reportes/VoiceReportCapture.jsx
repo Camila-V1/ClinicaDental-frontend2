@@ -28,6 +28,11 @@ const VoiceReportCapture = ({ onReportGenerated }) => {
     setIsProcessing(true);
 
     try {
+      // Detectar si el usuario pidió exportar a PDF o Excel
+      const transcriptLower = transcript.toLowerCase();
+      const requestPDF = transcriptLower.includes('pdf') || transcriptLower.includes('descargar') || transcriptLower.includes('exportar');
+      const requestExcel = transcriptLower.includes('excel') || transcriptLower.includes('xls');
+
       // Enviar comando al backend
       const result = await voiceReportService.processVoiceCommand(transcript);
 
@@ -37,10 +42,19 @@ const VoiceReportCapture = ({ onReportGenerated }) => {
         // Notificar al componente padre
         onReportGenerated(formattedData);
         
+        // Si el usuario pidió exportar, mostrar opciones
+        if (requestPDF || requestExcel) {
+          toast.success(
+            `📊 Reporte generado: ${formattedData.datos.length} registros\n\n` +
+            `💡 Usa los botones "Exportar PDF" o "Exportar Excel" en la parte superior para descargar`,
+            { duration: 6000, icon: '📥' }
+          );
+        } else {
+          toast.success(`✅ Reporte generado: ${formattedData.datos.length} registros encontrados`);
+        }
+        
         // Cerrar modal
         setIsModalOpen(false);
-        
-        toast.success(`✅ Reporte generado: ${formattedData.datos.length} registros encontrados`);
       } else {
         toast.error(result.error || 'Error al procesar el comando');
       }

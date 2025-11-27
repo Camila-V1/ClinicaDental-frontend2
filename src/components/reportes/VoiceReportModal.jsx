@@ -190,14 +190,38 @@ const VoiceReportModal = ({ isOpen, onClose, onSubmit, isProcessing }) => {
                 <div style={{ color: '#374151' }}><strong style={{ color: '#111827' }}>Tip:</strong> Habla claro y despacio. Di frases completas como "Dame las citas de hoy"</div>
               </div>
 
+              {/* Nota sobre exportación */}
+              <div style={{
+                padding: '12px',
+                background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                border: '2px solid #3b82f6',
+                borderRadius: '8px',
+                marginBottom: '12px',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
+                  <span style={{ fontSize: '20px' }}>💡</span>
+                  <div style={{ flex: 1 }}>
+                    <strong style={{ color: '#1e40af', fontSize: '13px', display: 'block', marginBottom: '4px' }}>
+                      ¿Quieres descargar en PDF o Excel?
+                    </strong>
+                    <p style={{ margin: 0, fontSize: '12px', color: '#1e3a8a', lineHeight: '1.5' }}>
+                      Primero genera el reporte con tu comando de voz, luego usa los botones 
+                      <strong> "Exportar PDF" o "Exportar Excel"</strong> que aparecerán en la parte superior de la tabla.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Ejemplos */}
               <div className="examples">
-                <p className="examples-title">Ejemplos:</p>
+                <p className="examples-title">Ejemplos de comandos:</p>
                 <ul>
                   <li>"Dame las citas del 1 al 5 de septiembre"</li>
                   <li>"Mostrar facturas de la semana pasada"</li>
                   <li>"Ingresos del mes actual"</li>
                   <li>"Facturas pendientes mayores a 1000"</li>
+                  <li>"Citas de hoy"</li>
+                  <li>"Tratamientos en progreso"</li>
                 </ul>
               </div>
             </>
