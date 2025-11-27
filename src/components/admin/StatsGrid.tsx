@@ -69,7 +69,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     },
     {
       label: 'Ingresos del Mes',
-      value: formatCurrency(parseFloat(stats.total_pagado_mes || '0')),
+      value: formatCurrency(parseFloat(stats.ingresos_mes_actual || '0')),
       color: '#059669', // emerald-600
     },
     {

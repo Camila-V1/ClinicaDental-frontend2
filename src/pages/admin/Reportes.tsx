@@ -77,7 +77,7 @@ export default function Reportes() {
     citas_hoy: kpis?.citas_hoy || 0, 
     
     // Para ingresos, confiamos más en el reporte financiero real
-    ingresos_mes: reporteFinanciero?.total_pagado || estadisticas?.total_pagado_mes || kpis?.ingresos_mes || "0",
+    ingresos_mes: reporteFinanciero?.total_pagado || estadisticas?.ingresos_mes_actual || kpis?.ingresos_mes || "0",
     
     tratamientos_activos: kpis?.tratamientos_activos || estadisticas?.planes_activos || 0,
     pacientes_nuevos_mes: kpis?.pacientes_nuevos_mes || estadisticas?.pacientes_nuevos_mes || 0,
@@ -380,7 +380,7 @@ export default function Reportes() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Ingresos (mes):</span>
-                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {parseFloat(estadisticas.total_pagado_mes || '0').toFixed(2)}</strong>
+                    <strong style={{ fontSize: '13px', color: '#10b981' }}>Bs. {parseFloat(estadisticas.ingresos_mes_actual || '0').toFixed(2)}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '13px', color: '#065f46' }}>Pendiente:</span>

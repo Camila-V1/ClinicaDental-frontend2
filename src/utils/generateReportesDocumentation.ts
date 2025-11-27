@@ -179,7 +179,7 @@ interface EstadisticasGenerales {
   total_procedimientos: number;
   
   // Financiero
-  total_pagado_mes: string;
+  ingresos_mes_actual: string;
   monto_pendiente: string;
   facturas_vencidas: number;
   promedio_factura: string;

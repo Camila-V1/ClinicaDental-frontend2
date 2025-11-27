@@ -45,7 +45,7 @@ export interface EstadisticasGenerales {
   total_procedimientos: number;
   
   // Financiero
-  total_pagado_mes: string;    // ✅ Nombre correcto del backend (string)
+  ingresos_mes_actual: string;    // ✅ CORRECCIÓN: backend envía ingresos_mes_actual
   monto_pendiente: string;     // ✅ Backend envía como string
   facturas_vencidas: number;
   promedio_factura: string;    // ✅ Backend envía como string
