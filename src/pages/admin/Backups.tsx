@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import backupService, { descargarArchivo, formatFileSize, formatRelativeTime } from '@/services/backupService';
 import ModalCrearBackup from '@/components/backups/ModalCrearBackup';
+import ConfiguracionAutomatica from '@/components/backups/ConfiguracionAutomatica';
 import type { BackupRecord } from '@/types/backups';
 
 export default function Backups() {
@@ -98,6 +99,11 @@ export default function Backups() {
             ➕ Crear Backup Manual
           </button>
         </div>
+      </div>
+
+      {/* Configuración Automática */}
+      <div style={{ marginBottom: '24px' }}>
+        <ConfiguracionAutomatica />
       </div>
 
       {/* Filtros */}

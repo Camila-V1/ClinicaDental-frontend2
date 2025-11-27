@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "49973871198",
+    "project_id": "psicoadmin-94485",
+    "storage_bucket": "psicoadmin-94485.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:49973871198:android:8d5790bf8d0674edef2acf",
+        "android_client_info": {
+          "package_name": "com.clinica.dental"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9qQjVFTKfNiPn_P6iYUDje9dyWT0rloY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:49973871198:android:decfbd2424e8a7cbef2acf",
+        "android_client_info": {
+          "package_name": "com.psicoadmin.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9qQjVFTKfNiPn_P6iYUDje9dyWT0rloY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
