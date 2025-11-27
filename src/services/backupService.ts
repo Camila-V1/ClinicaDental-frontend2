@@ -54,12 +54,9 @@ const backupService = {
    * Obtener configuración de backups automáticos
    */
   async getConfiguracion(): Promise<BackupConfig> {
-    const response = await api.get('/api/admin/config/');
+    const response = await api.get('/api/clinic/');
     return {
       backup_schedule: response.data.backup_schedule || 'disabled',
-      backup_time: response.data.backup_time,
-      backup_weekday: response.data.backup_weekday,
-      backup_day_of_month: response.data.backup_day_of_month,
       next_scheduled_backup: response.data.next_scheduled_backup,
       last_backup_at: response.data.last_backup_at
     };
@@ -69,7 +66,7 @@ const backupService = {
    * Actualizar configuración de backups automáticos
    */
   async actualizarConfiguracion(config: Partial<BackupConfig>): Promise<BackupConfig> {
-    const response = await api.patch('/api/admin/config/', config);
+    const response = await api.patch('/api/clinic/', config);
     return response.data;
   }
 };

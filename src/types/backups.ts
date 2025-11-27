@@ -39,10 +39,10 @@ export interface CreateBackupResponse {
  * Configuración de backups automáticos
  */
 export interface BackupConfig {
-  backup_schedule: 'disabled' | 'daily' | 'every_12h' | 'every_6h' | 'weekly' | 'monthly' | 'scheduled';
-  backup_time?: string;           // HH:MM:SS (ej: "02:00:00")
-  backup_weekday?: number;        // 0-6 (0=Lunes, 6=Domingo)
-  backup_day_of_month?: number;   // 1-28
+  backup_schedule: 'disabled' | 'daily' | 'weekly' | 'scheduled';
+  backup_time?: string;           // HH:MM:SS (ej: "02:00:00") - No usado en backend actual
+  backup_weekday?: number;        // 0-6 (0=Lunes, 6=Domingo) - No usado en backend actual
+  backup_day_of_month?: number;   // 1-28 - No usado en backend actual
   next_scheduled_backup?: string; // ISO 8601 datetime (solo para 'scheduled')
   last_backup_at?: string;        // ISO 8601 datetime (readonly)
 }
